@@ -42,6 +42,6 @@ namespace vaudionativewrapper
         public int decayHFLimit;
 
         // Ignore this
-        public int internalData;
+        private int internalData;
     }
 }

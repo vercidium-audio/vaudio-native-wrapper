@@ -5,36 +5,34 @@ namespace vaudionativewrapper
 {
     public static class TrianglePrimitiveBindings
     {
-        private const string DllName = "vaudionative";
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveCreate")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveCreate")]
         public static extern IntPtr Create();
 
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveSetPosition0")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveSetPosition0")]
         public static extern void SetPosition0(IntPtr primitive, Vector pos0);
 
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveSetPosition1")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveSetPosition1")]
         public static extern void SetPosition1(IntPtr primitive, Vector pos1);
 
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveSetPosition2")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveSetPosition2")]
         public static extern void SetPosition2(IntPtr primitive, Vector pos2);
 
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveGetPosition0")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveGetPosition0")]
         public static extern Vector GetPosition0(IntPtr primitive);
 
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveGetPosition1")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveGetPosition1")]
         public static extern Vector GetPosition1(IntPtr primitive);
 
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveGetPosition2")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveGetPosition2")]
         public static extern Vector GetPosition2(IntPtr primitive);
 
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveGetMaterial")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveGetMaterial")]
         public static extern MaterialType GetMaterial(IntPtr primitive);
 
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveSetMaterial")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveSetMaterial")]
         public static extern void SetMaterial(IntPtr primitive, MaterialType material);
 
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveFree")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveFree")]
         public static extern void Free(IntPtr primitive);
     }
 }

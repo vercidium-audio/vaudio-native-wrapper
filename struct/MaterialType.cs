@@ -5,7 +5,6 @@ namespace vaudionativewrapper
     /// </summary>
     public enum MaterialType
     {
-#pragma warning disable CS1591
         Air = 0,
         Brick,
         Cloth,
@@ -29,6 +28,5 @@ namespace vaudionativewrapper
         Water,
         WoodIndoor,
         WoodOutdoor,
-#pragma warning restore CS1591
     }
 }

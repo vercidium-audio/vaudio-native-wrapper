@@ -18,7 +18,6 @@ namespace vaudionativewrapper
             M41 = m41; M42 = m42; M43 = m43; M44 = m44;
         }
 
-#pragma warning disable CS1591
         public float M11;
         public float M12;
         public float M13;
@@ -35,6 +34,5 @@ namespace vaudionativewrapper
         public float M42;
         public float M43;
         public float M44;
-#pragma warning restore CS1591
     }
 }
