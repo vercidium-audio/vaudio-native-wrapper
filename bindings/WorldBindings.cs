@@ -26,7 +26,10 @@ namespace vaudionativewrapper
         public static extern void Wait(IntPtr world);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetPendingShutdown")]
-        public static extern void SetPendingShutdown(IntPtr world);
+        public static extern void SetPendingShutdown(IntPtr world, bool value);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetPendingShutdown")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool GetPendingShutdown(IntPtr world);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetThreadsRunning")]
         [return: MarshalAs(UnmanagedType.U1)]

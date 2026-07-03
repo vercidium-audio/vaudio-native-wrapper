@@ -367,9 +367,10 @@ namespace vaudionativewrapper.managed
             return WorldBindings.CalculateListenerRelativePan(worldVector, listenerPitch, listenerYaw);
         }
 
-        public void SetPendingShutdown()
+        public bool PendingShutdown
         {
-            WorldBindings.SetPendingShutdown(native);
+            get => WorldBindings.GetPendingShutdown(native);
+            set => WorldBindings.SetPendingShutdown(native, value);
         }
 
         public bool ThreadsRunning => WorldBindings.GetThreadsRunning(native);
