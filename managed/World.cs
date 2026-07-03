@@ -353,7 +353,6 @@ namespace vaudionativewrapper.managed
             }
         }
 
-
         public bool LogMemoryAllocationWarnings
         {
             get => WorldBindings.GetLogMemoryAllocationWarnings(native);
@@ -367,5 +366,12 @@ namespace vaudionativewrapper.managed
         {
             return WorldBindings.CalculateListenerRelativePan(worldVector, listenerPitch, listenerYaw);
         }
+
+        public void SetPendingShutdown()
+        {
+            WorldBindings.SetPendingShutdown(native);
+        }
+
+        public bool ThreadsRunning => WorldBindings.GetThreadsRunning(native);
     }
 }
