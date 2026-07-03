@@ -157,6 +157,12 @@ namespace vaudionativewrapper
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetEmittersOutsideTheWorldAreMuffled(IntPtr ctx);
 
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetWorldIsIndoors")]
+        public static extern void SetWorldIsIndoors(IntPtr ctx, bool value);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetWorldIsIndoors")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool GetWorldIsIndoors(IntPtr ctx);
+
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetEmitterCount")]
         public static extern int GetEmitterCount(IntPtr ctx);
 

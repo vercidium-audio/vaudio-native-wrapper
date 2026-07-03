@@ -6,6 +6,11 @@ namespace vaudionativewrapper.managed
     {
         public vaudionativewrapper.EAXReverb* native;
 
+        public EAXReverb(vaudionativewrapper.EAXReverb* native)
+        {
+            this.native = native;
+        }
+
         public float ReflectionsDelay
         {
             get => native->reflectionsDelay;

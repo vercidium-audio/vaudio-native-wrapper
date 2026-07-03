@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace vaudionativewrapper.managed
 {
-    public unsafe class AirAbsorptionSettings
+    public class AirAbsorptionSettings
     {
         public IntPtr native;
 
@@ -16,7 +16,6 @@ namespace vaudionativewrapper.managed
         {
             this.native = native;
         }
-
 
         public float Humidity
         {

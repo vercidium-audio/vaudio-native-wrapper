@@ -130,17 +130,17 @@ namespace vaudionativewrapper.managed
         public double RaytracingTime => WorldBindings.GetRaytracingTime(native);
         public double AnalysisTime => WorldBindings.GetAnalysisTime(native);
 
-        public List<vaudionativewrapper.managed.EAXReverb> GroupedEAX
+        public List<EAXReverb> GroupedEAX
         {
             get
             {
-                List<vaudionativewrapper.managed.EAXReverb> results = new List<vaudionativewrapper.managed.EAXReverb>();
+                List<EAXReverb> results = new List<EAXReverb>();
 
                 var listPtr = WorldBindings.GetGroupedEAX(native);
                 var count = WorldBindings.GetCurrentGroupedEAXCount(native);
 
                 for (int i = 0; i < count; i++)
-                    results.Add(new vaudionativewrapper.managed.EAXReverb() { native = listPtr[i] });
+                    results.Add(new EAXReverb(listPtr[i]));
 
                 return results;
             }
@@ -149,10 +149,13 @@ namespace vaudionativewrapper.managed
         public bool EmittersOutsideTheWorldAreMuffled
         {
             get => WorldBindings.GetEmittersOutsideTheWorldAreMuffled(native);
-            set
-            {
-                WorldBindings.SetEmittersOutsideTheWorldAreMuffled(native, value);
-            }
+            set => WorldBindings.SetEmittersOutsideTheWorldAreMuffled(native, value);
+        }
+
+        public bool WorldIsIndoors
+        {
+            get => WorldBindings.GetWorldIsIndoors(native);
+            set => WorldBindings.SetWorldIsIndoors(native, value);
         }
 
         public bool ReverbCalculated

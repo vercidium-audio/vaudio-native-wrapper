@@ -1,25 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace vaudionativewrapper.managed
 {
-    public unsafe class CustomEAXFormulaCallbacks
+    public class CustomEAXFormulaCallbacks
     {
-        public vaudionativewrapper.CustomEAXFormulas_InitialiseDelegate Initialise;
-        public vaudionativewrapper.CustomEAXFormulas_CalculateDiffusionDelegate CalculateDiffusion;
-        public vaudionativewrapper.CustomEAXFormulas_CalculateDensityDelegate CalculateDensity;
-        public vaudionativewrapper.CustomEAXFormulas_CalculateReflectionsDelayDelegate CalculateReflectionsDelay;
-        public vaudionativewrapper.CustomEAXFormulas_CalculateLateReverbDelayDelegate CalculateLateReverbDelay;
-        public vaudionativewrapper.CustomEAXFormulas_CalculateFrequencyGainsDelegate CalculateFrequencyGains;
-        public vaudionativewrapper.CustomEAXFormulas_CalculateReflectionsAndLateReverbGainDelegate CalculateReflectionsAndLateReverbGain;
-        public vaudionativewrapper.CustomEAXFormulas_CalculateRT60Delegate CalculateRT60;
+        public CustomEAXFormulas_InitialiseDelegate Initialise;
+        public CustomEAXFormulas_CalculateDiffusionDelegate CalculateDiffusion;
+        public CustomEAXFormulas_CalculateDensityDelegate CalculateDensity;
+        public CustomEAXFormulas_CalculateReflectionsDelayDelegate CalculateReflectionsDelay;
+        public CustomEAXFormulas_CalculateLateReverbDelayDelegate CalculateLateReverbDelay;
+        public CustomEAXFormulas_CalculateFrequencyGainsDelegate CalculateFrequencyGains;
+        public CustomEAXFormulas_CalculateReflectionsAndLateReverbGainDelegate CalculateReflectionsAndLateReverbGain;
+        public CustomEAXFormulas_CalculateRT60Delegate CalculateRT60;
     }
 
     public unsafe class CustomEAXFormulaHelper
     {
-        public static CustomEAXFormulaCallbacks CreateCustomEAXFormulaCallbacks(vaudionativewrapper.managed.CustomEAXFormulas value)
+        public static CustomEAXFormulaCallbacks CreateCustomEAXFormulaCallbacks(CustomEAXFormulas value)
         {
             var callbacks = new CustomEAXFormulaCallbacks();
 
