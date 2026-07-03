@@ -10,5 +10,7 @@ namespace vaudionativewrapper.managed
         {
             this.native = native;
         }
+
+        public Primitive() { }
     }
 }

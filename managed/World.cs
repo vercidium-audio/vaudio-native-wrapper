@@ -77,7 +77,7 @@ namespace vaudionativewrapper.managed
         {
             get
             {
-                return vaudionativewrapper.WorldBindings.GetSize(native);
+                return WorldBindings.GetSize(native);
             }
             set
             {
@@ -275,7 +275,7 @@ namespace vaudionativewrapper.managed
         {
             get
             {
-                return new managed.AirAbsorptionSettings(vaudionativewrapper.WorldBindings.GetAirAbsorption(native));
+                return new managed.AirAbsorptionSettings(WorldBindings.GetAirAbsorption(native));
             }
             set
             {
@@ -287,7 +287,7 @@ namespace vaudionativewrapper.managed
         {
             var callbacks = CustomEAXFormulaHelper.CreateCustomEAXFormulaCallbacks(formulas);
 
-            var nativeFormulas = vaudionativewrapper.CustomEAXFormulasBindings.Create();
+            var nativeFormulas = CustomEAXFormulasBindings.Create();
 
             nativeFormulas->initialise = Marshal.GetFunctionPointerForDelegate(callbacks.Initialise);
             nativeFormulas->calculateDiffusion = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateDiffusion);
@@ -298,7 +298,7 @@ namespace vaudionativewrapper.managed
             nativeFormulas->calculateReflectionsAndLateReverbGain = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateReflectionsAndLateReverbGain);
             nativeFormulas->calculateRT60 = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateRT60);
 
-            vaudionativewrapper.WorldBindings.SetCustomEAXFormulas(native, nativeFormulas);
+            WorldBindings.SetCustomEAXFormulas(native, nativeFormulas);
 
             return callbacks;
         }
