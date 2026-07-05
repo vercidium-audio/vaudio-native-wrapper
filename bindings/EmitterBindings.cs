@@ -265,15 +265,15 @@ namespace vaudionativewrapper
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetInitialising(IntPtr emitter);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetAffectsGroupedEax")]
-        public static extern void SetAffectsGroupedEax(IntPtr emitter, bool value);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetAffectsGroupedEAX")]
+        public static extern void SetAffectsGroupedEAX(IntPtr emitter, bool value);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetAffectsGroupedEax")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetAffectsGroupedEAX")]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool GetAffectsGroupedEax(IntPtr emitter);
+        public static extern bool GetAffectsGroupedEAX(IntPtr emitter);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetGroupedEaxIndex")]
-        public static extern int GetGroupedEaxIndex(IntPtr emitter);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetGroupedEAXIndex")]
+        public static extern int GetGroupedEAXIndex(IntPtr emitter);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetOutsidePercent")]
         public static extern float GetOutsidePercent(IntPtr emitter);

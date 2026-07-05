@@ -35,11 +35,11 @@ namespace vaudionativewrapper.managed
 
         public bool AffectsGroupedEAX
         {
-            get => EmitterBindings.GetAffectsGroupedEax(native);
-            set => EmitterBindings.SetAffectsGroupedEax(native, value);
+            get => EmitterBindings.GetAffectsGroupedEAX(native);
+            set => EmitterBindings.SetAffectsGroupedEAX(native, value);
         }
 
-        public int GroupedEAXIndex => EmitterBindings.GetGroupedEaxIndex(native);
+        public int GroupedEAXIndex => EmitterBindings.GetGroupedEAXIndex(native);
 
         public float OutsidePercent => EmitterBindings.GetOutsidePercent(native);
 

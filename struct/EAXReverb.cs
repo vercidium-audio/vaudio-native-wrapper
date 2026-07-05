@@ -14,8 +14,8 @@ namespace vaudionativewrapper
 
         // Opaque list pointers - use EAXReverbResultsBindings.GetPan / GetEffectSlotGain to query per-emitter
         IntPtr relativeEmitters;     /* Emitter keys for relativeDirections/relativeGains */
-        IntPtr relativeDirections;   /* Direction that reverb should be heard from, relative to each emitter with hasRelativeReverb=true. Access via vaEaxReverbGetRelativeDirection */
-        IntPtr relativeGains;        /* Gain for this reverb effect, relative to each emitter with hasRelativeReverb=true. Access via vaEaxReverbGetRelativeGain */
+        IntPtr relativeDirections;   /* Direction that reverb should be heard from, relative to each emitter with hasRelativeReverb=true. Access via vaEAXReverbGetRelativeDirection */
+        IntPtr relativeGains;        /* Gain for this reverb effect, relative to each emitter with hasRelativeReverb=true. Access via vaEAXReverbGetRelativeGain */
         int relativeCount;
         int relativeCapacity;
 
