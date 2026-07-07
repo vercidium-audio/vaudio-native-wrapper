@@ -14,6 +14,11 @@ namespace vaudionativewrapper.managed
             native = WorldBindings.Create();
         }
 
+        public World(IntPtr native)
+        {
+            this.native = native;
+        }
+
         public void Dispose()
         {
             if (native == null)

@@ -17,7 +17,7 @@ namespace vaudionativewrapper.managed
             }
         }
 
-        public Mesh(bool isNative, List<Vector> vertices, Vector minBounds, Vector maxBounds)
+        public Mesh(List<Vector> vertices, Vector minBounds, Vector maxBounds)
         {
             Vector[] copy = vertices.ToArray();
 
