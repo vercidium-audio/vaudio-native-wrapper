@@ -315,7 +315,6 @@ namespace vaudionativewrapper.managed
 
                 if (value != null)
                 {
-                    // TODO - just return raw VisualisationData* pointer?
                     VisualisationCallbackFn callback = (dataPtr, count) =>
                     {
                         var arr = new VisualisationData[count];
