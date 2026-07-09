@@ -288,6 +288,8 @@ namespace vaudionativewrapper.managed
             }
         }
 
+        private GCHandle[] _customEAXFormulaHandles;
+
         public CustomEAXFormulaCallbacks UpdateCustomEAXFormulas(managed.CustomEAXFormulas formulas)
         {
             var callbacks = CustomEAXFormulaHelper.CreateCustomEAXFormulaCallbacks(formulas);
@@ -304,6 +306,27 @@ namespace vaudionativewrapper.managed
             nativeFormulas->calculateRT60 = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateRT60);
 
             WorldBindings.SetCustomEAXFormulas(native, nativeFormulas);
+
+            // Native holds raw function pointers into these 8 delegates, invoked from native worker
+            // threads. A managed reference via the returned CustomEAXFormulaCallbacks isn't a reliable
+            // guarantee against collection for that pattern (see AirAbsorptionSettings), so pin each
+            // delegate explicitly for as long as native might call back into it.
+            if (_customEAXFormulaHandles != null)
+                foreach (var handle in _customEAXFormulaHandles)
+                    if (handle.IsAllocated)
+                        handle.Free();
+
+            _customEAXFormulaHandles = new[]
+            {
+                GCHandle.Alloc(callbacks.Initialise),
+                GCHandle.Alloc(callbacks.CalculateDiffusion),
+                GCHandle.Alloc(callbacks.CalculateDensity),
+                GCHandle.Alloc(callbacks.CalculateReflectionsDelay),
+                GCHandle.Alloc(callbacks.CalculateLateReverbDelay),
+                GCHandle.Alloc(callbacks.CalculateFrequencyGains),
+                GCHandle.Alloc(callbacks.CalculateReflectionsAndLateReverbGain),
+                GCHandle.Alloc(callbacks.CalculateRT60),
+            };
 
             return callbacks;
         }
