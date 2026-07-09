@@ -183,8 +183,13 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetLogMemoryAllocationWarnings")]
         public static extern void SetLogMemoryAllocationWarnings(IntPtr ctx, bool value);
 
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetCoordinateSystem")]
+        public static extern CoordinateSystem GetCoordinateSystem(IntPtr ctx);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetCoordinateSystem")]
+        public static extern void SetCoordinateSystem(IntPtr ctx, CoordinateSystem value);
+
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldCalculateListenerRelativePan")]
-        public static extern Vector CalculateListenerRelativePan(Vector worldVector, float listenerPitch, float listenerYaw);
+        public static extern Vector CalculateListenerRelativePan(IntPtr ctx, Vector worldVector, float listenerPitch, float listenerYaw);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetTotalPossibleRayCount")]
         public static extern int GetTotalPossibleRayCount(IntPtr ctx);

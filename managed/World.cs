@@ -390,9 +390,18 @@ namespace vaudionativewrapper.managed
             }
         }
 
-        public static Vector CalculateListenerRelativePan(Vector worldVector, float listenerPitch, float listenerYaw)
+        /// <summary>
+        /// Coordinate system used when calculating listener-relative reverb directionality (<see cref="CalculateListenerRelativePan"/>).
+        /// </summary>
+        public CoordinateSystem CoordinateSystem
         {
-            return WorldBindings.CalculateListenerRelativePan(worldVector, listenerPitch, listenerYaw);
+            get => WorldBindings.GetCoordinateSystem(native);
+            set => WorldBindings.SetCoordinateSystem(native, value);
+        }
+
+        public Vector CalculateListenerRelativePan(Vector worldVector, float listenerPitch, float listenerYaw)
+        {
+            return WorldBindings.CalculateListenerRelativePan(native, worldVector, listenerPitch, listenerYaw);
         }
 
         public bool PendingShutdown
