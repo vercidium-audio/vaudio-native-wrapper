@@ -190,12 +190,6 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetAmbientPermeationEnergyCap")]
         public static extern VAResult SetAmbientPermeationEnergyCap(IntPtr emitter, float value);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetReservedEmitterCount")]
-        public static extern int GetReservedEmitterCount(IntPtr emitter);
-
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetReservedEmitterCount")]
-        public static extern void SetReservedEmitterCount(IntPtr emitter, int value);
-
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetMinimumPermeationEnergy")]
         public static extern float GetMinimumPermeationEnergy(IntPtr emitter);
 

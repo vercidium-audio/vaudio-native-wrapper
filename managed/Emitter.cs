@@ -218,12 +218,6 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetMaxVolume(native, value);
         }
 
-        public int ReservedEmitterTargets
-        {
-            get => EmitterBindings.GetReservedEmitterCount(native);
-            set => EmitterBindings.SetReservedEmitterCount(native, value);
-        }
-
         public float MinimumPermeationEnergy
         {
             get => EmitterBindings.GetMinimumPermeationEnergy(native);
