@@ -160,6 +160,12 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetReverbEnergyCap")]
         public static extern VAResult SetReverbEnergyCap(IntPtr emitter, float value);
 
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetMaxVolume")]
+        public static extern float GetMaxVolume(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetMaxVolume")]
+        public static extern VAResult SetMaxVolume(IntPtr emitter, float value);
+
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetOcclusionEnergyCap")]
         public static extern float GetOcclusionEnergyCap(IntPtr emitter);
 
@@ -264,6 +270,10 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetInitialising")]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetInitialising(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetPendingRemoval")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool GetPendingRemoval(IntPtr emitter);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetAffectsGroupedEAX")]
         public static extern void SetAffectsGroupedEAX(IntPtr emitter, bool value);

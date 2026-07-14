@@ -33,6 +33,11 @@ namespace vaudionativewrapper.managed
             get => EmitterBindings.GetInitialising(native);
         }
 
+        public bool PendingRemoval
+        {
+            get => EmitterBindings.GetPendingRemoval(native);
+        }
+
         public bool AffectsGroupedEAX
         {
             get => EmitterBindings.GetAffectsGroupedEAX(native);
@@ -205,6 +210,12 @@ namespace vaudionativewrapper.managed
         {
             get => EmitterBindings.GetReverbEnergyCap(native);
             set => EmitterBindings.SetReverbEnergyCap(native, value);
+        }
+
+        public float MaxVolume
+        {
+            get => EmitterBindings.GetMaxVolume(native);
+            set => EmitterBindings.SetMaxVolume(native, value);
         }
 
         public int ReservedEmitterTargets
