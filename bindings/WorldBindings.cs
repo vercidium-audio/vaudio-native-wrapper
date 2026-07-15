@@ -65,6 +65,10 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldCreateMaterial")]
         public static extern void CreateMaterial(IntPtr world, int materialId);
 
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldHasMaterial")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool HasMaterial(IntPtr world, int materialId);
+
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMaterialAbsorptionLF")]
         public static extern float GetMaterialAbsorptionLF(IntPtr world, int materialId);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMaterialAbsorptionHF")]
