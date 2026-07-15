@@ -10,6 +10,9 @@ namespace vaudionativewrapper
     public delegate void OnRaytracedByAnotherEmitterFn(IntPtr source, IntPtr target);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void OnRemovedFn();
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public unsafe delegate void VisualisationCallbackFn(VisualisationData* data, int count);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -251,6 +254,9 @@ namespace vaudionativewrapper
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetOnRaytracedByAnotherEmitterCallback")]
         public static extern void SetOnRaytracedByAnotherEmitterCallback(IntPtr emitter, OnRaytracedByAnotherEmitterFn callback);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetOnRemovedCallback")]
+        public static extern void SetOnRemovedCallback(IntPtr emitter, OnRemovedFn callback);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetVisualisationCallback")]
         public static extern void SetVisualisationCallback(IntPtr emitter, VisualisationCallbackFn callback);

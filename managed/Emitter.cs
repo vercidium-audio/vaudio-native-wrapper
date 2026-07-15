@@ -264,12 +264,13 @@ namespace vaudionativewrapper.managed
 
         private GCHandle _onRaytracingCompleteHandle;
         private GCHandle _onRaytracedByAnotherEmitterHandle;
+        private GCHandle _onRemovedHandle;
         private GCHandle _visualisationCallbackHandle;
         private GCHandle _gainFormulaHandle;
         private GCHandle _ambientGainFormulaHandle;
         private GCHandle _logCallbackHandle;
         private GCHandle _logErrorCallbackHandle;
-
+        
         public Action OnRaytracingComplete
         {
             set
@@ -307,6 +308,27 @@ namespace vaudionativewrapper.managed
                 else
                 {
                     EmitterBindings.SetOnRaytracedByAnotherEmitterCallback(native, null);
+                }
+            }
+        }
+
+        public Action OnRemoved
+        {
+            set
+            {
+                if (_onRemovedHandle.IsAllocated)
+                    _onRemovedHandle.Free();
+
+                if (value != null)
+                {
+                    OnRemovedFn callback = () => value.Invoke();
+
+                    _onRemovedHandle = GCHandle.Alloc(callback);
+                    EmitterBindings.SetOnRemovedCallback(native, callback);
+                }
+                else
+                {
+                    EmitterBindings.SetOnRemovedCallback(native, null);
                 }
             }
         }
