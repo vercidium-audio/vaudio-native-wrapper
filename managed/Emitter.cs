@@ -168,7 +168,7 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetVisualisationUpdateFrequency(native, value);
         }
 
-        public bool CastsRays => EmitterBindings.CastsRays(native);
+        public bool CastsRays => EmitterBindings.CastsAnyRays(native);
 
         public bool WithinWorldBounds => EmitterBindings.WithinWorldBounds(native);
 

@@ -52,10 +52,10 @@ namespace vaudionativewrapper
         public static extern Vector GetSize(IntPtr world);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetSize")]
         public static extern VAResult SetSize(IntPtr world, Vector size);
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMaxBounds")]
-        public static extern Vector GetMaxBounds(IntPtr world);
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetMaxBounds")]
-        public static extern VAResult SetMaxBounds(IntPtr world, Vector maxBounds);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMaximumBounds")]
+        public static extern Vector GetMaximumBounds(IntPtr world);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetMaximumBounds")]
+        public static extern VAResult SetMaximumBounds(IntPtr world, Vector maxBounds);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetGroupedEAX")]
         public static extern unsafe EAXReverb** GetGroupedEAX(IntPtr world);
@@ -109,12 +109,6 @@ namespace vaudionativewrapper
         public static extern int GetMaximumConcurrencyLevel(IntPtr world);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetMaximumConcurrencyLevel")]
         public static extern VAResult SetMaximumConcurrencyLevel(IntPtr world, int value);
-
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetSingleThreaded")]
-        [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool GetSingleThreaded(IntPtr world);
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetSingleThreaded")]
-        public static extern void SetSingleThreaded(IntPtr world, bool value);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMetersPerUnit")]
         public static extern float GetMetersPerUnit(IntPtr world);
@@ -170,9 +164,9 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetEmitterCount")]
         public static extern int GetEmitterCount(IntPtr ctx);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetReverbCalculated")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetInitialising")]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool GetReverbCalculated(IntPtr ctx);
+        public static extern bool GetInitialising(IntPtr ctx);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetOnReverbUpdatedCallback")]
         public static extern void SetOnReverbUpdated(IntPtr ctx, IntPtr callback);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetLogCallback")]
@@ -191,10 +185,6 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldCalculateListenerRelativePan")]
         public static extern Vector CalculateListenerRelativePan(IntPtr ctx, Vector worldVector, float listenerPitch, float listenerYaw);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetTotalPossibleRayCount")]
-        public static extern int GetTotalPossibleRayCount(IntPtr ctx);
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetRayCachePercent")]
-        public static extern float GetRayCachePercent(IntPtr ctx);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetRaysCastThisFrame")]
         public static extern int GetRaysCastThisFrame(IntPtr ctx);
 
