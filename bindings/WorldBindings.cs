@@ -11,14 +11,14 @@ namespace vaudionativewrapper
         public static extern void Destroy(IntPtr world);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldAddPrimitive_")]
-        public static extern void AddPrimitive(IntPtr world, IntPtr primitive);
+        public static extern VAResult AddPrimitive(IntPtr world, IntPtr primitive);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldRemovePrimitive_")]
-        public static extern void RemovePrimitive(IntPtr world, IntPtr primitive);
+        public static extern VAResult RemovePrimitive(IntPtr world, IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldAddEmitter")]
         public static extern VAResult AddEmitter(IntPtr ctx, IntPtr emitter);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldRemoveEmitter")]
-        public static extern void RemoveEmitter(IntPtr ctx, IntPtr emitter);
+        public static extern int RemoveEmitter(IntPtr ctx, IntPtr emitter);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldUpdate")]
         public static extern void Update(IntPtr world);
@@ -195,6 +195,6 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldExport")]
         public static extern VAResult Export(IntPtr world, [MarshalAs(UnmanagedType.LPStr)] string fileName);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldImport")]
-        public static extern unsafe int Import(IntPtr world, [MarshalAs(UnmanagedType.LPStr)] string fileName, IntPtr** outEmitters, int* outEmitterCount);
+        public static extern unsafe VAResult Import(IntPtr world, [MarshalAs(UnmanagedType.LPStr)] string fileName, IntPtr** outEmitters, int* outEmitterCount);
     }
 }

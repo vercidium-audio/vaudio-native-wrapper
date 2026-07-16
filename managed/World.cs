@@ -38,18 +38,13 @@ namespace vaudionativewrapper.managed
             WorldBindings.Wait(native);
         }
 
-        public void AddMaterial(MaterialType type, MaterialProperties material)
+        public MaterialProperties CreateMaterial(MaterialType type)
         {
             var id = (int)type;
 
             WorldBindings.CreateMaterial(native, id);
-            WorldBindings.SetMaterialAbsorptionLF(native, id, material.AbsorptionLF);
-            WorldBindings.SetMaterialAbsorptionHF(native, id, material.AbsorptionHF);
-            WorldBindings.SetMaterialScattering(native, id, material.Scattering);
-            WorldBindings.SetMaterialTransmissionLF(native, id, material.TransmissionLF);
-            WorldBindings.SetMaterialTransmissionHF(native, id, material.TransmissionHF);
-            WorldBindings.SetMaterialPlaneTransmissionLF(native, id, material.PlaneTransmissionLF);
-            WorldBindings.SetMaterialPlaneTransmissionHF(native, id, material.PlaneTransmissionHF);
+
+            return new MaterialProperties(native, id);
         }
 
         public void AddPrimitive(Primitive primitive)
