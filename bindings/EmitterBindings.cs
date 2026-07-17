@@ -10,6 +10,9 @@ namespace vaudionativewrapper
     public delegate void OnRaytracedByAnotherEmitterFn(IntPtr source, IntPtr target);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void OnRemovedFn();
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public unsafe delegate void VisualisationCallbackFn(VisualisationData* data, int count);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -160,6 +163,12 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetReverbEnergyCap")]
         public static extern VAResult SetReverbEnergyCap(IntPtr emitter, float value);
 
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetMaxVolume")]
+        public static extern float GetMaxVolume(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetMaxVolume")]
+        public static extern VAResult SetMaxVolume(IntPtr emitter, float value);
+
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetOcclusionEnergyCap")]
         public static extern float GetOcclusionEnergyCap(IntPtr emitter);
 
@@ -184,47 +193,41 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetAmbientPermeationEnergyCap")]
         public static extern VAResult SetAmbientPermeationEnergyCap(IntPtr emitter, float value);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetReservedEmitterCount")]
-        public static extern int GetReservedEmitterCount(IntPtr emitter);
-
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetReservedEmitterCount")]
-        public static extern void SetReservedEmitterCount(IntPtr emitter, int value);
-
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetMinimumPermeationEnergy")]
         public static extern float GetMinimumPermeationEnergy(IntPtr emitter);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetMinimumPermeationEnergy")]
         public static extern void SetMinimumPermeationEnergy(IntPtr emitter, float value);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterReverbEnabled")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetReverbEnabled")]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool ReverbEnabled(IntPtr emitter);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterOcclusionEnabled")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetOcclusionEnabled")]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool OcclusionEnabled(IntPtr emitter);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterPermeationEnabled")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetPermeationEnabled")]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool PermeationEnabled(IntPtr emitter);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterAmbientOcclusionEnabled")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetAmbientOcclusionEnabled")]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool AmbientOcclusionEnabled(IntPtr emitter);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterAmbientPermeationEnabled")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetAmbientPermeationEnabled")]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool AmbientPermeationEnabled(IntPtr emitter);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterVisualisationEnabled")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetVisualisationEnabled")]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool VisualisationEnabled(IntPtr emitter);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterCastsRays")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetCastsAnyRays")]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool CastsRays(IntPtr emitter);
+        public static extern bool CastsAnyRays(IntPtr emitter);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterWithinWorldBounds")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetWithinWorldBounds")]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool WithinWorldBounds(IntPtr emitter);
 
@@ -252,6 +255,9 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetOnRaytracedByAnotherEmitterCallback")]
         public static extern void SetOnRaytracedByAnotherEmitterCallback(IntPtr emitter, OnRaytracedByAnotherEmitterFn callback);
 
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetOnRemovedCallback")]
+        public static extern void SetOnRemovedCallback(IntPtr emitter, OnRemovedFn callback);
+
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetVisualisationCallback")]
         public static extern void SetVisualisationCallback(IntPtr emitter, VisualisationCallbackFn callback);
 
@@ -265,15 +271,19 @@ namespace vaudionativewrapper
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetInitialising(IntPtr emitter);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetAffectsGroupedEax")]
-        public static extern void SetAffectsGroupedEax(IntPtr emitter, bool value);
-
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetAffectsGroupedEax")]
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetPendingRemoval")]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool GetAffectsGroupedEax(IntPtr emitter);
+        public static extern bool GetPendingRemoval(IntPtr emitter);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetGroupedEaxIndex")]
-        public static extern int GetGroupedEaxIndex(IntPtr emitter);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetAffectsGroupedEAX")]
+        public static extern void SetAffectsGroupedEAX(IntPtr emitter, bool value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetAffectsGroupedEAX")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool GetAffectsGroupedEAX(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetGroupedEAXIndex")]
+        public static extern int GetGroupedEAXIndex(IntPtr emitter);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetOutsidePercent")]
         public static extern float GetOutsidePercent(IntPtr emitter);

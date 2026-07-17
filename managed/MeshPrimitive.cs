@@ -39,7 +39,7 @@ namespace vaudionativewrapper.managed
             set => MeshPrimitiveBindings.SetTransform(native, ref value);
         }
 
-        public bool supports3DPermeation
+        public bool Supports3DPermeation
         {
             get => MeshPrimitiveBindings.GetSupports3DPermeation(native);
             set => MeshPrimitiveBindings.SetSupports3DPermeation(native, value);

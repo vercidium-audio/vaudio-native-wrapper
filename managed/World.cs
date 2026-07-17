@@ -14,6 +14,11 @@ namespace vaudionativewrapper.managed
             native = WorldBindings.Create();
         }
 
+        public World(IntPtr native)
+        {
+            this.native = native;
+        }
+
         public void Dispose()
         {
             if (native == null)
@@ -33,18 +38,13 @@ namespace vaudionativewrapper.managed
             WorldBindings.Wait(native);
         }
 
-        public void AddMaterial(MaterialType type, MaterialProperties material)
+        public MaterialProperties CreateMaterial(MaterialType type)
         {
             var id = (int)type;
 
             WorldBindings.CreateMaterial(native, id);
-            WorldBindings.SetMaterialAbsorptionLF(native, id, material.AbsorptionLF);
-            WorldBindings.SetMaterialAbsorptionHF(native, id, material.AbsorptionHF);
-            WorldBindings.SetMaterialScattering(native, id, material.Scattering);
-            WorldBindings.SetMaterialTransmissionLF(native, id, material.TransmissionLF);
-            WorldBindings.SetMaterialTransmissionHF(native, id, material.TransmissionHF);
-            WorldBindings.SetMaterialPlaneTransmissionLF(native, id, material.PlaneTransmissionLF);
-            WorldBindings.SetMaterialPlaneTransmissionHF(native, id, material.PlaneTransmissionHF);
+
+            return new MaterialProperties(native, id);
         }
 
         public void AddPrimitive(Primitive primitive)
@@ -60,7 +60,7 @@ namespace vaudionativewrapper.managed
         public void AddEmitter(Emitter emitter)
         {
             VAResult result = WorldBindings.AddEmitter(native, emitter.native);
-            Debug.Assert(result == 0);
+            Debug.Assert(result == VAResult.Success);
         }
 
         public void RemoveEmitter(Emitter emitter)
@@ -75,38 +75,20 @@ namespace vaudionativewrapper.managed
 
         public Vector Size
         {
-            get
-            {
-                return WorldBindings.GetSize(native);
-            }
-            set
-            {
-                WorldBindings.SetSize(native, value);
-            }
+            get => WorldBindings.GetSize(native);
+            set => WorldBindings.SetSize(native, value);
         }
 
         public Vector Position
         {
-            get
-            {
-                return WorldBindings.GetPosition(native);
-            }
-            set
-            {
-                WorldBindings.SetPosition(native, value);
-            }
+            get => WorldBindings.GetPosition(native);
+            set => WorldBindings.SetPosition(native, value);
         }
 
         public Vector MaxBounds
         {
-            get
-            {
-                return WorldBindings.GetMaxBounds(native);
-            }
-            set
-            {
-                WorldBindings.SetMaxBounds(native, value);
-            }
+            get => WorldBindings.GetMaximumBounds(native);
+            set => WorldBindings.SetMaximumBounds(native, value);
         }
 
         public void UpdateWorldPosition(Vector position)
@@ -158,130 +140,59 @@ namespace vaudionativewrapper.managed
             set => WorldBindings.SetWorldIsIndoors(native, value);
         }
 
-        public bool ReverbCalculated
-        {
-            get => WorldBindings.GetReverbCalculated(native);
-        }
+        public bool Initialising => WorldBindings.GetInitialising(native);
 
-        public int TotalPossibleRayCount
-        {
-            get
-            {
-                return WorldBindings.GetTotalPossibleRayCount(native);
-            }
-        }
-
-        public float RayCachePercent
-        {
-            get
-            {
-                return WorldBindings.GetRayCachePercent(native);
-            }
-        }
-
-        public int RaysCastThisFrame
-        {
-            get
-            {
-                return WorldBindings.GetRaysCastThisFrame(native);
-            }
-        }
+        public int RaysCastThisFrame => WorldBindings.GetRaysCastThisFrame(native);
 
         public int MaximumGroupedEAXCount
         {
-            get
-            {
-                return WorldBindings.GetMaximumGroupedEAXCount(native);
-            }
-            set
-            {
-                WorldBindings.SetMaximumGroupedEAXCount(native, value);
-            }
+            get => WorldBindings.GetMaximumGroupedEAXCount(native);
+            set => WorldBindings.SetMaximumGroupedEAXCount(native, value);
         }
 
         public int WorkItemCount
         {
-            get
-            {
-                return WorldBindings.GetWorkItemCount(native);
-            }
-            set
-            {
-                WorldBindings.SetWorkItemCount(native, value);
-            }
+            get => WorldBindings.GetWorkItemCount(native);
+            set => WorldBindings.SetWorkItemCount(native, value);
         }
 
         public int MaximumConcurrencyLevel
         {
-            get
-            {
-                return WorldBindings.GetMaximumConcurrencyLevel(native);
-            }
-            set
-            {
-                WorldBindings.SetMaximumConcurrencyLevel(native, value);
-            }
+            get => WorldBindings.GetMaximumConcurrencyLevel(native);
+            set => WorldBindings.SetMaximumConcurrencyLevel(native, value);
         }
 
         public float MetersPerUnit
         {
-            get
-            {
-                return WorldBindings.GetMetersPerUnit(native);
-            }
-            set
-            {
-                WorldBindings.SetMetersPerUnit(native, value);
-            }
+            get => WorldBindings.GetMetersPerUnit(native);
+            set => WorldBindings.SetMetersPerUnit(native, value);
         }
 
         public float InverseSpeedOfSound
         {
-            get
-            {
-                return WorldBindings.GetInverseSpeedOfSound(native);
-            }
-            set
-            {
-                WorldBindings.SetInverseSpeedOfSound(native, value);
-            }
+            get => WorldBindings.GetInverseSpeedOfSound(native);
+            set => WorldBindings.SetInverseSpeedOfSound(native, value);
         }
 
         public float ReferenceFrequencyLF
         {
-            get
-            {
-                return WorldBindings.GetReferenceFrequencyLF(native);
-            }
-            set
-            {
-                WorldBindings.SetReferenceFrequencyLF(native, value);
-            }
+            get => WorldBindings.GetReferenceFrequencyLF(native);
+            set => WorldBindings.SetReferenceFrequencyLF(native, value);
         }
 
         public float ReferenceFrequencyHF
         {
-            get
-            {
-                return WorldBindings.GetReferenceFrequencyHF(native);
-            }
-            set
-            {
-                WorldBindings.SetReferenceFrequencyHF(native, value);
-            }
+            get => WorldBindings.GetReferenceFrequencyHF(native);
+            set => WorldBindings.SetReferenceFrequencyHF(native, value);
         }
 
-        public managed.AirAbsorptionSettings AirAbsorption
+        public AirAbsorptionSettings AirAbsorption
         {
-            get
-            {
-                return new managed.AirAbsorptionSettings(WorldBindings.GetAirAbsorption(native));
-            }
-            set
-            {
-                WorldBindings.SetAirAbsorption(native, value.native);
-            }
+            get => new AirAbsorptionSettings(WorldBindings.GetAirAbsorption(native));
+            set => WorldBindings.SetAirAbsorption(native, value.native);
         }
+
+        private GCHandle[] _customEAXFormulaHandles;
 
         public CustomEAXFormulaCallbacks UpdateCustomEAXFormulas(managed.CustomEAXFormulas formulas)
         {
@@ -299,6 +210,27 @@ namespace vaudionativewrapper.managed
             nativeFormulas->calculateRT60 = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateRT60);
 
             WorldBindings.SetCustomEAXFormulas(native, nativeFormulas);
+
+            // Native holds raw function pointers into these 8 delegates, invoked from native worker
+            // threads. A managed reference via the returned CustomEAXFormulaCallbacks isn't a reliable
+            // guarantee against collection for that pattern (see AirAbsorptionSettings), so pin each
+            // delegate explicitly for as long as native might call back into it.
+            if (_customEAXFormulaHandles != null)
+                foreach (var handle in _customEAXFormulaHandles)
+                    if (handle.IsAllocated)
+                        handle.Free();
+
+            _customEAXFormulaHandles = new[]
+            {
+                GCHandle.Alloc(callbacks.Initialise),
+                GCHandle.Alloc(callbacks.CalculateDiffusion),
+                GCHandle.Alloc(callbacks.CalculateDensity),
+                GCHandle.Alloc(callbacks.CalculateReflectionsDelay),
+                GCHandle.Alloc(callbacks.CalculateLateReverbDelay),
+                GCHandle.Alloc(callbacks.CalculateFrequencyGains),
+                GCHandle.Alloc(callbacks.CalculateReflectionsAndLateReverbGain),
+                GCHandle.Alloc(callbacks.CalculateRT60),
+            };
 
             return callbacks;
         }
@@ -356,15 +288,21 @@ namespace vaudionativewrapper.managed
         public bool LogMemoryAllocationWarnings
         {
             get => WorldBindings.GetLogMemoryAllocationWarnings(native);
-            set
-            {
-                WorldBindings.SetLogMemoryAllocationWarnings(native, value);
-            }
+            set => WorldBindings.SetLogMemoryAllocationWarnings(native, value);
         }
 
-        public static Vector CalculateListenerRelativePan(Vector worldVector, float listenerPitch, float listenerYaw)
+        /// <summary>
+        /// Coordinate system used when calculating listener-relative reverb directionality (<see cref="CalculateListenerRelativePan"/>).
+        /// </summary>
+        public CoordinateSystem CoordinateSystem
         {
-            return WorldBindings.CalculateListenerRelativePan(worldVector, listenerPitch, listenerYaw);
+            get => WorldBindings.GetCoordinateSystem(native);
+            set => WorldBindings.SetCoordinateSystem(native, value);
+        }
+
+        public Vector CalculateListenerRelativePan(Vector worldVector, float listenerPitch, float listenerYaw)
+        {
+            return WorldBindings.CalculateListenerRelativePan(native, worldVector, listenerPitch, listenerYaw);
         }
 
         public bool PendingShutdown

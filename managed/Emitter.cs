@@ -33,13 +33,18 @@ namespace vaudionativewrapper.managed
             get => EmitterBindings.GetInitialising(native);
         }
 
-        public bool AffectsGroupedEAX
+        public bool PendingRemoval
         {
-            get => EmitterBindings.GetAffectsGroupedEax(native);
-            set => EmitterBindings.SetAffectsGroupedEax(native, value);
+            get => EmitterBindings.GetPendingRemoval(native);
         }
 
-        public int GroupedEAXIndex => EmitterBindings.GetGroupedEaxIndex(native);
+        public bool AffectsGroupedEAX
+        {
+            get => EmitterBindings.GetAffectsGroupedEAX(native);
+            set => EmitterBindings.SetAffectsGroupedEAX(native, value);
+        }
+
+        public int GroupedEAXIndex => EmitterBindings.GetGroupedEAXIndex(native);
 
         public float OutsidePercent => EmitterBindings.GetOutsidePercent(native);
 
@@ -163,7 +168,7 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetVisualisationUpdateFrequency(native, value);
         }
 
-        public bool CastsRays => EmitterBindings.CastsRays(native);
+        public bool CastsRays => EmitterBindings.CastsAnyRays(native);
 
         public bool WithinWorldBounds => EmitterBindings.WithinWorldBounds(native);
 
@@ -207,10 +212,10 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetReverbEnergyCap(native, value);
         }
 
-        public int ReservedEmitterTargets
+        public float MaxVolume
         {
-            get => EmitterBindings.GetReservedEmitterCount(native);
-            set => EmitterBindings.SetReservedEmitterCount(native, value);
+            get => EmitterBindings.GetMaxVolume(native);
+            set => EmitterBindings.SetMaxVolume(native, value);
         }
 
         public float MinimumPermeationEnergy
@@ -259,12 +264,13 @@ namespace vaudionativewrapper.managed
 
         private GCHandle _onRaytracingCompleteHandle;
         private GCHandle _onRaytracedByAnotherEmitterHandle;
+        private GCHandle _onRemovedHandle;
         private GCHandle _visualisationCallbackHandle;
         private GCHandle _gainFormulaHandle;
         private GCHandle _ambientGainFormulaHandle;
         private GCHandle _logCallbackHandle;
         private GCHandle _logErrorCallbackHandle;
-
+        
         public Action OnRaytracingComplete
         {
             set
@@ -306,6 +312,27 @@ namespace vaudionativewrapper.managed
             }
         }
 
+        public Action OnRemoved
+        {
+            set
+            {
+                if (_onRemovedHandle.IsAllocated)
+                    _onRemovedHandle.Free();
+
+                if (value != null)
+                {
+                    OnRemovedFn callback = () => value.Invoke();
+
+                    _onRemovedHandle = GCHandle.Alloc(callback);
+                    EmitterBindings.SetOnRemovedCallback(native, callback);
+                }
+                else
+                {
+                    EmitterBindings.SetOnRemovedCallback(native, null);
+                }
+            }
+        }
+
         public Action<VisualisationData[]> VisualisationCallback
         {
             set
@@ -315,7 +342,6 @@ namespace vaudionativewrapper.managed
 
                 if (value != null)
                 {
-                    // TODO - just return raw VisualisationData* pointer?
                     VisualisationCallbackFn callback = (dataPtr, count) =>
                     {
                         var arr = new VisualisationData[count];

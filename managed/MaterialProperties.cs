@@ -7,9 +7,9 @@ namespace vaudionativewrapper.managed
         private IntPtr world;
         private int id;
 
-        public MaterialProperties(IntPtr ctx, int id)
+        public MaterialProperties(IntPtr world, int id)
         {
-            world = ctx;
+            this.world = world;
             this.id = id;
         }
 
