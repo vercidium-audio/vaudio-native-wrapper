@@ -3,5 +3,6 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Platforms>AnyCPU</Platforms>
+        <Configurations>Debug;Release;Production</Configurations>
     </PropertyGroup>
 </Project>
