@@ -212,6 +212,30 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetReverbEnergyCap(native, value);
         }
 
+        public float OcclusionEnergyCap
+        {
+            get => EmitterBindings.GetOcclusionEnergyCap(native);
+            set => EmitterBindings.SetOcclusionEnergyCap(native, value);
+        }
+
+        public float PermeationEnergyCap
+        {
+            get => EmitterBindings.GetPermeationEnergyCap(native);
+            set => EmitterBindings.SetPermeationEnergyCap(native, value);
+        }
+
+        public float AmbientOcclusionEnergyCap
+        {
+            get => EmitterBindings.GetAmbientOcclusionEnergyCap(native);
+            set => EmitterBindings.SetAmbientOcclusionEnergyCap(native, value);
+        }
+
+        public float AmbientPermeationEnergyCap
+        {
+            get => EmitterBindings.GetAmbientPermeationEnergyCap(native);
+            set => EmitterBindings.SetAmbientPermeationEnergyCap(native, value);
+        }
+
         public float MaxVolume
         {
             get => EmitterBindings.GetMaxVolume(native);
