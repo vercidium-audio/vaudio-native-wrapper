@@ -6,7 +6,7 @@ namespace vaudionativewrapper
     public static class MeshPrimitiveBindings
     {
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaMeshPrimitiveCreate")]
-        public static extern unsafe IntPtr Create(MaterialType material, Vector* vertices, int vertexCount, Vector minBounds, Vector maxBounds, ref Matrix transform);
+        public static extern unsafe VAResult Create(MaterialType material, Vector* vertices, int vertexCount, Vector minBounds, Vector maxBounds, ref Matrix transform, IntPtr* outPrimitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaMeshPrimitiveFree")]
         public static extern void Free(IntPtr primitive);
@@ -31,6 +31,6 @@ namespace vaudionativewrapper
         public static extern void SetSupports3DPermeation(IntPtr primitive, bool supports3DPermeation);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaMeshPrimitiveCreateFromMesh")]
-        public static extern IntPtr CreatePrimitiveFromMesh(MaterialType material, IntPtr mesh, ref Matrix transform);
+        public static extern unsafe VAResult CreatePrimitiveFromMesh(MaterialType material, IntPtr mesh, ref Matrix transform, IntPtr* outPrimitive);
     }
 }

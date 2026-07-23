@@ -10,22 +10,31 @@ namespace vaudionativewrapper.managed
 
         public Mesh(Vector[] vertices, Vector minBounds, Vector maxBounds)
         {
+            IntPtr outMesh;
+
             fixed (Vector* ptr = vertices)
             {
-                native = MeshBindings.Create(ptr, vertices.Length, minBounds, maxBounds);
-                Debug.Assert(native != IntPtr.Zero);
+                var result = MeshBindings.Create(ptr, vertices.Length, minBounds, maxBounds, &outMesh);
+                Debug.Assert(result == VAResult.Success);
             }
+
+            native = outMesh;
+            Debug.Assert(native != IntPtr.Zero);
         }
 
         public Mesh(List<Vector> vertices, Vector minBounds, Vector maxBounds)
         {
             Vector[] copy = vertices.ToArray();
+            IntPtr outMesh;
 
             fixed (Vector* ptr = copy)
             {
-                native = MeshBindings.Create(ptr, copy.Length, minBounds, maxBounds);
-                Debug.Assert(native != IntPtr.Zero);
+                var result = MeshBindings.Create(ptr, copy.Length, minBounds, maxBounds, &outMesh);
+                Debug.Assert(result == VAResult.Success);
             }
+
+            native = outMesh;
+            Debug.Assert(native != IntPtr.Zero);
         }
 
         public void Destroy()

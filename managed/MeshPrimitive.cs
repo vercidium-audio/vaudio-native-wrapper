@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace vaudionativewrapper.managed
 {
@@ -7,24 +9,37 @@ namespace vaudionativewrapper.managed
         public MeshPrimitive(MaterialType material, List<Vector> vertices, Vector minBounds, Vector maxBounds, Matrix transform)
         {
             Vector[] copy = vertices.ToArray();
+            IntPtr outPrimitive;
 
             fixed (Vector* ptr = copy)
             {
-                native = MeshPrimitiveBindings.Create(material, ptr, copy.Length, minBounds, maxBounds, ref transform);
+                var result = MeshPrimitiveBindings.Create(material, ptr, copy.Length, minBounds, maxBounds, ref transform, &outPrimitive);
+                Debug.Assert(result == VAResult.Success);
             }
+
+            native = outPrimitive;
         }
 
         public MeshPrimitive(MaterialType material, Vector[] vertices, Vector minBounds, Vector maxBounds, Matrix transform)
         {
+            IntPtr outPrimitive;
+
             fixed (Vector* ptr = vertices)
             {
-                native = MeshPrimitiveBindings.Create(material, ptr, vertices.Length, minBounds, maxBounds, ref transform);
+                var result = MeshPrimitiveBindings.Create(material, ptr, vertices.Length, minBounds, maxBounds, ref transform, &outPrimitive);
+                Debug.Assert(result == VAResult.Success);
             }
+
+            native = outPrimitive;
         }
 
         public MeshPrimitive(MaterialType material, Mesh mesh, Matrix transform)
         {
-            native = MeshPrimitiveBindings.CreatePrimitiveFromMesh(material, mesh.native, ref transform);
+            IntPtr outPrimitive;
+            var result = MeshPrimitiveBindings.CreatePrimitiveFromMesh(material, mesh.native, ref transform, &outPrimitive);
+            Debug.Assert(result == VAResult.Success);
+
+            native = outPrimitive;
         }
 
         public MaterialType material
