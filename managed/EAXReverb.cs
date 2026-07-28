@@ -156,5 +156,45 @@ namespace vaudionativewrapper.managed
 
             return null;
         }
+
+        /// <summary>
+        /// Computes a similarity score between this reverb preset and another, in the range [0, 1] where 1 means identical.
+        /// </summary>
+        public float GetSimilarity(EAXReverb other)
+        {
+            return EAXUtilsBindings.GetSimilarity(native, other.native);
+        }
+
+        /// <summary>
+        /// Gets the number of seconds this reverb's tail remains audible after the emitter stops emitting, used to delay removal from the world.
+        /// maxVolume is the loudest linear volume (0-1) the emitter's dry source is ever played at (see Emitter.GetMaxVolume).
+        /// </summary>
+        public float GetEffectiveTailSeconds(float maxVolume)
+        {
+            return EAXUtilsBindings.GetEffectiveTailSeconds(native, maxVolume);
+        }
+
+        /// <summary>
+        /// Finds the candidate most similar to target.
+        /// Returns the best match, or null if target or candidates is null/empty.
+        /// </summary>
+        public static EAXReverb FindBestMatch(EAXReverb target, EAXReverb[] candidates)
+        {
+            if (target == null || candidates == null || candidates.Length == 0)
+                return null;
+
+            var nativeCandidates = stackalloc vaudionativewrapper.EAXReverb*[candidates.Length];
+
+            for (int i = 0; i < candidates.Length; i++)
+                nativeCandidates[i] = candidates[i].native;
+
+            vaudionativewrapper.EAXReverb* outBest;
+            int index = EAXUtilsBindings.FindBestMatch(target.native, nativeCandidates, candidates.Length, &outBest);
+
+            if (index < 0 || outBest == null)
+                return null;
+
+            return candidates[index];
+        }
     }
 }

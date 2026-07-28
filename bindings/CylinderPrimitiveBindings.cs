@@ -9,13 +9,13 @@ namespace vaudionativewrapper
         public static extern IntPtr Create();
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaCylinderPrimitiveSetRadius")]
-        public static extern void SetRadius(IntPtr primitive, float radius);
+        public static extern VAResult SetRadius(IntPtr primitive, float radius);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaCylinderPrimitiveSetLength")]
-        public static extern void SetLength(IntPtr primitive, float length);
+        public static extern VAResult SetLength(IntPtr primitive, float length);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaCylinderPrimitiveSetTransform")]
-        public static extern unsafe void SetTransform(IntPtr primitive, ref Matrix transform);
+        public static extern unsafe VAResult SetTransform(IntPtr primitive, ref Matrix transform);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaCylinderPrimitiveGetRadius")]
         public static extern float GetRadius(IntPtr primitive);
@@ -30,9 +30,9 @@ namespace vaudionativewrapper
         public static extern MaterialType GetMaterial(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaCylinderPrimitiveSetMaterial")]
-        public static extern void SetMaterial(IntPtr primitive, MaterialType material);
+        public static extern VAResult SetMaterial(IntPtr primitive, MaterialType material);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaCylinderPrimitiveFree")]
-        public static extern void Free(IntPtr primitive);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaCylinderPrimitiveDestroy")]
+        public static extern VAResult Destroy(IntPtr primitive);
     }
 }

@@ -12,7 +12,7 @@ namespace vaudionativewrapper.managed
         protected float[] echogramDb = new float[1];
         protected float binDurationMs;
 
-        protected ProcessedReverb* processed;
+        protected vaudionativewrapper.ProcessedReverb* processed;
         protected float totalReturnedEnergyLF;
         protected float totalReturnedEnergyHF;
         protected float totalReturnedEnergyAverage;
@@ -31,7 +31,7 @@ namespace vaudionativewrapper.managed
         /// <param name="echogramLF">Low-frequency echogram energy bins</param>
         /// <param name="echogramHF">High-frequency echogram energy bins</param>
         /// <param name="echogramAverage">Average echogram energy bins used for most calculations</param>
-        public virtual void Initialise(ProcessedReverb* processed, float totalReturnedEnergyLF, float totalReturnedEnergyHF, float echogramGranularity, float[] echogramLF, float[] echogramHF, float[] echogramAverage)
+        public virtual void Initialise(vaudionativewrapper.ProcessedReverb* processed, float totalReturnedEnergyLF, float totalReturnedEnergyHF, float echogramGranularity, float[] echogramLF, float[] echogramHF, float[] echogramAverage)
         {
             Debug.Assert(echogramGranularity > 0);
 

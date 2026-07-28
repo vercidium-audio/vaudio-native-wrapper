@@ -9,36 +9,36 @@ namespace vaudionativewrapper
         public static extern IntPtr Create(int width, int height, int depth);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaVoxelPrimitiveDestroy")]
-        public static extern int Destroy(IntPtr primitive);
+        public static extern VAResult Destroy(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaVoxelPrimitiveGetScale")]
         public static extern float GetScale(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaVoxelPrimitiveSetScale")]
-        public static extern void SetScale(IntPtr primitive, float scale);
+        public static extern VAResult SetScale(IntPtr primitive, float scale);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaVoxelPrimitiveGetTransform")]
         public static extern unsafe Matrix* GetTransform(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaVoxelPrimitiveSetTransform")]
-        public static extern void SetTransform(IntPtr primitive, ref Matrix transform);
+        public static extern VAResult SetTransform(IntPtr primitive, ref Matrix transform);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaVoxelPrimitiveGetSize")]
-        public static extern void GetSize(IntPtr primitive, out int width, out int height, out int depth);
+        public static extern VAResult GetSize(IntPtr primitive, out int width, out int height, out int depth);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaVoxelPrimitiveGetVoxel")]
         public static extern MaterialType GetVoxel(IntPtr primitive, int x, int y, int z);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaVoxelPrimitiveSetVoxel")]
-        public static extern void SetVoxel(IntPtr primitive, int x, int y, int z, MaterialType material);
+        public static extern VAResult SetVoxel(IntPtr primitive, int x, int y, int z, MaterialType material);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaVoxelPrimitiveSetDataDirty")]
-        public static extern void SetDataDirty(IntPtr primitive);
+        public static extern VAResult SetDataDirty(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaVoxelPrimitiveGetMaterial")]
         public static extern MaterialType GetMaterial(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaVoxelPrimitiveSetMaterial")]
-        public static extern void SetMaterial(IntPtr primitive, MaterialType material);
+        public static extern VAResult SetMaterial(IntPtr primitive, MaterialType material);
     }
 }

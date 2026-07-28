@@ -9,16 +9,16 @@ namespace vaudionativewrapper
         public static extern IntPtr Create();
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaRectangularConePrimitiveSetWidth")]
-        public static extern void SetWidth(IntPtr primitive, float width);
+        public static extern VAResult SetWidth(IntPtr primitive, float width);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaRectangularConePrimitiveSetLength")]
-        public static extern void SetLength(IntPtr primitive, float length);
+        public static extern VAResult SetLength(IntPtr primitive, float length);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaRectangularConePrimitiveSetHeight")]
-        public static extern void SetHeight(IntPtr primitive, float height);
+        public static extern VAResult SetHeight(IntPtr primitive, float height);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaRectangularConePrimitiveSetTransform")]
-        public static extern unsafe void SetTransform(IntPtr primitive, ref Matrix transform);
+        public static extern unsafe VAResult SetTransform(IntPtr primitive, ref Matrix transform);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaRectangularConePrimitiveGetWidth")]
         public static extern float GetWidth(IntPtr primitive);
@@ -36,9 +36,9 @@ namespace vaudionativewrapper
         public static extern MaterialType GetMaterial(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaRectangularConePrimitiveSetMaterial")]
-        public static extern void SetMaterial(IntPtr primitive, MaterialType material);
+        public static extern VAResult SetMaterial(IntPtr primitive, MaterialType material);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaRectangularConePrimitiveFree")]
-        public static extern void Free(IntPtr primitive);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaRectangularConePrimitiveDestroy")]
+        public static extern VAResult Destroy(IntPtr primitive);
     }
 }

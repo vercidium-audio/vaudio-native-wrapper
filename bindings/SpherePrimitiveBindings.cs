@@ -9,10 +9,10 @@ namespace vaudionativewrapper
         public static extern IntPtr Create();
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaSpherePrimitiveSetCenter")]
-        public static extern void SetCenter(IntPtr primitive, Vector center);
+        public static extern VAResult SetCenter(IntPtr primitive, Vector center);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaSpherePrimitiveSetRadius")]
-        public static extern void SetRadius(IntPtr primitive, float radius);
+        public static extern VAResult SetRadius(IntPtr primitive, float radius);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaSpherePrimitiveGetCenter")]
         public static extern Vector GetCenter(IntPtr primitive);
@@ -24,9 +24,9 @@ namespace vaudionativewrapper
         public static extern MaterialType GetMaterial(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaSpherePrimitiveSetMaterial")]
-        public static extern void SetMaterial(IntPtr primitive, MaterialType material);
+        public static extern VAResult SetMaterial(IntPtr primitive, MaterialType material);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaSpherePrimitiveFree")]
-        public static extern void Free(IntPtr primitive);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaSpherePrimitiveDestroy")]
+        public static extern VAResult Destroy(IntPtr primitive);
     }
 }

@@ -8,7 +8,7 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldCreate")]
         public static extern IntPtr Create();
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldDestroy")]
-        public static extern void Destroy(IntPtr world);
+        public static extern VAResult Destroy(IntPtr world);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldAddPrimitive_")]
         public static extern VAResult AddPrimitive(IntPtr world, IntPtr primitive);
@@ -18,15 +18,15 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldAddEmitter")]
         public static extern VAResult AddEmitter(IntPtr ctx, IntPtr emitter);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldRemoveEmitter")]
-        public static extern int RemoveEmitter(IntPtr ctx, IntPtr emitter);
+        public static extern VAResult RemoveEmitter(IntPtr ctx, IntPtr emitter);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldUpdate")]
-        public static extern void Update(IntPtr world);
+        public static extern VAResult Update(IntPtr world);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldWait")]
-        public static extern void Wait(IntPtr world);
+        public static extern VAResult Wait(IntPtr world);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetPendingShutdown")]
-        public static extern void SetPendingShutdown(IntPtr world, bool value);
+        public static extern VAResult SetPendingShutdown(IntPtr world, bool value);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetPendingShutdown")]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetPendingShutdown(IntPtr world);
@@ -63,7 +63,7 @@ namespace vaudionativewrapper
         public static extern int GetCurrentGroupedEAXCount(IntPtr world);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldCreateMaterial")]
-        public static extern void CreateMaterial(IntPtr world, int materialId);
+        public static extern VAResult CreateMaterial(IntPtr world, int materialId);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldHasMaterial")]
         [return: MarshalAs(UnmanagedType.U1)]
@@ -140,27 +140,27 @@ namespace vaudionativewrapper
         public static extern VAResult SetAirAbsorption(IntPtr world, IntPtr settings);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetAirAbsorptionHumidity")]
-        public static extern void SetAirAbsorptionHumidity(IntPtr world, float value);
+        public static extern VAResult SetAirAbsorptionHumidity(IntPtr world, float value);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetAirAbsorptionTemperature")]
-        public static extern void SetAirAbsorptionTemperature(IntPtr world, float value);
+        public static extern VAResult SetAirAbsorptionTemperature(IntPtr world, float value);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetAirAbsorptionPressure")]
-        public static extern void SetAirAbsorptionPressure(IntPtr world, float value);
+        public static extern VAResult SetAirAbsorptionPressure(IntPtr world, float value);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetAirAbsorptionCustomFormulaLF")]
-        public static extern void SetAirAbsorptionCustomFormulaLF(IntPtr world, IntPtr formula);
+        public static extern VAResult SetAirAbsorptionCustomFormulaLF(IntPtr world, IntPtr formula);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetAirAbsorptionCustomFormulaHF")]
-        public static extern void SetAirAbsorptionCustomFormulaHF(IntPtr world, IntPtr formula);
+        public static extern VAResult SetAirAbsorptionCustomFormulaHF(IntPtr world, IntPtr formula);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetCustomEAXFormulas")]
-        public static extern unsafe void SetCustomEAXFormulas(IntPtr world, CustomEAXFormulas* formulas);
+        public static extern unsafe VAResult SetCustomEAXFormulas(IntPtr world, CustomEAXFormulas* formulas);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetEmittersOutsideTheWorldAreMuffled")]
-        public static extern void SetEmittersOutsideTheWorldAreMuffled(IntPtr ctx, bool value);
+        public static extern VAResult SetEmittersOutsideTheWorldAreMuffled(IntPtr ctx, bool value);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetEmittersOutsideTheWorldAreMuffled")]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetEmittersOutsideTheWorldAreMuffled(IntPtr ctx);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetWorldIsIndoors")]
-        public static extern void SetWorldIsIndoors(IntPtr ctx, bool value);
+        public static extern VAResult SetWorldIsIndoors(IntPtr ctx, bool value);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetWorldIsIndoors")]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetWorldIsIndoors(IntPtr ctx);
@@ -171,20 +171,37 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetInitialising")]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetInitialising(IntPtr ctx);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetOnRaytracingCompletedCallback")]
+        public static extern VAResult SetOnRaytracingCompleted(IntPtr ctx, IntPtr callback);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetOnReverbUpdatedCallback")]
-        public static extern void SetOnReverbUpdated(IntPtr ctx, IntPtr callback);
+        public static extern VAResult SetOnReverbUpdated(IntPtr ctx, IntPtr callback);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetOnRaytracingResultsHandledCallback")]
+        public static extern VAResult SetOnRaytracingResultsHandled(IntPtr ctx, IntPtr callback);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetLogCallback")]
-        public static extern void SetLogCallback(IntPtr ctx, IntPtr callback);
+        public static extern VAResult SetLogCallback(IntPtr ctx, IntPtr callback);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetLogMemoryAllocationWarnings")]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetLogMemoryAllocationWarnings(IntPtr ctx);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetLogMemoryAllocationWarnings")]
-        public static extern void SetLogMemoryAllocationWarnings(IntPtr ctx, bool value);
+        public static extern VAResult SetLogMemoryAllocationWarnings(IntPtr ctx, bool value);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetCoordinateSystem")]
         public static extern CoordinateSystem GetCoordinateSystem(IntPtr ctx);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetCoordinateSystem")]
-        public static extern void SetCoordinateSystem(IntPtr ctx, CoordinateSystem value);
+        public static extern VAResult SetCoordinateSystem(IntPtr ctx, CoordinateSystem value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetEpsilon")]
+        public static extern float GetEpsilon(IntPtr world);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetEpsilon")]
+        public static extern VAResult SetEpsilon(IntPtr world, float value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetLatency")]
+        public static extern double GetLatency(IntPtr world);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetUserData")]
+        public static extern IntPtr GetUserData(IntPtr world);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetUserData")]
+        public static extern VAResult SetUserData(IntPtr world, IntPtr userData);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldCalculateListenerRelativePan")]
         public static extern Vector CalculateListenerRelativePan(IntPtr ctx, Vector worldVector, float listenerPitch, float listenerYaw);

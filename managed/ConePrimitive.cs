@@ -10,25 +10,30 @@
         public MaterialType material
         {
             get => ConePrimitiveBindings.GetMaterial(native);
-            set => ConePrimitiveBindings.SetMaterial(native, value);
+            set => ConePrimitiveBindings.SetMaterial(native, value).ThrowIfError();
         }
 
         public float radius
         {
             get => ConePrimitiveBindings.GetRadius(native);
-            set => ConePrimitiveBindings.SetRadius(native, value);
+            set => ConePrimitiveBindings.SetRadius(native, value).ThrowIfError();
         }
 
         public float height
         {
             get => ConePrimitiveBindings.GetHeight(native);
-            set => ConePrimitiveBindings.SetHeight(native, value);
+            set => ConePrimitiveBindings.SetHeight(native, value).ThrowIfError();
         }
 
         public Matrix transform
         {
             get => *ConePrimitiveBindings.GetTransform(native);
-            set => ConePrimitiveBindings.SetTransform(native, ref value);
+            set => ConePrimitiveBindings.SetTransform(native, ref value).ThrowIfError();
+        }
+
+        public void Destroy()
+        {
+            ConePrimitiveBindings.Destroy(native).ThrowIfError();
         }
     }
 }

@@ -10,25 +10,30 @@ namespace vaudionativewrapper.managed
         public MaterialType material
         {
             get => TrianglePrimitiveBindings.GetMaterial(native);
-            set => TrianglePrimitiveBindings.SetMaterial(native, value);
+            set => TrianglePrimitiveBindings.SetMaterial(native, value).ThrowIfError();
         }
 
         public Vector position0
         {
             get => TrianglePrimitiveBindings.GetPosition0(native);
-            set => TrianglePrimitiveBindings.SetPosition0(native, value);
+            set => TrianglePrimitiveBindings.SetPosition0(native, value).ThrowIfError();
         }
 
         public Vector position1
         {
             get => TrianglePrimitiveBindings.GetPosition1(native);
-            set => TrianglePrimitiveBindings.SetPosition1(native, value);
+            set => TrianglePrimitiveBindings.SetPosition1(native, value).ThrowIfError();
         }
 
         public Vector position2
         {
             get => TrianglePrimitiveBindings.GetPosition2(native);
-            set => TrianglePrimitiveBindings.SetPosition2(native, value);
+            set => TrianglePrimitiveBindings.SetPosition2(native, value).ThrowIfError();
+        }
+
+        public void Destroy()
+        {
+            TrianglePrimitiveBindings.Destroy(native).ThrowIfError();
         }
     }
 }

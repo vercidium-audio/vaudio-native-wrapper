@@ -24,25 +24,25 @@ namespace vaudionativewrapper.managed
             if (native == null)
                 return;
 
-            WorldBindings.Destroy(native);
+            WorldBindings.Destroy(native).ThrowIfError();
             native = IntPtr.Zero;
         }
 
-        public void Update()
+        public VAResult Update()
         {
-            WorldBindings.Update(native);
+            return WorldBindings.Update(native);
         }
 
-        public void Wait()
+        public VAResult Wait()
         {
-            WorldBindings.Wait(native);
+            return WorldBindings.Wait(native);
         }
 
         public MaterialProperties CreateMaterial(MaterialType type)
         {
             var id = (int)type;
 
-            WorldBindings.CreateMaterial(native, id);
+            WorldBindings.CreateMaterial(native, id).ThrowIfError();
 
             return new MaterialProperties(native, id);
         }
@@ -63,9 +63,9 @@ namespace vaudionativewrapper.managed
             Debug.Assert(result == VAResult.Success);
         }
 
-        public void RemoveEmitter(Emitter emitter)
+        public VAResult RemoveEmitter(Emitter emitter)
         {
-            WorldBindings.RemoveEmitter(native, emitter.native);
+            return WorldBindings.RemoveEmitter(native, emitter.native);
         }
 
         public int GetEmitterCount()
@@ -76,29 +76,29 @@ namespace vaudionativewrapper.managed
         public Vector Size
         {
             get => WorldBindings.GetSize(native);
-            set => WorldBindings.SetSize(native, value);
+            set => WorldBindings.SetSize(native, value).ThrowIfError();
         }
 
         public Vector Position
         {
             get => WorldBindings.GetPosition(native);
-            set => WorldBindings.SetPosition(native, value);
+            set => WorldBindings.SetPosition(native, value).ThrowIfError();
         }
 
         public Vector MaxBounds
         {
             get => WorldBindings.GetMaximumBounds(native);
-            set => WorldBindings.SetMaximumBounds(native, value);
+            set => WorldBindings.SetMaximumBounds(native, value).ThrowIfError();
         }
 
         public void UpdateWorldPosition(Vector position)
         {
-            WorldBindings.SetPosition(native, position);
+            WorldBindings.SetPosition(native, position).ThrowIfError();
         }
 
         public void UpdateWorldSize(Vector size)
         {
-            WorldBindings.SetSize(native, size);
+            WorldBindings.SetSize(native, size).ThrowIfError();
         }
 
         public void UpdateWorldBounds(Vector position, Vector size)
@@ -131,13 +131,13 @@ namespace vaudionativewrapper.managed
         public bool EmittersOutsideTheWorldAreMuffled
         {
             get => WorldBindings.GetEmittersOutsideTheWorldAreMuffled(native);
-            set => WorldBindings.SetEmittersOutsideTheWorldAreMuffled(native, value);
+            set => WorldBindings.SetEmittersOutsideTheWorldAreMuffled(native, value).ThrowIfError();
         }
 
         public bool WorldIsIndoors
         {
             get => WorldBindings.GetWorldIsIndoors(native);
-            set => WorldBindings.SetWorldIsIndoors(native, value);
+            set => WorldBindings.SetWorldIsIndoors(native, value).ThrowIfError();
         }
 
         public bool Initialising => WorldBindings.GetInitialising(native);
@@ -147,49 +147,63 @@ namespace vaudionativewrapper.managed
         public int MaximumGroupedEAXCount
         {
             get => WorldBindings.GetMaximumGroupedEAXCount(native);
-            set => WorldBindings.SetMaximumGroupedEAXCount(native, value);
+            set => WorldBindings.SetMaximumGroupedEAXCount(native, value).ThrowIfError();
         }
 
         public int WorkItemCount
         {
             get => WorldBindings.GetWorkItemCount(native);
-            set => WorldBindings.SetWorkItemCount(native, value);
+            set => WorldBindings.SetWorkItemCount(native, value).ThrowIfError();
         }
 
         public int MaximumConcurrencyLevel
         {
             get => WorldBindings.GetMaximumConcurrencyLevel(native);
-            set => WorldBindings.SetMaximumConcurrencyLevel(native, value);
+            set => WorldBindings.SetMaximumConcurrencyLevel(native, value).ThrowIfError();
         }
 
         public float MetersPerUnit
         {
             get => WorldBindings.GetMetersPerUnit(native);
-            set => WorldBindings.SetMetersPerUnit(native, value);
+            set => WorldBindings.SetMetersPerUnit(native, value).ThrowIfError();
         }
 
         public float InverseSpeedOfSound
         {
             get => WorldBindings.GetInverseSpeedOfSound(native);
-            set => WorldBindings.SetInverseSpeedOfSound(native, value);
+            set => WorldBindings.SetInverseSpeedOfSound(native, value).ThrowIfError();
         }
 
         public float ReferenceFrequencyLF
         {
             get => WorldBindings.GetReferenceFrequencyLF(native);
-            set => WorldBindings.SetReferenceFrequencyLF(native, value);
+            set => WorldBindings.SetReferenceFrequencyLF(native, value).ThrowIfError();
         }
 
         public float ReferenceFrequencyHF
         {
             get => WorldBindings.GetReferenceFrequencyHF(native);
-            set => WorldBindings.SetReferenceFrequencyHF(native, value);
+            set => WorldBindings.SetReferenceFrequencyHF(native, value).ThrowIfError();
+        }
+
+        public float Epsilon
+        {
+            get => WorldBindings.GetEpsilon(native);
+            set => WorldBindings.SetEpsilon(native, value).ThrowIfError();
+        }
+
+        public double Latency => WorldBindings.GetLatency(native);
+
+        public IntPtr UserData
+        {
+            get => WorldBindings.GetUserData(native);
+            set => WorldBindings.SetUserData(native, value).ThrowIfError();
         }
 
         public AirAbsorptionSettings AirAbsorption
         {
             get => new AirAbsorptionSettings(WorldBindings.GetAirAbsorption(native));
-            set => WorldBindings.SetAirAbsorption(native, value.native);
+            set => WorldBindings.SetAirAbsorption(native, value.native).ThrowIfError();
         }
 
         private GCHandle[] _customEAXFormulaHandles;
@@ -209,7 +223,7 @@ namespace vaudionativewrapper.managed
             nativeFormulas->calculateReflectionsAndLateReverbGain = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateReflectionsAndLateReverbGain);
             nativeFormulas->calculateRT60 = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateRT60);
 
-            WorldBindings.SetCustomEAXFormulas(native, nativeFormulas);
+            WorldBindings.SetCustomEAXFormulas(native, nativeFormulas).ThrowIfError();
 
             // Native holds raw function pointers into these 8 delegates, invoked from native worker
             // threads. A managed reference via the returned CustomEAXFormulaCallbacks isn't a reliable
@@ -255,11 +269,11 @@ namespace vaudionativewrapper.managed
                     OnReverbUpdatedFn fn = () => value();
                     _onReverbUpdatedHandle = GCHandle.Alloc(fn);
 
-                    WorldBindings.SetOnReverbUpdated(native, Marshal.GetFunctionPointerForDelegate(fn));
+                    WorldBindings.SetOnReverbUpdated(native, Marshal.GetFunctionPointerForDelegate(fn)).ThrowIfError();
                 }
                 else
                 {
-                    WorldBindings.SetOnReverbUpdated(native, IntPtr.Zero);
+                    WorldBindings.SetOnReverbUpdated(native, IntPtr.Zero).ThrowIfError();
                 }
             }
         }
@@ -276,11 +290,11 @@ namespace vaudionativewrapper.managed
                     LogCallbackFn fn = (msg) => value(msg);
                     _logCallbackHandle = GCHandle.Alloc(fn);
 
-                    WorldBindings.SetLogCallback(native, Marshal.GetFunctionPointerForDelegate(fn));
+                    WorldBindings.SetLogCallback(native, Marshal.GetFunctionPointerForDelegate(fn)).ThrowIfError();
                 }
                 else
                 {
-                    WorldBindings.SetLogCallback(native, IntPtr.Zero);
+                    WorldBindings.SetLogCallback(native, IntPtr.Zero).ThrowIfError();
                 }
             }
         }
@@ -288,7 +302,7 @@ namespace vaudionativewrapper.managed
         public bool LogMemoryAllocationWarnings
         {
             get => WorldBindings.GetLogMemoryAllocationWarnings(native);
-            set => WorldBindings.SetLogMemoryAllocationWarnings(native, value);
+            set => WorldBindings.SetLogMemoryAllocationWarnings(native, value).ThrowIfError();
         }
 
         /// <summary>
@@ -297,7 +311,7 @@ namespace vaudionativewrapper.managed
         public CoordinateSystem CoordinateSystem
         {
             get => WorldBindings.GetCoordinateSystem(native);
-            set => WorldBindings.SetCoordinateSystem(native, value);
+            set => WorldBindings.SetCoordinateSystem(native, value).ThrowIfError();
         }
 
         public Vector CalculateListenerRelativePan(Vector worldVector, float listenerPitch, float listenerYaw)
@@ -308,7 +322,7 @@ namespace vaudionativewrapper.managed
         public bool PendingShutdown
         {
             get => WorldBindings.GetPendingShutdown(native);
-            set => WorldBindings.SetPendingShutdown(native, value);
+            set => WorldBindings.SetPendingShutdown(native, value).ThrowIfError();
         }
 
         public bool ThreadsRunning => WorldBindings.GetThreadsRunning(native);

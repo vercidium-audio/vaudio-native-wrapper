@@ -27,20 +27,24 @@ namespace vaudionativewrapper.managed
         public float Humidity
         {
             get => AirAbsorptionSettingsBindings.GetHumidity(native);
-            set => AirAbsorptionSettingsBindings.SetHumidity(native, value);
+            set => AirAbsorptionSettingsBindings.SetHumidity(native, value).ThrowIfError();
         }
 
         public float Temperature
         {
             get => AirAbsorptionSettingsBindings.GetTemperature(native);
-            set => AirAbsorptionSettingsBindings.SetTemperature(native, value);
+            set => AirAbsorptionSettingsBindings.SetTemperature(native, value).ThrowIfError();
         }
 
         public float Pressure
         {
             get => AirAbsorptionSettingsBindings.GetPressure(native);
-            set => AirAbsorptionSettingsBindings.SetPressure(native, value);
+            set => AirAbsorptionSettingsBindings.SetPressure(native, value).ThrowIfError();
         }
+
+        public VAResult Validate() => AirAbsorptionSettingsBindings.Validate(native);
+
+        public VAResult Destroy() => AirAbsorptionSettingsBindings.Destroy(native);
 
         public AirAbsorptionFormulaDelegate SetCustomFormulaLF(Func<float, float> value)
         {
@@ -53,12 +57,12 @@ namespace vaudionativewrapper.managed
                 var del = (AirAbsorptionFormulaDelegate)callback;
                 lfHandle = GCHandle.Alloc(del);
 
-                AirAbsorptionSettingsBindings.SetCustomFormulaLF(native, Marshal.GetFunctionPointerForDelegate(del));
+                AirAbsorptionSettingsBindings.SetCustomFormulaLF(native, Marshal.GetFunctionPointerForDelegate(del)).ThrowIfError();
                 return del;
             }
             else
             {
-                AirAbsorptionSettingsBindings.SetCustomFormulaLF(native, IntPtr.Zero);
+                AirAbsorptionSettingsBindings.SetCustomFormulaLF(native, IntPtr.Zero).ThrowIfError();
                 return null;
             }
         }
@@ -74,12 +78,12 @@ namespace vaudionativewrapper.managed
                 var del = (AirAbsorptionFormulaDelegate)callback;
                 hfHandle = GCHandle.Alloc(del);
 
-                AirAbsorptionSettingsBindings.SetCustomFormulaHF(native, Marshal.GetFunctionPointerForDelegate(del));
+                AirAbsorptionSettingsBindings.SetCustomFormulaHF(native, Marshal.GetFunctionPointerForDelegate(del)).ThrowIfError();
                 return del;
             }
             else
             {
-                AirAbsorptionSettingsBindings.SetCustomFormulaHF(native, IntPtr.Zero);
+                AirAbsorptionSettingsBindings.SetCustomFormulaHF(native, IntPtr.Zero).ThrowIfError();
                 return null;
             }
         }
