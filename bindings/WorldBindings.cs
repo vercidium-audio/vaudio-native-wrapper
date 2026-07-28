@@ -213,5 +213,7 @@ namespace vaudionativewrapper
         public static extern VAResult Export(IntPtr world, [MarshalAs(UnmanagedType.LPStr)] string fileName);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldImport")]
         public static extern unsafe VAResult Import(IntPtr world, [MarshalAs(UnmanagedType.LPStr)] string fileName, IntPtr** outEmitters, int* outEmitterCount);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldImportFreeEmitters")]
+        public static extern unsafe VAResult ImportFreeEmitters(IntPtr* emitters);
     }
 }

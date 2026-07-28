@@ -38,6 +38,33 @@ namespace vaudionativewrapper.managed
             return WorldBindings.Wait(native);
         }
 
+        public VAResult Export(string fileName)
+        {
+            return WorldBindings.Export(native, fileName);
+        }
+
+        public VAResult Import(string fileName, out Emitter[] emitters)
+        {
+            IntPtr* emittersPtr = null;
+            int emitterCount = 0;
+
+            var result = WorldBindings.Import(native, fileName, &emittersPtr, &emitterCount);
+
+            if (result != VAResult.Success || emittersPtr == null)
+            {
+                emitters = Array.Empty<Emitter>();
+                return result;
+            }
+
+            emitters = new Emitter[emitterCount];
+            for (int i = 0; i < emitterCount; i++)
+                emitters[i] = new Emitter(emittersPtr[i]);
+
+            WorldBindings.ImportFreeEmitters(emittersPtr);
+
+            return result;
+        }
+
         public MaterialProperties CreateMaterial(MaterialType type)
         {
             var id = (int)type;
