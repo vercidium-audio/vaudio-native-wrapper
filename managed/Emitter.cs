@@ -84,6 +84,12 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetType(native, value);
         }
 
+        public IntPtr UserData
+        {
+            get => EmitterBindings.GetUserData(native);
+            set => EmitterBindings.SetUserData(native, value);
+        }
+
         public EAXReverb EAX => new EAXReverb(EmitterBindings.GetEAX(native));
 
         public ProcessedReverb* ProcessedReverb => EmitterBindings.GetProcessedReverb(native);
@@ -304,7 +310,7 @@ namespace vaudionativewrapper.managed
 
                 if (value != null)
                 {
-                    OnRaytracingCompleteFn callback = () => value.Invoke();
+                    OnRaytracingCompleteFn callback = (emitter) => value.Invoke();
 
                     _onRaytracingCompleteHandle = GCHandle.Alloc(callback);
                     EmitterBindings.SetOnRaytracingCompleteCallback(native, callback);

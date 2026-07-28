@@ -252,7 +252,7 @@ namespace vaudionativewrapper.managed
 
                 if (value != null)
                 {
-                    OnRaytracingCompleteFn fn = () => value();
+                    OnReverbUpdatedFn fn = () => value();
                     _onReverbUpdatedHandle = GCHandle.Alloc(fn);
 
                     WorldBindings.SetOnReverbUpdated(native, Marshal.GetFunctionPointerForDelegate(fn));

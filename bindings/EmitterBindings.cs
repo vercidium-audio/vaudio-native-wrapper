@@ -4,7 +4,10 @@ using System.Runtime.InteropServices;
 namespace vaudionativewrapper
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void OnRaytracingCompleteFn();
+    public delegate void OnRaytracingCompleteFn(IntPtr emitter);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void OnReverbUpdatedFn();
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void OnRaytracedByAnotherEmitterFn(IntPtr source, IntPtr target);
@@ -332,6 +335,12 @@ namespace vaudionativewrapper
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetType")]
         public static extern int GetType(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetUserData")]
+        public static extern void SetUserData(IntPtr emitter, IntPtr userData);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetUserData")]
+        public static extern IntPtr GetUserData(IntPtr emitter);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetProcessedReverb")]
         public static extern unsafe ProcessedReverb* GetProcessedReverb(IntPtr emitter);
