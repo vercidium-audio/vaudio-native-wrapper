@@ -38,23 +38,17 @@ namespace vaudionativewrapper.managed
             return WorldBindings.Wait(native);
         }
 
-        public VAResult Export(string fileName)
+        public void Export(string fileName)
         {
             return WorldBindings.Export(native, fileName);
         }
 
-        public VAResult Import(string fileName, out Emitter[] emitters)
+        public void Import(string fileName, out Emitter[] emitters)
         {
             IntPtr* emittersPtr = null;
             int emitterCount = 0;
 
-            var result = WorldBindings.Import(native, fileName, &emittersPtr, &emitterCount);
-
-            if (result != VAResult.Success || emittersPtr == null)
-            {
-                emitters = Array.Empty<Emitter>();
-                return result;
-            }
+            WorldBindings.Import(native, fileName, &emittersPtr, &emitterCount).ThrowIfError();
 
             emitters = new Emitter[emitterCount];
             for (int i = 0; i < emitterCount; i++)
@@ -76,23 +70,22 @@ namespace vaudionativewrapper.managed
 
         public void AddPrimitive(Primitive primitive)
         {
-            WorldBindings.AddPrimitive(native, primitive.native);
+            WorldBindings.AddPrimitive(native, primitive.native).ThrowIfError();
         }
 
         public void RemovePrimitive(Primitive primitive)
         {
-            WorldBindings.RemovePrimitive(native, primitive.native);
+            WorldBindings.RemovePrimitive(native, primitive.native).ThrowIfError();
         }
 
         public void AddEmitter(Emitter emitter)
         {
-            VAResult result = WorldBindings.AddEmitter(native, emitter.native);
-            Debug.Assert(result == VAResult.Success);
+            WorldBindings.AddEmitter(native, emitter.native).ThrowIfError();
         }
 
         public VAResult RemoveEmitter(Emitter emitter)
         {
-            return WorldBindings.RemoveEmitter(native, emitter.native);
+            return WorldBindings.RemoveEmitter(native, emitter.native).ThrowIfError();
         }
 
         public int GetEmitterCount()

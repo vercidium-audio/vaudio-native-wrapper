@@ -7,11 +7,13 @@ namespace vaudionativewrapper.managed
     {
         public IntPtr native;
 
+#region Functions
         public Emitter(IntPtr native)
         {
             this.native = native;
         }
 
+        // TODO - sync XML docs from C# source
         public Emitter()
         {
             native = EmitterBindings.Create();
@@ -22,6 +24,20 @@ namespace vaudionativewrapper.managed
             EmitterBindings.Destroy(native).ThrowIfError();
         }
 
+        public void AddTarget(Emitter target) => EmitterBindings.AddTarget(native, target.native);
+
+        public void RemoveTarget(Emitter target) => EmitterBindings.RemoveTarget(native, target.native).ThrowIfError();
+
+        public bool HasTarget(Emitter target) => EmitterBindings.HasTarget(native, target.native);
+
+        public bool HasRaytracedTarget(Emitter target) => EmitterBindings.HasRaytracedTarget(native, target.native);
+
+        public LowPassFilter* GetTargetFilter(Emitter target) => EmitterBindings.GetTargetFilter(native, target.native);
+
+        public void ResetTrails() => EmitterBindings.ResetTrails(native).ThrowIfError();
+#endregion
+
+#region Properties
         public Vector Position
         {
             get => EmitterBindings.GetPosition(native);
@@ -43,10 +59,6 @@ namespace vaudionativewrapper.managed
             get => EmitterBindings.GetAffectsGroupedEAX(native);
             set => EmitterBindings.SetAffectsGroupedEAX(native, value).ThrowIfError();
         }
-
-        public int GroupedEAXIndex => EmitterBindings.GetGroupedEAXIndex(native);
-
-        public float OutsidePercent => EmitterBindings.GetOutsidePercent(native);
 
         public bool HasRelativeReverb
         {
@@ -89,12 +101,6 @@ namespace vaudionativewrapper.managed
             get => EmitterBindings.GetUserData(native);
             set => EmitterBindings.SetUserData(native, value).ThrowIfError();
         }
-
-        public EAXReverb EAX => new EAXReverb(EmitterBindings.GetEAX(native));
-
-        public ProcessedReverb ProcessedReverb => new ProcessedReverb(EmitterBindings.GetProcessedReverb(native));
-
-        public LowPassFilter* AmbientFilter => EmitterBindings.GetAmbientFilter(native);
 
         public int ReverbRayCount
         {
@@ -174,20 +180,6 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetVisualisationUpdateFrequency(native, value).ThrowIfError();
         }
 
-        public bool CastsRays => EmitterBindings.CastsAnyRays(native);
-
-        public bool WithinWorldBounds => EmitterBindings.WithinWorldBounds(native);
-
-        public int TrailCount => EmitterBindings.GetTrailCount(native);
-        public int TrailBounceCount => EmitterBindings.GetTrailBounceCount(native);
-
-        public bool ReverbEnabled => EmitterBindings.ReverbEnabled(native);
-        public bool OcclusionEnabled => EmitterBindings.OcclusionEnabled(native);
-        public bool PermeationEnabled => EmitterBindings.PermeationEnabled(native);
-        public bool AmbientOcclusionEnabled => EmitterBindings.AmbientOcclusionEnabled(native);
-        public bool AmbientPermeationEnabled => EmitterBindings.AmbientPermeationEnabled(native);
-        public bool VisualisationEnabled => EmitterBindings.VisualisationEnabled(native);
-
         public int MaxEchogramTime
         {
             get => EmitterBindings.GetMaxEchogramTime(native);
@@ -259,17 +251,30 @@ namespace vaudionativewrapper.managed
             get => EmitterBindings.GetScatteringSeed(native);
             set => EmitterBindings.SetScatteringSeed(native, value).ThrowIfError();
         }
+#endregion
 
-        public void AddTarget(Emitter target) => EmitterBindings.AddTarget(native, target.native);
+#region ReadOnly
+        public EAXReverb EAX => new EAXReverb(EmitterBindings.GetEAX(native));
+        public ProcessedReverb ProcessedReverb => new ProcessedReverb(EmitterBindings.GetProcessedReverb(native));
+        public LowPassFilter* AmbientFilter => EmitterBindings.GetAmbientFilter(native);
 
-        public void RemoveTarget(Emitter target) => EmitterBindings.RemoveTarget(native, target.native).ThrowIfError();
+        public bool CastsRays => EmitterBindings.CastsAnyRays(native);
+        public bool WithinWorldBounds => EmitterBindings.WithinWorldBounds(native);
+        public int GroupedEAXIndex => EmitterBindings.GetGroupedEAXIndex(native);
+        public float OutsidePercent => EmitterBindings.GetOutsidePercent(native);
 
-        public bool HasTarget(Emitter target) => EmitterBindings.HasTarget(native, target.native);
-        public bool HasRaytracedTarget(Emitter target) => EmitterBindings.HasRaytracedTarget(native, target.native);
-        public LowPassFilter* GetTargetFilter(Emitter target) => EmitterBindings.GetTargetFilter(native, target.native);
+        public int TrailCount => EmitterBindings.GetTrailCount(native);
+        public int TrailBounceCount => EmitterBindings.GetTrailBounceCount(native);
 
-        public void ResetTrails() => EmitterBindings.ResetTrails(native).ThrowIfError();
+        public bool ReverbEnabled => EmitterBindings.ReverbEnabled(native);
+        public bool OcclusionEnabled => EmitterBindings.OcclusionEnabled(native);
+        public bool PermeationEnabled => EmitterBindings.PermeationEnabled(native);
+        public bool AmbientOcclusionEnabled => EmitterBindings.AmbientOcclusionEnabled(native);
+        public bool AmbientPermeationEnabled => EmitterBindings.AmbientPermeationEnabled(native);
+        public bool VisualisationEnabled => EmitterBindings.VisualisationEnabled(native);
+#endregion
 
+#region WriteOnly
         public Vector[] OverridePositions
         {
             set
@@ -291,7 +296,9 @@ namespace vaudionativewrapper.managed
                 }
             }
         }
+#endregion
 
+    #region Callbacks
         private GCHandle _onRaytracingCompleteHandle;
         private GCHandle _onRaytracedByAnotherEmitterHandle;
         private GCHandle _onRemovedHandle;
@@ -473,5 +480,6 @@ namespace vaudionativewrapper.managed
                 }
             }
         }
+#endregion
     }
 }

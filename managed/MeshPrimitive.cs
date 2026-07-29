@@ -13,8 +13,7 @@ namespace vaudionativewrapper.managed
 
             fixed (Vector* ptr = copy)
             {
-                var result = MeshPrimitiveBindings.Create(material, ptr, copy.Length, minBounds, maxBounds, ref transform, &outPrimitive);
-                Debug.Assert(result == VAResult.Success);
+                MeshPrimitiveBindings.Create(material, ptr, copy.Length, minBounds, maxBounds, ref transform, &outPrimitive).ThrowIfError();
             }
 
             native = outPrimitive;
@@ -26,8 +25,7 @@ namespace vaudionativewrapper.managed
 
             fixed (Vector* ptr = vertices)
             {
-                var result = MeshPrimitiveBindings.Create(material, ptr, vertices.Length, minBounds, maxBounds, ref transform, &outPrimitive);
-                Debug.Assert(result == VAResult.Success);
+                MeshPrimitiveBindings.Create(material, ptr, vertices.Length, minBounds, maxBounds, ref transform, &outPrimitive).ThrowIfError();
             }
 
             native = outPrimitive;
@@ -36,8 +34,7 @@ namespace vaudionativewrapper.managed
         public MeshPrimitive(MaterialType material, Mesh mesh, Matrix transform)
         {
             IntPtr outPrimitive;
-            var result = MeshPrimitiveBindings.CreatePrimitiveFromMesh(material, mesh.native, ref transform, &outPrimitive);
-            Debug.Assert(result == VAResult.Success);
+            MeshPrimitiveBindings.CreatePrimitiveFromMesh(material, mesh.native, ref transform, &outPrimitive).ThrowIfError();
 
             native = outPrimitive;
         }
