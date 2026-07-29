@@ -5,10 +5,12 @@ using System.Runtime.InteropServices;
 
 namespace vaudionativewrapper.managed
 {
+    /// <summary>A standalone world with its own primitives, emitters, materials and settings</summary>
     public unsafe class World
     {
         public IntPtr native;
 
+        /// <summary>Create a new world</summary>
         public World()
         {
             native = WorldBindings.Create();
@@ -19,6 +21,7 @@ namespace vaudionativewrapper.managed
             this.native = native;
         }
 
+        /// <summary>Waits for background thread to complete, then disposes everything. After calling this method, this world cannot be reused.</summary>
         public void Dispose()
         {
             if (native == null)
@@ -28,19 +31,22 @@ namespace vaudionativewrapper.managed
             native = IntPtr.Zero;
         }
 
+        /// <summary>Updates the raytracing simulation. Call this method regularly to process raytracing results and submit new work. This method does nothing if background raytracing threads are still running. When threads are idle, it performs the following operations: - Handles the last raytracing results, updating reverb objects and invoking OnRaytracedByAnotherEmitter callbacks - Applies new settings and resizes memory buffers if needed (e.g. if ray counts were changed) - Processes new, modified, and removed primitives - Starts raytracing again on background threads This method must be called from the main thread. Calling this more frequently is safe and can reduce latency for emitter updates.</summary>
         public VAResult Update()
         {
             return WorldBindings.Update(native);
         }
 
+        /// <summary>Blocks the calling thread until all background raytracing threads complete, then handles the results (updates reverb objects and invokes OnRaytracingComplete and OnRaytracedByAnotherEmitter callbacks for each emitter).</summary>
         public VAResult Wait()
         {
             return WorldBindings.Wait(native);
         }
 
+        /// <summary>Exports all world settings, materials, primitives, and emitters to a binary file.</summary>
         public void Export(string fileName)
         {
-            return WorldBindings.Export(native, fileName);
+            WorldBindings.Export(native, fileName).ThrowIfError();
         }
 
         public void Import(string fileName, out Emitter[] emitters)
@@ -54,9 +60,7 @@ namespace vaudionativewrapper.managed
             for (int i = 0; i < emitterCount; i++)
                 emitters[i] = new Emitter(emittersPtr[i]);
 
-            WorldBindings.ImportFreeEmitters(emittersPtr);
-
-            return result;
+            WorldBindings.ImportFreeEmitters(emittersPtr).ThrowIfError();
         }
 
         public MaterialProperties CreateMaterial(MaterialType type)
@@ -68,24 +72,28 @@ namespace vaudionativewrapper.managed
             return new MaterialProperties(native, id);
         }
 
+        /// <summary>Adds a 3D object to the raytracing scene. This method is thread-safe and will not affect the current raytracing threads. Primitives completely outside the world bounds will be ignored during raytracing.</summary>
         public void AddPrimitive(Primitive primitive)
         {
             WorldBindings.AddPrimitive(native, primitive.native).ThrowIfError();
         }
 
+        /// <summary>Removes a 3D object from the raytracing scene. This method is thread-safe and will not affect the current raytracing threads.</summary>
         public void RemovePrimitive(Primitive primitive)
         {
             WorldBindings.RemovePrimitive(native, primitive.native).ThrowIfError();
         }
 
+        /// <summary>Add an Emitter to the world. This method is thread-safe and will not affect the current raytracing threads.</summary>
         public void AddEmitter(Emitter emitter)
         {
             WorldBindings.AddEmitter(native, emitter.native).ThrowIfError();
         }
 
-        public VAResult RemoveEmitter(Emitter emitter)
+        /// <summary>Remove an Emitter from the world. This method is thread-safe and will not affect the current raytracing threads. This emitter's OnRaytracingComplete callback will not be invoked.</summary>
+        public void RemoveEmitter(Emitter emitter)
         {
-            return WorldBindings.RemoveEmitter(native, emitter.native).ThrowIfError();
+            WorldBindings.RemoveEmitter(native, emitter.native).ThrowIfError();
         }
 
         public int GetEmitterCount()
@@ -93,18 +101,21 @@ namespace vaudionativewrapper.managed
             return WorldBindings.GetEmitterCount(native);
         }
 
+        /// <summary>The size of the world. Emitters outside the world will not be raytraced, and Primitives that are fully outside these bounds will be ignored</summary>
         public Vector Size
         {
             get => WorldBindings.GetSize(native);
             set => WorldBindings.SetSize(native, value).ThrowIfError();
         }
 
+        /// <summary>The minimum bounds of the world. Emitters outside the world will not be raytraced, and Primitives that are fully outside these bounds will not affect raytracing.</summary>
         public Vector Position
         {
             get => WorldBindings.GetPosition(native);
             set => WorldBindings.SetPosition(native, value).ThrowIfError();
         }
 
+        /// <summary>The maximum bounds of the world (Position + Size)</summary>
         public Vector MaxBounds
         {
             get => WorldBindings.GetMaximumBounds(native);
@@ -127,11 +138,16 @@ namespace vaudionativewrapper.managed
             UpdateWorldSize(size);
         }
 
+        /// <summary>The average time (in milliseconds) spent by Update on the main thread. This includes time spent handling previous raytracing results, applying new settings, processing primitive updates and submitting work to background threads. Use this metric to monitor main thread performance impact.</summary>
         public double MainThreadTime => WorldBindings.GetMainThreadTime(native);
+        /// <summary>The average time (in milliseconds) spent in the preparation thread before the raytracing threads begin. This phase updates the BVH (Bounding Volume Hierarchy) acceleration structure with new, modified, and removed primitives. Higher values are a result of complex scene changes.</summary>
         public double PreparationTime => WorldBindings.GetPreparationTime(native);
+        /// <summary>The average time (in milliseconds) spent in the raytracing threads. This is the real-world elapsed time it takes for raytracing to complete, not the sum of all thread times. This value is automatically adjusted based on how many threads perform raytracing. Use this to monitor raytracing performance and adjust ray counts if needed.</summary>
         public double RaytracingTime => WorldBindings.GetRaytracingTime(native);
+        /// <summary>The average time (in milliseconds) spent in the analysing thread after the raytracing threads complete. This phase runs after raytracing completes and calculate reverb properties. Use this to monitor raytracing performance and adjust ray counts if needed.</summary>
         public double AnalysisTime => WorldBindings.GetAnalysisTime(native);
 
+        /// <summary>List of grouped EAX reverb properties for all emitters. Contains parameters compatible with EAX reverb effects.</summary>
         public List<EAXReverb> GroupedEAX
         {
             get
@@ -148,70 +164,83 @@ namespace vaudionativewrapper.managed
             }
         }
 
+        /// <summary>Whether Emitters outside the world have 0 occlusion/permeation energy (true) or maximum energy (false).</summary>
         public bool EmittersOutsideTheWorldAreMuffled
         {
             get => WorldBindings.GetEmittersOutsideTheWorldAreMuffled(native);
             set => WorldBindings.SetEmittersOutsideTheWorldAreMuffled(native, value).ThrowIfError();
         }
 
+        /// <summary>Whether the entire world is considered indoors or outdoors. When false, reverb rays stop accumulating energy after hitting the world edge. Defaults to false.</summary>
         public bool WorldIsIndoors
         {
             get => WorldBindings.GetWorldIsIndoors(native);
             set => WorldBindings.SetWorldIsIndoors(native, value).ThrowIfError();
         }
 
+        /// <summary>True until raytracing has run at least once</summary>
         public bool Initialising => WorldBindings.GetInitialising(native);
 
+        /// <summary>The number of rays cast this frame.</summary>
         public int RaysCastThisFrame => WorldBindings.GetRaysCastThisFrame(native);
 
+        /// <summary>The maximum number of grouped EAX reverb properties shared across all emitters that affect grouped EAX. Higher values increase accuracy but are more expensive to run.</summary>
         public int MaximumGroupedEAXCount
         {
             get => WorldBindings.GetMaximumGroupedEAXCount(native);
             set => WorldBindings.SetMaximumGroupedEAXCount(native, value).ThrowIfError();
         }
 
+        /// <summary>The number of work items to split trails across for load balancing. A higher value helps evenly distribute work across all threads.</summary>
         public int WorkItemCount
         {
             get => WorldBindings.GetWorkItemCount(native);
             set => WorldBindings.SetWorkItemCount(native, value).ThrowIfError();
         }
 
+        /// <summary>The maximum amount of threads that can run in parallel. On WASM all worlds share a single thread pool, so this is a global setting via MaximumConcurrencyLevel. The maximum amount of threads that can run in parallel for this world</summary>
         public int MaximumConcurrencyLevel
         {
             get => WorldBindings.GetMaximumConcurrencyLevel(native);
             set => WorldBindings.SetMaximumConcurrencyLevel(native, value).ThrowIfError();
         }
 
+        /// <summary>Get meters per world unit. Affects air absorption and reverb calculation.</summary>
         public float MetersPerUnit
         {
             get => WorldBindings.GetMetersPerUnit(native);
             set => WorldBindings.SetMetersPerUnit(native, value).ThrowIfError();
         }
 
+        /// <summary>Inverse speed of sound in seconds per meter. Defaults to 1.0f / 343.0f. Affects reverb calculation</summary>
         public float InverseSpeedOfSound
         {
             get => WorldBindings.GetInverseSpeedOfSound(native);
             set => WorldBindings.SetInverseSpeedOfSound(native, value).ThrowIfError();
         }
 
+        /// <summary>Low-frequency reference (Hz) for air absorption, reverb, and material scattering</summary>
         public float ReferenceFrequencyLF
         {
             get => WorldBindings.GetReferenceFrequencyLF(native);
             set => WorldBindings.SetReferenceFrequencyLF(native, value).ThrowIfError();
         }
 
+        /// <summary>High-frequency reference (Hz) for air absorption, reverb, and material scattering</summary>
         public float ReferenceFrequencyHF
         {
             get => WorldBindings.GetReferenceFrequencyHF(native);
             set => WorldBindings.SetReferenceFrequencyHF(native, value).ThrowIfError();
         }
 
+        /// <summary>The epsilon value used for raytracing and primitive intersections. Defaults to 0.01f</summary>
         public float Epsilon
         {
             get => WorldBindings.GetEpsilon(native);
             set => WorldBindings.SetEpsilon(native, value).ThrowIfError();
         }
 
+        /// <summary>The average time (in milliseconds) between when Update is invoked, and when OnReverbUpdated is invoked.</summary>
         public double Latency => WorldBindings.GetLatency(native);
 
         public IntPtr UserData
@@ -220,6 +249,7 @@ namespace vaudionativewrapper.managed
             set => WorldBindings.SetUserData(native, value).ThrowIfError();
         }
 
+        /// <summary>Air absorption settings. Set to null to disable air absorption.</summary>
         public AirAbsorptionSettings AirAbsorption
         {
             get => new AirAbsorptionSettings(WorldBindings.GetAirAbsorption(native));
@@ -269,6 +299,7 @@ namespace vaudionativewrapper.managed
             return callbacks;
         }
 
+        /// <summary>Get properties for a specific material.</summary>
         public MaterialProperties GetMaterial(MaterialType type)
         {
             return new MaterialProperties(native, (int)type);
@@ -277,6 +308,7 @@ namespace vaudionativewrapper.managed
         private GCHandle _onReverbUpdatedHandle;
         private GCHandle _logCallbackHandle;
 
+        /// <summary>This callback is invoked after EAX reverb results are updated. This gives you a chance to update your EAX effects, so they can be applied to an emitter in it's OnRaytracingComplete callback. After this, each emitter's callback are invoked, and then OnRaytracingResultsHandled will be invoked next.</summary>
         public Action OnReverbUpdated
         {
             set
@@ -298,6 +330,7 @@ namespace vaudionativewrapper.managed
             }
         }
 
+        /// <summary>A custom logging callback. Defaults to WriteLine()</summary>
         public Action<string> LogCallback
         {
             set
@@ -319,15 +352,14 @@ namespace vaudionativewrapper.managed
             }
         }
 
+        /// <summary>Whether to log memory allocation warnings</summary>
         public bool LogMemoryAllocationWarnings
         {
             get => WorldBindings.GetLogMemoryAllocationWarnings(native);
             set => WorldBindings.SetLogMemoryAllocationWarnings(native, value).ThrowIfError();
         }
 
-        /// <summary>
-        /// Coordinate system used when calculating listener-relative reverb directionality (<see cref="CalculateListenerRelativePan"/>).
-        /// </summary>
+        /// <summary>Coordinate system used in the debug window and when calculating listener-relative reverb directionality</summary>
         public CoordinateSystem CoordinateSystem
         {
             get => WorldBindings.GetCoordinateSystem(native);
@@ -339,6 +371,7 @@ namespace vaudionativewrapper.managed
             return WorldBindings.CalculateListenerRelativePan(native, worldVector, listenerPitch, listenerYaw);
         }
 
+        /// <summary>When set to true, Update will stop submitting work to background threads. When ThreadsRunning becomes false, it is safe to call Dispose.</summary>
         public bool PendingShutdown
         {
             get => WorldBindings.GetPendingShutdown(native);

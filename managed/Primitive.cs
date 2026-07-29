@@ -2,6 +2,7 @@
 
 namespace vaudionativewrapper.managed
 {
+    /// <summary>A 3D primitive that rays collide with.</summary>
     public unsafe class Primitive
     {
         public IntPtr native;

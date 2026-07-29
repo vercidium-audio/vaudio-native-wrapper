@@ -1,5 +1,6 @@
 namespace vaudionativewrapper.managed
 {
+    /// <summary>A cylindrical audio primitive</summary>
     public unsafe class CylinderPrimitive : Primitive
     {
         public CylinderPrimitive()
@@ -7,24 +8,28 @@ namespace vaudionativewrapper.managed
             native = CylinderPrimitiveBindings.Create();
         }
 
+        /// <summary>Determines the amount of energy lost when rays bounce off this primitive, permeate through it, and scatter off it</summary>
         public MaterialType material
         {
             get => CylinderPrimitiveBindings.GetMaterial(native);
             set => CylinderPrimitiveBindings.SetMaterial(native, value).ThrowIfError();
         }
 
+        /// <summary>Radius of the cylinder</summary>
         public float radius
         {
             get => CylinderPrimitiveBindings.GetRadius(native);
             set => CylinderPrimitiveBindings.SetRadius(native, value).ThrowIfError();
         }
 
+        /// <summary>Length of the cylinder along its axis</summary>
         public float length
         {
             get => CylinderPrimitiveBindings.GetLength(native);
             set => CylinderPrimitiveBindings.SetLength(native, value).ThrowIfError();
         }
 
+        /// <summary>Must only contain rotation and translation components, not scale</summary>
         public Matrix transform
         {
             get => *CylinderPrimitiveBindings.GetTransform(native);

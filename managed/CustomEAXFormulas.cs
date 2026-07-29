@@ -3,9 +3,7 @@ using System.Diagnostics;
 
 namespace vaudionativewrapper.managed
 {
-    /// <summary>
-    /// Class containing functions that can be overriden to manually calculate each EAX parameter
-    /// </summary>
+    /// <summary>Class containing functions that can be overriden to manually calculate each EAX parameter</summary>
     public unsafe class CustomEAXFormulas
     {
         protected float[] tempDiffusionCumulative = new float[1];
@@ -56,7 +54,6 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Calculates the EAX diffusion parameter based on how smoothly energy accumulates over time</summary>
-        /// <returns>Diffusion value, typically in the range 0.0–1.0</returns>
         public virtual float CalculateDiffusion()
         {
             if (tempDiffusionCumulative.Length != echogramAverage.Length)
@@ -102,7 +99,6 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Calculates the EAX density parameter based on the number of energy peaks in the early echogram</summary>
-        /// <returns>Density value, typically in the range 0.0–1.0</returns>
         public virtual float CalculateDensity()
         {
             // Count significant energy peaks in the first 150ms
@@ -143,8 +139,6 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Calculates the delay in seconds before the first significant reflection is detected</summary>
-        /// <param name="energyThreshold">Fraction of peak energy required to consider a bin significant (e.g. 0.1 = 10%)</param>
-        /// <returns>Delay in seconds to the first reflection, or 0 if none found</returns>
         public virtual float CalculateReflectionsDelay(float energyThreshold)
         {
             if (maxEnergy <= 0f)
@@ -169,7 +163,6 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Calculates the delay in seconds before late reverb begins, based on the 25% energy accumulation point</summary>
-        /// <returns>Late reverb delay in seconds</returns>
         public virtual float CalculateLateReverbDelay()
         {
             if (totalReturnedEnergy <= 0f)
@@ -205,9 +198,6 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Calculates the low and high frequency gain values relative to a reference energy level</summary>
-        /// <param name="referenceEnergy">Reference energy used to normalise the output gains</param>
-        /// <param name="lfGain">Output low-frequency gain</param>
-        /// <param name="hfGain">Output high-frequency gain</param>
         public virtual void CalculateFrequencyGains(float referenceEnergy, out float lfGain, out float hfGain)
         {
             if (totalReturnedEnergy <= 0 || referenceEnergy <= 0)
@@ -233,10 +223,6 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Calculates the gain for early reflections and late reverb by splitting the echogram at a transition point</summary>
-        /// <param name="earlyLateTransitionMs">Time in milliseconds marking the boundary between early and late energy</param>
-        /// <param name="referenceEnergy">Reference energy used to normalise the output gains</param>
-        /// <param name="reflectionsGain">Output gain for early reflections</param>
-        /// <param name="lateReverbGain">Output gain for late reverb</param>
         public virtual void CalculateReflectionsAndLateReverbGain(float earlyLateTransitionMs, float referenceEnergy, out float reflectionsGain, out float lateReverbGain)
         {
             int transitionBin = (int)(earlyLateTransitionMs / binDurationMs);
@@ -278,8 +264,6 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Calculates the RT60 reverberation time in seconds for a given echogram using linear regression on the decay slope</summary>
-        /// <param name="echogram">Energy echogram bins to analyse</param>
-        /// <returns>RT60 in seconds, or 0 if the decay cannot be determined</returns>
         public virtual float CalculateRT60(float[] echogram)
         {
             // Convert energy to dB scale
