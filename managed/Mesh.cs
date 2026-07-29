@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace vaudionativewrapper.managed
 {
@@ -13,13 +12,9 @@ namespace vaudionativewrapper.managed
             IntPtr outMesh;
 
             fixed (Vector* ptr = vertices)
-            {
-                var result = MeshBindings.Create(ptr, vertices.Length, minBounds, maxBounds, &outMesh);
-                Debug.Assert(result == VAResult.Success);
-            }
+                MeshBindings.Create(ptr, vertices.Length, minBounds, maxBounds, &outMesh).ThrowIfError();
 
             native = outMesh;
-            Debug.Assert(native != IntPtr.Zero);
         }
 
         public Mesh(List<Vector> vertices, Vector minBounds, Vector maxBounds)
@@ -28,18 +23,11 @@ namespace vaudionativewrapper.managed
             IntPtr outMesh;
 
             fixed (Vector* ptr = copy)
-            {
-                var result = MeshBindings.Create(ptr, copy.Length, minBounds, maxBounds, &outMesh);
-                Debug.Assert(result == VAResult.Success);
-            }
+                MeshBindings.Create(ptr, copy.Length, minBounds, maxBounds, &outMesh).ThrowIfError();
 
             native = outMesh;
-            Debug.Assert(native != IntPtr.Zero);
         }
 
-        public void Destroy()
-        {
-            MeshBindings.Destroy(native);
-        }
+        public VAResult Destroy() => MeshBindings.Destroy(native);
     }
 }

@@ -18,27 +18,29 @@ namespace vaudionativewrapper.managed
         public MaterialType material
         {
             get => VoxelPrimitiveBindings.GetMaterial(native);
-            set => VoxelPrimitiveBindings.SetMaterial(native, value);
+            set => VoxelPrimitiveBindings.SetMaterial(native, value).ThrowIfError();
         }
 
         public float scale
         {
             get => VoxelPrimitiveBindings.GetScale(native);
-            set => VoxelPrimitiveBindings.SetScale(native, value);
+            set => VoxelPrimitiveBindings.SetScale(native, value).ThrowIfError();
         }
 
         public Matrix transform
         {
             get => *VoxelPrimitiveBindings.GetTransform(native);
-            set => VoxelPrimitiveBindings.SetTransform(native, ref value);
+            set => VoxelPrimitiveBindings.SetTransform(native, ref value).ThrowIfError();
         }
 
         public MaterialType this[int x, int y, int z]
         {
             get => VoxelPrimitiveBindings.GetVoxel(native, x, y, z);
-            set => VoxelPrimitiveBindings.SetVoxel(native, x, y, z, value);
+            set => VoxelPrimitiveBindings.SetVoxel(native, x, y, z, value).ThrowIfError();
         }
 
-        public void SetDataDirty() => VoxelPrimitiveBindings.SetDataDirty(native);
+        public void SetDataDirty() => VoxelPrimitiveBindings.SetDataDirty(native).ThrowIfError();
+
+        public void Destroy() => VoxelPrimitiveBindings.Destroy(native).ThrowIfError();
     }
 }

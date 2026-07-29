@@ -9,13 +9,13 @@ namespace vaudionativewrapper
         public static extern IntPtr Create();
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveSetPosition0")]
-        public static extern void SetPosition0(IntPtr primitive, Vector pos0);
+        public static extern VAResult SetPosition0(IntPtr primitive, Vector pos0);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveSetPosition1")]
-        public static extern void SetPosition1(IntPtr primitive, Vector pos1);
+        public static extern VAResult SetPosition1(IntPtr primitive, Vector pos1);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveSetPosition2")]
-        public static extern void SetPosition2(IntPtr primitive, Vector pos2);
+        public static extern VAResult SetPosition2(IntPtr primitive, Vector pos2);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveGetPosition0")]
         public static extern Vector GetPosition0(IntPtr primitive);
@@ -30,9 +30,9 @@ namespace vaudionativewrapper
         public static extern MaterialType GetMaterial(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveSetMaterial")]
-        public static extern void SetMaterial(IntPtr primitive, MaterialType material);
+        public static extern VAResult SetMaterial(IntPtr primitive, MaterialType material);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveFree")]
-        public static extern void Free(IntPtr primitive);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaTrianglePrimitiveDestroy")]
+        public static extern VAResult Destroy(IntPtr primitive);
     }
 }

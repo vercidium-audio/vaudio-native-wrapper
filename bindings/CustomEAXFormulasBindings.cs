@@ -7,7 +7,7 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaCustomEAXFormulasCreate")]
         public static extern unsafe CustomEAXFormulas* Create();
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaCustomEAXFormulasFree")]
-        public static extern unsafe void Free(CustomEAXFormulas* formulas);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaCustomEAXFormulasDestroy")]
+        public static extern unsafe VAResult Destroy(CustomEAXFormulas* formulas);
     }
 }

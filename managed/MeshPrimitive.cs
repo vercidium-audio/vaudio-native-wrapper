@@ -45,19 +45,24 @@ namespace vaudionativewrapper.managed
         public MaterialType material
         {
             get => MeshPrimitiveBindings.GetMaterial(native);
-            set => MeshPrimitiveBindings.SetMaterial(native, value);
+            set => MeshPrimitiveBindings.SetMaterial(native, value).ThrowIfError();
         }
 
         public Matrix transform
         {
             get => *MeshPrimitiveBindings.GetTransform(native);
-            set => MeshPrimitiveBindings.SetTransform(native, ref value);
+            set => MeshPrimitiveBindings.SetTransform(native, ref value).ThrowIfError();
         }
 
         public bool Supports3DPermeation
         {
             get => MeshPrimitiveBindings.GetSupports3DPermeation(native);
-            set => MeshPrimitiveBindings.SetSupports3DPermeation(native, value);
+            set => MeshPrimitiveBindings.SetSupports3DPermeation(native, value).ThrowIfError();
+        }
+
+        public void Destroy()
+        {
+            MeshPrimitiveBindings.Destroy(native).ThrowIfError();
         }
     }
 }

@@ -10,25 +10,30 @@ namespace vaudionativewrapper.managed
         public MaterialType material
         {
             get => TriangularPrismPrimitiveBindings.GetMaterial(native);
-            set => TriangularPrismPrimitiveBindings.SetMaterial(native, value);
+            set => TriangularPrismPrimitiveBindings.SetMaterial(native, value).ThrowIfError();
         }
 
         public float radius
         {
             get => TriangularPrismPrimitiveBindings.GetRadius(native);
-            set => TriangularPrismPrimitiveBindings.SetRadius(native, value);
+            set => TriangularPrismPrimitiveBindings.SetRadius(native, value).ThrowIfError();
         }
 
         public float length
         {
             get => TriangularPrismPrimitiveBindings.GetLength(native);
-            set => TriangularPrismPrimitiveBindings.SetLength(native, value);
+            set => TriangularPrismPrimitiveBindings.SetLength(native, value).ThrowIfError();
         }
 
         public Matrix transform
         {
             get => *TriangularPrismPrimitiveBindings.GetTransform(native);
-            set => TriangularPrismPrimitiveBindings.SetTransform(native, ref value);
+            set => TriangularPrismPrimitiveBindings.SetTransform(native, ref value).ThrowIfError();
+        }
+
+        public void Destroy()
+        {
+            TriangularPrismPrimitiveBindings.Destroy(native).ThrowIfError();
         }
     }
 }
