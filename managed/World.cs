@@ -72,6 +72,12 @@ namespace vaudionativewrapper.managed
             return new MaterialProperties(native, id);
         }
 
+        /// <summary>Gets the debug rendering colour for a specific material type (dev build only). No effect on raytracing.</summary>
+        public Color GetMaterialColor(int materialId) => WorldBindings.GetMaterialColor(native, materialId);
+
+        /// <summary>Sets the debug rendering colour for a specific material type (dev build only). No effect on raytracing.</summary>
+        public void SetMaterialColor(int materialId, Color color) => WorldBindings.SetMaterialColor(native, materialId, color).ThrowIfError();
+
         /// <summary>Adds a 3D object to the raytracing scene. This method is thread-safe and will not affect the current raytracing threads. Primitives completely outside the world bounds will be ignored during raytracing.</summary>
         public void AddPrimitive(Primitive primitive)
         {
@@ -379,5 +385,78 @@ namespace vaudionativewrapper.managed
         }
 
         public bool ThreadsRunning => WorldBindings.GetThreadsRunning(native);
+
+        #region Rendering
+
+        /// <summary>Whether to render the raytracing scene in a separate window (dev build only)</summary>
+        public bool RenderingEnabled
+        {
+            get => WorldBindings.GetRenderingEnabled(native);
+            set => WorldBindings.SetRenderingEnabled(native, value).ThrowIfError();
+        }
+
+        /// <summary>The position of the camera in the debug window (dev build only)</summary>
+        public Vector CameraPosition
+        {
+            get => WorldBindings.GetCameraPosition(native);
+            set => WorldBindings.SetCameraPosition(native, value).ThrowIfError();
+        }
+
+        /// <summary>The pitch of the camera in the debug window (dev build only)</summary>
+        public float CameraPitch
+        {
+            get => WorldBindings.GetCameraPitch(native);
+            set => WorldBindings.SetCameraPitch(native, value).ThrowIfError();
+        }
+
+        /// <summary>The yaw of the camera in the debug window (dev build only)</summary>
+        public float CameraYaw
+        {
+            get => WorldBindings.GetCameraYaw(native);
+            set => WorldBindings.SetCameraYaw(native, value).ThrowIfError();
+        }
+
+        /// <summary>The field of view (in radians) of the camera in the debug window (dev build only)</summary>
+        public float FieldOfView
+        {
+            get => WorldBindings.GetFieldOfView(native);
+            set => WorldBindings.SetFieldOfView(native, value).ThrowIfError();
+        }
+
+        /// <summary>The speed of the camera in the debug window (dev build only)</summary>
+        public float CameraSpeed
+        {
+            get => WorldBindings.GetCameraSpeed(native);
+            set => WorldBindings.SetCameraSpeed(native, value).ThrowIfError();
+        }
+
+        /// <summary>The time spent (in milliseconds) rendering the debug window (dev build only)</summary>
+        public float RenderTime
+        {
+            get => WorldBindings.GetRenderTime(native);
+        }
+
+        /// <summary>Whether the debug window can independently move its camera around (dev build only)</summary>
+        public bool ManualCamera
+        {
+            get => WorldBindings.GetManualCamera(native);
+            set => WorldBindings.SetManualCamera(native, value).ThrowIfError();
+        }
+
+        /// <summary>Whether to render rays in the debug window (dev build only)</summary>
+        public bool ShouldRenderRays
+        {
+            get => WorldBindings.GetShouldRenderRays(native);
+            set => WorldBindings.SetShouldRenderRays(native, value).ThrowIfError();
+        }
+
+        /// <summary>Whether to render primitives in the debug window (dev build only)</summary>
+        public bool ShouldRenderPrimitives
+        {
+            get => WorldBindings.GetShouldRenderPrimitives(native);
+            set => WorldBindings.SetShouldRenderPrimitives(native, value).ThrowIfError();
+        }
+
+        #endregion
     }
 }

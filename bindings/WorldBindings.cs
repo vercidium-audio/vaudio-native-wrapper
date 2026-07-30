@@ -48,10 +48,12 @@ namespace vaudionativewrapper
         public static extern Vector GetPosition(IntPtr world);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetPosition")]
         public static extern VAResult SetPosition(IntPtr world, Vector position);
+
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetSize")]
         public static extern Vector GetSize(IntPtr world);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetSize")]
         public static extern VAResult SetSize(IntPtr world, Vector size);
+
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMaximumBounds")]
         public static extern Vector GetMaximumBounds(IntPtr world);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetMaximumBounds")]
@@ -98,6 +100,11 @@ namespace vaudionativewrapper
         public static extern VAResult SetMaterialPlaneTransmissionLF(IntPtr world, int materialId, float value);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetMaterialPlaneTransmissionHF")]
         public static extern VAResult SetMaterialPlaneTransmissionHF(IntPtr world, int materialId, float value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMaterialColor")]
+        public static extern Color GetMaterialColor(IntPtr world, int materialId);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetMaterialColor")]
+        public static extern VAResult SetMaterialColor(IntPtr world, int materialId, Color color);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMaximumGroupedEAXCount")]
         public static extern int GetMaximumGroupedEAXCount(IntPtr world);
@@ -211,9 +218,66 @@ namespace vaudionativewrapper
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldExport")]
         public static extern VAResult Export(IntPtr world, [MarshalAs(UnmanagedType.LPStr)] string fileName);
+
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldImport")]
         public static extern unsafe VAResult Import(IntPtr world, [MarshalAs(UnmanagedType.LPStr)] string fileName, IntPtr** outEmitters, int* outEmitterCount);
+
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldImportFreeEmitters")]
         public static extern unsafe VAResult ImportFreeEmitters(IntPtr* emitters);
+
+#region Rendering
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetRenderingEnabled")]
+        public static extern VAResult SetRenderingEnabled(IntPtr world, bool value);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetRenderingEnabled")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool GetRenderingEnabled(IntPtr world);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetManualCamera")]
+        public static extern VAResult SetManualCamera(IntPtr world, bool value);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetManualCamera")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool GetManualCamera(IntPtr world);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetShouldRenderRays")]
+        public static extern VAResult SetShouldRenderRays(IntPtr world, bool value);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetShouldRenderRays")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool GetShouldRenderRays(IntPtr world);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetShouldRenderPrimitives")]
+        public static extern VAResult SetShouldRenderPrimitives(IntPtr world, bool value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetShouldRenderPrimitives")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool GetShouldRenderPrimitives(IntPtr world);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetCameraPosition")]
+        public static extern Vector GetCameraPosition(IntPtr world);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetCameraPosition")]
+        public static extern VAResult SetCameraPosition(IntPtr world, Vector position);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetCameraPitch")]
+        public static extern float GetCameraPitch(IntPtr world);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetCameraPitch")]
+        public static extern VAResult SetCameraPitch(IntPtr world, float pitch);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetCameraYaw")]
+        public static extern float GetCameraYaw(IntPtr world);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetCameraYaw")]
+        public static extern VAResult SetCameraYaw(IntPtr world, float yaw);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetFieldOfView")]
+        public static extern float GetFieldOfView(IntPtr world);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetFieldOfView")]
+        public static extern VAResult SetFieldOfView(IntPtr world, float fieldOfView);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetCameraSpeed")]
+        public static extern float GetCameraSpeed(IntPtr world);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetCameraSpeed")]
+        public static extern VAResult SetCameraSpeed(IntPtr world, float cameraSpeed);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetRenderTime")]
+        public static extern float GetRenderTime(IntPtr world);
+        #endregion
     }
 }

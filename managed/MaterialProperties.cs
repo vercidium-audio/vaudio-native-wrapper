@@ -62,5 +62,12 @@ namespace vaudionativewrapper.managed
             get => WorldBindings.GetMaterialPlaneTransmissionHF(world, id);
             set => WorldBindings.SetMaterialPlaneTransmissionHF(world, id, value);
         }
+
+        /// <summary>Debug rendering colour for this material (dev build only). No effect on raytracing.</summary>
+        public Color Color
+        {
+            get => WorldBindings.GetMaterialColor(world, id);
+            set => WorldBindings.SetMaterialColor(world, id, value).ThrowIfError();
+        }
     }
 }

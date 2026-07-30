@@ -34,7 +34,7 @@ namespace vaudionativewrapper
         // VA_UNCHANGED means the setter was a no-op (value already matched) - not an error.
         public static void ThrowIfError(this VAResult result)
         {
-            if (result != VAResult.Success && result != VAResult.Unchanged)
+            if (result != VAResult.Success && result != VAResult.Unchanged && result != VAResult.PendingRemoval)
                 throw new InvalidOperationException($"Native call failed: {result}");
         }
     }
