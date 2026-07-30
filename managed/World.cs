@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace vaudionativewrapper.managed
@@ -34,13 +33,17 @@ namespace vaudionativewrapper.managed
         /// <summary>Updates the raytracing simulation. Call this method regularly to process raytracing results and submit new work. This method does nothing if background raytracing threads are still running. When threads are idle, it performs the following operations: - Handles the last raytracing results, updating reverb objects and invoking OnRaytracedByAnotherEmitter callbacks - Applies new settings and resizes memory buffers if needed (e.g. if ray counts were changed) - Processes new, modified, and removed primitives - Starts raytracing again on background threads This method must be called from the main thread. Calling this more frequently is safe and can reduce latency for emitter updates.</summary>
         public VAResult Update()
         {
-            return WorldBindings.Update(native);
+            var result = WorldBindings.Update(native);
+            result.ThrowIfError();
+            return result;
         }
 
         /// <summary>Blocks the calling thread until all background raytracing threads complete, then handles the results (updates reverb objects and invokes OnRaytracingComplete and OnRaytracedByAnotherEmitter callbacks for each emitter).</summary>
         public VAResult Wait()
         {
-            return WorldBindings.Wait(native);
+            var result = WorldBindings.Wait(native);
+            result.ThrowIfError();
+            return result;
         }
 
         /// <summary>Exports all world settings, materials, primitives, and emitters to a binary file.</summary>
@@ -146,10 +149,13 @@ namespace vaudionativewrapper.managed
 
         /// <summary>The average time (in milliseconds) spent by Update on the main thread. This includes time spent handling previous raytracing results, applying new settings, processing primitive updates and submitting work to background threads. Use this metric to monitor main thread performance impact.</summary>
         public double MainThreadTime => WorldBindings.GetMainThreadTime(native);
+        
         /// <summary>The average time (in milliseconds) spent in the preparation thread before the raytracing threads begin. This phase updates the BVH (Bounding Volume Hierarchy) acceleration structure with new, modified, and removed primitives. Higher values are a result of complex scene changes.</summary>
         public double PreparationTime => WorldBindings.GetPreparationTime(native);
+        
         /// <summary>The average time (in milliseconds) spent in the raytracing threads. This is the real-world elapsed time it takes for raytracing to complete, not the sum of all thread times. This value is automatically adjusted based on how many threads perform raytracing. Use this to monitor raytracing performance and adjust ray counts if needed.</summary>
         public double RaytracingTime => WorldBindings.GetRaytracingTime(native);
+        
         /// <summary>The average time (in milliseconds) spent in the analysing thread after the raytracing threads complete. This phase runs after raytracing completes and calculate reverb properties. Use this to monitor raytracing performance and adjust ray counts if needed.</summary>
         public double AnalysisTime => WorldBindings.GetAnalysisTime(native);
 
@@ -386,7 +392,7 @@ namespace vaudionativewrapper.managed
 
         public bool ThreadsRunning => WorldBindings.GetThreadsRunning(native);
 
-        #region Rendering
+#region Rendering
 
         /// <summary>Whether to render the raytracing scene in a separate window (dev build only)</summary>
         public bool RenderingEnabled
@@ -455,6 +461,34 @@ namespace vaudionativewrapper.managed
         {
             get => WorldBindings.GetShouldRenderPrimitives(native);
             set => WorldBindings.SetShouldRenderPrimitives(native, value).ThrowIfError();
+        }
+
+        /// <summary>The position of the debug window (dev build only)</summary>
+        public (int x, int y) WindowPosition
+        {
+            get
+            {
+                WorldBindings.GetWindowPosition(native, out int x, out int y);
+                return (x, y);
+            }
+            set
+            {
+                WorldBindings.SetWindowPosition(native, value.x, value.y).ThrowIfError();
+            }
+        }
+
+        /// <summary>The size of the debug window (dev build only)</summary>
+        public (int x, int y) WindowSize
+        {
+            get
+            {
+                WorldBindings.GetWindowSize(native, out int x, out int y);
+                return (x, y);
+            }
+            set
+            {
+                WorldBindings.SetWindowSize(native, value.x, value.y).ThrowIfError();
+            }
         }
 
         #endregion

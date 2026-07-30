@@ -246,7 +246,6 @@ namespace vaudionativewrapper
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetShouldRenderPrimitives")]
         public static extern VAResult SetShouldRenderPrimitives(IntPtr world, bool value);
-
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetShouldRenderPrimitives")]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetShouldRenderPrimitives(IntPtr world);
@@ -278,6 +277,17 @@ namespace vaudionativewrapper
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetRenderTime")]
         public static extern float GetRenderTime(IntPtr world);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetWindowPosition")]
+        public static extern int GetWindowPosition(IntPtr world, out int x, out int y);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetWindowPosition")]
+        public static extern VAResult SetWindowPosition(IntPtr world, int x, int y);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetWindowSize")]
+        public static extern int GetWindowSize(IntPtr world, out int width, out int height);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetWindowSize")]
+        public static extern VAResult SetWindowSize(IntPtr world, int width, int height);
+
         #endregion
     }
 }
