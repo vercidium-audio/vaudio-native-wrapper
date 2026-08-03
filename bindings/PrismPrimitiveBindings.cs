@@ -12,7 +12,7 @@ namespace vaudionativewrapper
         public static extern VAResult SetSize(IntPtr primitive, Vector size);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPrismPrimitiveSetTransform")]
-        public static extern unsafe VAResult SetTransform(IntPtr primitive, ref Matrix transform);
+        public static extern VAResult SetTransform(IntPtr primitive, ref Matrix transform);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPrismPrimitiveGetSize")]
         public static extern Vector GetSize(IntPtr primitive);

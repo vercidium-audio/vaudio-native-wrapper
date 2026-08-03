@@ -18,7 +18,7 @@ namespace vaudionativewrapper
         public static extern VAResult SetHeight(IntPtr primitive, float height);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaRectangularConePrimitiveSetTransform")]
-        public static extern unsafe VAResult SetTransform(IntPtr primitive, ref Matrix transform);
+        public static extern VAResult SetTransform(IntPtr primitive, ref Matrix transform);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaRectangularConePrimitiveGetWidth")]
         public static extern float GetWidth(IntPtr primitive);

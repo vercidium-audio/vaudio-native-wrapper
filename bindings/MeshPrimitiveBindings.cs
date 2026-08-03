@@ -15,7 +15,7 @@ namespace vaudionativewrapper
         public static extern unsafe Matrix* GetTransform(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaMeshPrimitiveSetTransform")]
-        public static extern unsafe VAResult SetTransform(IntPtr primitive, ref Matrix transform);
+        public static extern VAResult SetTransform(IntPtr primitive, ref Matrix transform);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaMeshPrimitiveGetMaterial")]
         public static extern MaterialType GetMaterial(IntPtr primitive);

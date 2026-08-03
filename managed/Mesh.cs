@@ -3,10 +3,12 @@ using System.Collections.Generic;
 
 namespace vaudionativewrapper.managed
 {
+    /// <summary>A triangulated mesh that is built once and can be shared across multiple MeshPrimitive instances</summary>
     public unsafe class Mesh
     {
         internal readonly IntPtr native;
 
+        /// <summary>Create a mesh from an array of vertices</summary>
         public Mesh(Vector[] vertices, Vector minBounds, Vector maxBounds)
         {
             IntPtr outMesh;
@@ -17,6 +19,7 @@ namespace vaudionativewrapper.managed
             native = outMesh;
         }
 
+        /// <summary>Create a mesh from a list of vertices</summary>
         public Mesh(List<Vector> vertices, Vector minBounds, Vector maxBounds)
         {
             Vector[] copy = vertices.ToArray();

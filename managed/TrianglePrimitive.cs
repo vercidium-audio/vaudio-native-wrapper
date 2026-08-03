@@ -1,5 +1,6 @@
 namespace vaudionativewrapper.managed
 {
+    /// <summary>A triangle primitive</summary>
     public class TrianglePrimitive : Primitive
     {
         public TrianglePrimitive()
@@ -7,24 +8,28 @@ namespace vaudionativewrapper.managed
             native = TrianglePrimitiveBindings.Create();
         }
 
+        /// <summary>Determines the amount of energy lost when rays bounce off this primitive, permeate through it, and scatter off it</summary>
         public MaterialType material
         {
             get => TrianglePrimitiveBindings.GetMaterial(native);
             set => TrianglePrimitiveBindings.SetMaterial(native, value).ThrowIfError();
         }
 
+        /// <summary>First vertex of the triangle</summary>
         public Vector position0
         {
             get => TrianglePrimitiveBindings.GetPosition0(native);
             set => TrianglePrimitiveBindings.SetPosition0(native, value).ThrowIfError();
         }
 
+        /// <summary>Second vertex of the triangle</summary>
         public Vector position1
         {
             get => TrianglePrimitiveBindings.GetPosition1(native);
             set => TrianglePrimitiveBindings.SetPosition1(native, value).ThrowIfError();
         }
 
+        /// <summary>Third vertex of the triangle</summary>
         public Vector position2
         {
             get => TrianglePrimitiveBindings.GetPosition2(native);

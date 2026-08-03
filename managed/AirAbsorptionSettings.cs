@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace vaudionativewrapper.managed
 {
+    /// <summary>Settings that control how sound energy is absorbed by the air over distance</summary>
     public class AirAbsorptionSettings
     {
         public IntPtr native;
@@ -14,6 +15,7 @@ namespace vaudionativewrapper.managed
         GCHandle lfHandle;
         GCHandle hfHandle;
 
+        /// <summary>Create a new AirAbsorptionSettings with default settings</summary>
         public AirAbsorptionSettings()
         {
             native = AirAbsorptionSettingsBindings.Create();
@@ -24,18 +26,21 @@ namespace vaudionativewrapper.managed
             this.native = native;
         }
 
+        /// <summary>Relative humidity as a percentage (0–1). Defaults to 0.1f</summary>
         public float Humidity
         {
             get => AirAbsorptionSettingsBindings.GetHumidity(native);
             set => AirAbsorptionSettingsBindings.SetHumidity(native, value).ThrowIfError();
         }
 
+        /// <summary>Air temperature in degrees Celsius. Defaults to 26</summary>
         public float Temperature
         {
             get => AirAbsorptionSettingsBindings.GetTemperature(native);
             set => AirAbsorptionSettingsBindings.SetTemperature(native, value).ThrowIfError();
         }
 
+        /// <summary>Atmospheric pressure in Pascals. Defaults to 101325</summary>
         public float Pressure
         {
             get => AirAbsorptionSettingsBindings.GetPressure(native);
