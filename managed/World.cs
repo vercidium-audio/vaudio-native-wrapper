@@ -46,7 +46,7 @@ namespace vaudionativewrapper.managed
             return result;
         }
 
-        /// <summary>Exports all world settings, materials, primitives, and emitters to a binary file (dev build only)</summary>
+        /// <summary>Exports all world settings, materials, primitives, and emitters to a binary file (dev build only).</summary>
         public void Export(string fileName)
         {
             WorldBindings.Export(native, fileName).ThrowIfError();
@@ -99,6 +99,12 @@ namespace vaudionativewrapper.managed
         public void AddEmitter(Emitter emitter)
         {
             WorldBindings.AddEmitter(native, emitter.native).ThrowIfError();
+        }
+
+        /// <summary>Checks if the world has an emitter. Returns VA_INVALID_POINTER if emitter is NULL, VA_PENDING_REMOVAL if the emitter will be removed once its reverb tail has finished playing, VA_TRUE if it has the emitter, VA_FALSE if it does not have the emitter</summary>
+        public VAResult HasEmitter(Emitter emitter)
+        {
+            return WorldBindings.HasEmitter(native, emitter.native);
         }
 
         /// <summary>Remove an Emitter from the world. This method is thread-safe and will not affect the current raytracing threads. This emitter's OnRaytracingComplete callback will not be invoked.</summary>

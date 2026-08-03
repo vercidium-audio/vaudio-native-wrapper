@@ -17,6 +17,8 @@ namespace vaudionativewrapper
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldAddEmitter")]
         public static extern VAResult AddEmitter(IntPtr ctx, IntPtr emitter);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldHasEmitter")]
+        public static extern VAResult HasEmitter(IntPtr ctx, IntPtr emitter);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldRemoveEmitter")]
         public static extern VAResult RemoveEmitter(IntPtr ctx, IntPtr emitter);
 
