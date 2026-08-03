@@ -12,7 +12,7 @@ namespace vaudionativewrapper
         public static extern VAResult SetRadius(IntPtr primitive, float radius);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaHalfSpherePrimitiveSetTransform")]
-        public static extern unsafe VAResult SetTransform(IntPtr primitive, ref Matrix transform);
+        public static extern VAResult SetTransform(IntPtr primitive, ref Matrix transform);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaHalfSpherePrimitiveGetRadius")]
         public static extern float GetRadius(IntPtr primitive);

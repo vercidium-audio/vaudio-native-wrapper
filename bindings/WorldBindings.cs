@@ -276,7 +276,7 @@ namespace vaudionativewrapper
         public static extern VAResult SetCameraSpeed(IntPtr world, float cameraSpeed);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetRenderTime")]
-        public static extern float GetRenderTime(IntPtr world);
+        public static extern double GetRenderTime(IntPtr world);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetWindowPosition")]
         public static extern int GetWindowPosition(IntPtr world, out int x, out int y);

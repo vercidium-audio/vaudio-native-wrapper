@@ -23,7 +23,7 @@ namespace vaudionativewrapper.managed
         /// <summary>Waits for background thread to complete, then disposes everything. After calling this method, this world cannot be reused.</summary>
         public void Dispose()
         {
-            if (native == null)
+            if (native == IntPtr.Zero)
                 return;
 
             WorldBindings.Destroy(native).ThrowIfError();
@@ -46,12 +46,13 @@ namespace vaudionativewrapper.managed
             return result;
         }
 
-        /// <summary>Exports all world settings, materials, primitives, and emitters to a binary file.</summary>
+        /// <summary>Exports all world settings, materials, primitives, and emitters to a binary file (dev build only)</summary>
         public void Export(string fileName)
         {
             WorldBindings.Export(native, fileName).ThrowIfError();
         }
 
+        /// <summary>Imports all world settings, materials, primitives, and emitters from a binary file (dev build only)</summary>
         public void Import(string fileName, out Emitter[] emitters)
         {
             IntPtr* emittersPtr = null;
@@ -66,6 +67,7 @@ namespace vaudionativewrapper.managed
             WorldBindings.ImportFreeEmitters(emittersPtr).ThrowIfError();
         }
 
+        /// <summary>Create a material with default settings.</summary>
         public MaterialProperties CreateMaterial(MaterialType type)
         {
             var id = (int)type;
@@ -437,7 +439,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>The time spent (in milliseconds) rendering the debug window (dev build only)</summary>
-        public float RenderTime
+        public double RenderTime
         {
             get => WorldBindings.GetRenderTime(native);
         }

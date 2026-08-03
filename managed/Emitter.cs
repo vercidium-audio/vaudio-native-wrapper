@@ -14,13 +14,13 @@ namespace vaudionativewrapper.managed
             this.native = native;
         }
 
-        // TODO - sync XML docs from C# source
         /// <summary>Create a new Emitter with default settings</summary>
         public Emitter()
         {
             native = EmitterBindings.Create();
         }
 
+        /// <summary>Free the emitter. Throws if the emitter is still added to a world.</summary>
         public void Destroy()
         {
             EmitterBindings.Destroy(native).ThrowIfError();
