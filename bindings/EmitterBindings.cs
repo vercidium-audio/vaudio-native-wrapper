@@ -350,5 +350,42 @@ namespace vaudionativewrapper
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetAmbientFilter")]
         public static extern unsafe LowPassFilter* GetAmbientFilter(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetRandomTrailColor")]
+        public static extern VAResult SetRandomTrailColor(IntPtr emitter, bool value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetRandomTrailColor")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool GetRandomTrailColor(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetTrailColor")]
+        public static extern VAResult SetTrailColor(IntPtr emitter, Color value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetTrailColor")]
+        public static extern Color GetTrailColor(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetReverbColor")]
+        public static extern VAResult SetReverbColor(IntPtr emitter, Color value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetReverbColor")]
+        public static extern Color GetReverbColor(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetOcclusionColor")]
+        public static extern VAResult SetOcclusionColor(IntPtr emitter, Color value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetOcclusionColor")]
+        public static extern Color GetOcclusionColor(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetPermeationColor")]
+        public static extern VAResult SetPermeationColor(IntPtr emitter, Color value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetPermeationColor")]
+        public static extern Color GetPermeationColor(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetAmbientPermeationColor")]
+        public static extern VAResult SetAmbientPermeationColor(IntPtr emitter, Color value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetAmbientPermeationColor")]
+        public static extern Color GetAmbientPermeationColor(IntPtr emitter);
     }
 }
