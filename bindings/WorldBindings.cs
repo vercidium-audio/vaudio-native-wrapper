@@ -281,12 +281,12 @@ namespace vaudionativewrapper
         public static extern double GetRenderTime(IntPtr world);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetWindowPosition")]
-        public static extern int GetWindowPosition(IntPtr world, out int x, out int y);
+        public static extern void GetWindowPosition(IntPtr world, out int x, out int y);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetWindowPosition")]
         public static extern VAResult SetWindowPosition(IntPtr world, int x, int y);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetWindowSize")]
-        public static extern int GetWindowSize(IntPtr world, out int width, out int height);
+        public static extern void GetWindowSize(IntPtr world, out int width, out int height);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetWindowSize")]
         public static extern VAResult SetWindowSize(IntPtr world, int width, int height);
 

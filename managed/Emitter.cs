@@ -239,7 +239,7 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetRefreshDistanceThreshold(native, value).ThrowIfError();
         }
 
-        /// <summary>The percentage of returning energy required for reverb to be at maximum volume. Defaults to 20%.</summary>
+        /// <summary>The percentage of returning energy required for reverb to be at maximum volume. Defaults to 15%.</summary>
         public float ReverbEnergyCap
         {
             get => EmitterBindings.GetReverbEnergyCap(native);
@@ -293,6 +293,48 @@ namespace vaudionativewrapper.managed
         {
             get => EmitterBindings.GetScatteringSeed(native);
             set => EmitterBindings.SetScatteringSeed(native, value).ThrowIfError();
+        }
+
+        /// <summary>Whether to render each trail a different color (dev build only)</summary>
+        public bool RandomTrailColor
+        {
+            get => EmitterBindings.GetRandomTrailColor(native);
+            set => EmitterBindings.SetRandomTrailColor(native, value).ThrowIfError();
+        }
+
+        /// <summary>The color of ray trails in the debug window (dev build only)</summary>
+        public Color TrailColor
+        {
+            get => EmitterBindings.GetTrailColor(native);
+            set => EmitterBindings.SetTrailColor(native, value).ThrowIfError();
+        }
+
+        /// <summary>The color of reverb rays in the debug window (dev build only)</summary>
+        public Color ReverbColor
+        {
+            get => EmitterBindings.GetReverbColor(native);
+            set => EmitterBindings.SetReverbColor(native, value).ThrowIfError();
+        }
+
+        /// <summary>The color of occlusion rays in the debug window (dev build only)</summary>
+        public Color OcclusionColor
+        {
+            get => EmitterBindings.GetOcclusionColor(native);
+            set => EmitterBindings.SetOcclusionColor(native, value).ThrowIfError();
+        }
+
+        /// <summary>The color of permeation rays in the debug window (dev build only)</summary>
+        public Color PermeationColor
+        {
+            get => EmitterBindings.GetPermeationColor(native);
+            set => EmitterBindings.SetPermeationColor(native, value).ThrowIfError();
+        }
+
+        /// <summary>The color of ambient permeation rays in the debug window (dev build only)</summary>
+        public Color AmbientPermeationColor
+        {
+            get => EmitterBindings.GetAmbientPermeationColor(native);
+            set => EmitterBindings.SetAmbientPermeationColor(native, value).ThrowIfError();
         }
 #endregion
 
