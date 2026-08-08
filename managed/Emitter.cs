@@ -485,7 +485,7 @@ namespace vaudionativewrapper.managed
 
                 if (value != null)
                 {
-                    VisualisationCallbackFn callback = (dataPtr, count) =>
+                    VisualisationCallbackFn callback = (emitter, dataPtr, count) =>
                     {
                         var arr = new VisualisationData[count];
 
