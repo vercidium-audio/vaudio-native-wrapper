@@ -3,11 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace vaudionativewrapper.managed
 {
-    /// <summary>
-    /// A 3D grid of voxels that reads directly from unmanaged memory owned by the caller, rather than copying it.<br/>
-    /// Each voxel is converted to a material by the world's <see cref="World.UnsafeVoxelMaterialMap"/>, which must be set before adding this primitive to a world.<br/>
-    /// The memory is read from background threads, and must not be freed until this primitive is removed from its world and its <see cref="OnRemoved"/> callback is invoked.
-    /// </summary>
+    /// <summary>A 3D grid of voxels that reads directly from unmanaged memory owned by the caller, rather than copying it into a managed array. Each voxel is converted to a material by the world's UnsafeVoxelMaterialMap, which must be set before adding this primitive to a world. Voxel memory is read by the raytracing threads without synchronisation, and must remain valid until this primitive is removed from its world and its OnRemoved callback is invoked.</summary>
     public unsafe class UnsafeVoxelPrimitive : Primitive
     {
         /// <summary>Pointer to the first voxel. Owned by the caller</summary>
@@ -22,10 +18,7 @@ namespace vaudionativewrapper.managed
         /// <summary>Number of voxels between neighbouring voxels along each axis, i.e. the voxel at (x, y, z) is at data + (x * xPitch + y * yPitch + z * zPitch) * stride</summary>
         public readonly int xPitch, yPitch, zPitch;
 
-        /// <summary>
-        /// Invoked on the main thread once this primitive has been removed from its world and the raytracing threads no longer use its voxel data.<br/>
-        /// This is invoked by <see cref="World.Update"/>, or by <see cref="World.RemovePrimitive"/> if this primitive was never sent to the raytracing threads.<br/>
-        /// </summary>
+        /// <summary>Invoked on the main thread once this primitive has been removed from its world and the raytracing threads no longer use its voxel data. This is invoked by Update, or by RemovePrimitive if this primitive was never sent to the raytracing threads.</summary>
         public Action OnRemoved;
 
         // Keep a delegate for native callbacks
@@ -44,7 +37,6 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Create a new voxel primitive with a custom memory layout</summary>
-        /// <exception cref="ArgumentException">Thrown if data is null, or width, height, depth, stride or a pitch are &lt;= 0</exception>
         public UnsafeVoxelPrimitive(void* data, int width, int height, int depth, int stride, int xPitch, int yPitch, int zPitch)
         {
             native = UnsafeVoxelPrimitiveBindings.CreateWithPitch((IntPtr)data, width, height, depth, stride, xPitch, yPitch, zPitch);
@@ -81,10 +73,10 @@ namespace vaudionativewrapper.managed
             set => UnsafeVoxelPrimitiveBindings.SetTransform(native, ref value).ThrowIfError();
         }
 
-        /// <summary>Returns the material of the voxel at (x, y, z), using the world's <see cref="World.UnsafeVoxelMaterialMap"/>. Returns <see cref="MaterialType.Air"/> if this primitive hasn't been added to a world</summary>
+        /// <summary>Returns the material of the voxel at (x, y, z), using the world's UnsafeVoxelMaterialMap</summary>
         public MaterialType GetMaterial(int x, int y, int z) => UnsafeVoxelPrimitiveBindings.GetVoxel(native, x, y, z);
 
-        /// <summary>Returns true if the voxel at (x, y, z) is solid, i.e. its material is not <see cref="MaterialType.Air"/></summary>
+        /// <summary>Returns true if the voxel at (x, y, z) is solid, using the world's UnsafeVoxelMaterialMap</summary>
         public bool IsSolid(int x, int y, int z) => UnsafeVoxelPrimitiveBindings.IsSolid(native, x, y, z);
 
         /// <summary>Call this after editing voxel data</summary>
