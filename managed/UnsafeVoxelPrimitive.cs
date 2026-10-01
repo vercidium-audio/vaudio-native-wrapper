@@ -1,11 +1,12 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace vaudionativewrapper.managed
 {
     /// <summary>
     /// A 3D grid of voxels that reads directly from unmanaged memory owned by the caller, rather than copying it.<br/>
     /// Each voxel is converted to a material by the world's <see cref="World.UnsafeVoxelMaterialMap"/>, which must be set before adding this primitive to a world.<br/>
-    /// The memory is read from background threads, and must not be freed until this primitive is removed from its world.
+    /// The memory is read from background threads, and must not be freed until this primitive is removed from its world and its <see cref="OnRemoved"/> callback is invoked.
     /// </summary>
     public unsafe class UnsafeVoxelPrimitive : Primitive
     {
@@ -20,6 +21,20 @@ namespace vaudionativewrapper.managed
 
         /// <summary>Number of voxels between neighbouring voxels along each axis, i.e. the voxel at (x, y, z) is at data + (x * xPitch + y * yPitch + z * zPitch) * stride</summary>
         public readonly int xPitch, yPitch, zPitch;
+
+        /// <summary>
+        /// Invoked on the main thread once this primitive has been removed from its world and the raytracing threads no longer use its voxel data.<br/>
+        /// This is invoked by <see cref="World.Update"/>, or by <see cref="World.RemovePrimitive"/> if this primitive was never sent to the raytracing threads.<br/>
+        /// </summary>
+        public Action OnRemoved;
+
+        // Keep a delegate for native callbacks
+        static readonly UnsafeVoxelRemovedCallback removedCallback = OnRemovedNative;
+        static readonly IntPtr removedCallbackPtr = Marshal.GetFunctionPointerForDelegate(removedCallback);
+
+        GCHandle handle;
+        int pendingRemovedCallbacks;
+        bool destroyed;
 
         /// <summary>Create a new voxel primitive that uses the same memory layout as VoxelPrimitive: (x * height + y) * depth + z</summary>
         /// <exception cref="ArgumentException">Thrown if data is null, or width, height, depth or stride are &lt;= 0</exception>
@@ -47,6 +62,9 @@ namespace vaudionativewrapper.managed
             this.xPitch = xPitch;
             this.yPitch = yPitch;
             this.zPitch = zPitch;
+
+            handle = GCHandle.Alloc(this);
+            UnsafeVoxelPrimitiveBindings.SetRemovedCallback(native, removedCallbackPtr, GCHandle.ToIntPtr(handle)).ThrowIfError();
         }
 
         /// <summary>Scale of the voxels</summary>
@@ -72,7 +90,45 @@ namespace vaudionativewrapper.managed
         /// <summary>Call this after editing voxel data</summary>
         public void SetDataDirty() => UnsafeVoxelPrimitiveBindings.SetDataDirty(native).ThrowIfError();
 
-        protected override VAResult DestroyNative(IntPtr native) => UnsafeVoxelPrimitiveBindings.Destroy(native);
+        // A primitive can be added and removed from a world multiple times, so ensure we invoke OnRemoved the correct amount of times
+        internal override void OnAddedToWorld() => pendingRemovedCallbacks++;
+
+        static void OnRemovedNative(IntPtr userData)
+        {
+            var primitive = (UnsafeVoxelPrimitive)GCHandle.FromIntPtr(userData).Target;
+            primitive.pendingRemovedCallbacks--;
+
+            // Exceptions must not propagate into native code
+            try
+            {
+                primitive.OnRemoved?.Invoke();
+            }
+            catch (Exception e)
+            {
+                LogSettings.Error($"The OnRemoved callback for an UnsafeVoxelPrimitive threw this exception: {e}");
+            }
+
+            primitive.FreeHandleIfUnused();
+        }
+
+        void FreeHandleIfUnused()
+        {
+            if (destroyed && pendingRemovedCallbacks == 0 && handle.IsAllocated)
+                handle.Free();
+        }
+
+        protected override VAResult DestroyNative(IntPtr native)
+        {
+            var result = UnsafeVoxelPrimitiveBindings.Destroy(native);
+
+            if (result == VAResult.Success)
+            {
+                destroyed = true;
+                FreeHandleIfUnused();
+            }
+
+            return result;
+        }
 
         protected override string DebugInfo => $"material={material}, width={width}, height={height}, depth={depth}, stride={stride}, scale={scale}";
     }

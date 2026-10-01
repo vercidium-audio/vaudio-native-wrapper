@@ -3,8 +3,14 @@ using System.Runtime.InteropServices;
 
 namespace vaudionativewrapper
 {
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void UnsafeVoxelRemovedCallback(IntPtr userData);
+
     public static class UnsafeVoxelPrimitiveBindings
     {
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaUnsafeVoxelPrimitiveSetRemovedCallback")]
+        public static extern VAResult SetRemovedCallback(IntPtr primitive, IntPtr callback, IntPtr userData);
+
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaUnsafeVoxelPrimitiveCreate")]
         public static extern IntPtr Create(IntPtr data, int width, int height, int depth, int stride);
 
