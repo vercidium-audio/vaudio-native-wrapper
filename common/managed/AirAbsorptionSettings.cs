@@ -1,0 +1,118 @@
+﻿using System;
+using System.Runtime.InteropServices;
+
+namespace vaudionativewrapper.managed
+{
+    /// <summary>Settings that control how sound energy is absorbed by the air over distance</summary>
+    public class AirAbsorptionSettings
+    {
+        public IntPtr native;
+        private readonly bool owns;
+
+        // Must keep these to prevent garbage collection
+        GCHandle lfHandle;
+        GCHandle hfHandle;
+
+#if DEBUG
+        string stackTrace;
+#endif
+
+        /// <summary>Create a new AirAbsorptionSettings with default settings</summary>
+        public AirAbsorptionSettings()
+        {
+            native = AirAbsorptionSettingsBindings.Create();
+            owns = true;
+#if DEBUG
+            stackTrace = Environment.StackTrace;
+#endif
+        }
+
+        public AirAbsorptionSettings(IntPtr native)
+        {
+            this.native = native;
+#if DEBUG
+            stackTrace = Environment.StackTrace;
+#endif
+        }
+
+        /// <summary>Relative humidity as a percentage</summary>
+        public float Humidity
+        {
+            get => AirAbsorptionSettingsBindings.GetHumidity(native);
+            set => AirAbsorptionSettingsBindings.SetHumidity(native, value).ThrowIfError();
+        }
+
+        /// <summary>Air temperature in degrees Celsius</summary>
+        public float Temperature
+        {
+            get => AirAbsorptionSettingsBindings.GetTemperature(native);
+            set => AirAbsorptionSettingsBindings.SetTemperature(native, value).ThrowIfError();
+        }
+
+        /// <summary>Atmospheric pressure in Pascals</summary>
+        public float Pressure
+        {
+            get => AirAbsorptionSettingsBindings.GetPressure(native);
+            set => AirAbsorptionSettingsBindings.SetPressure(native, value).ThrowIfError();
+        }
+
+        public VAResult Validate() => AirAbsorptionSettingsBindings.Validate(native);
+
+        public VAResult Destroy()
+        {
+            var result = AirAbsorptionSettingsBindings.Destroy(native);
+            native = IntPtr.Zero;
+            return result;
+        }
+
+#if DEBUG
+        ~AirAbsorptionSettings()
+        {
+            if (owns && native != IntPtr.Zero)
+                LogSettings.Warn($"AirAbsorptionSettings was garbage collected without calling Destroy() first. Stack trace: {stackTrace}");
+        }
+#endif
+
+        public AirAbsorptionFormulaDelegate SetCustomFormulaLF(Func<float, float> value)
+        {
+            if (lfHandle.IsAllocated)
+                lfHandle.Free();
+
+            if (value != null)
+            {
+                float callback(float distance) => value(distance);
+                var del = (AirAbsorptionFormulaDelegate)callback;
+                lfHandle = GCHandle.Alloc(del);
+
+                AirAbsorptionSettingsBindings.SetCustomFormulaLF(native, Marshal.GetFunctionPointerForDelegate(del)).ThrowIfError();
+                return del;
+            }
+            else
+            {
+                AirAbsorptionSettingsBindings.SetCustomFormulaLF(native, IntPtr.Zero).ThrowIfError();
+                return null;
+            }
+        }
+
+        public AirAbsorptionFormulaDelegate SetCustomFormulaHF(Func<float, float> value)
+        {
+            if (hfHandle.IsAllocated)
+                hfHandle.Free();
+
+            if (value != null)
+            {
+                float callback(float distance) => value(distance);
+                var del = (AirAbsorptionFormulaDelegate)callback;
+                hfHandle = GCHandle.Alloc(del);
+
+                AirAbsorptionSettingsBindings.SetCustomFormulaHF(native, Marshal.GetFunctionPointerForDelegate(del)).ThrowIfError();
+                return del;
+            }
+            else
+            {
+                AirAbsorptionSettingsBindings.SetCustomFormulaHF(native, IntPtr.Zero).ThrowIfError();
+                return null;
+            }
+        }
+    }
+}

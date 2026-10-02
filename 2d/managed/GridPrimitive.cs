@@ -1,0 +1,54 @@
+namespace vaudionativewrapper.managed
+{
+    /// <summary>A 2D grid of cells</summary>
+    public unsafe class GridPrimitive : Primitive
+    {
+        public readonly int width;
+        public readonly int height;
+
+        /// <summary>Create a new grid primitive with the specified size</summary>
+        public GridPrimitive(int width, int height)
+        {
+            this.width = width;
+            this.height = height;
+
+            native = GridPrimitiveBindings.Create(width, height);
+            owns = true;
+        }
+
+        /// <summary>Position of the grid in world space</summary>
+        public Vector position
+        {
+            get => GridPrimitiveBindings.GetPosition(native);
+            set => GridPrimitiveBindings.SetPosition(native, value).ThrowIfError();
+        }
+
+        /// <summary>Rotation of the grid in radians</summary>
+        public float rotation
+        {
+            get => GridPrimitiveBindings.GetRotation(native);
+            set => GridPrimitiveBindings.SetRotation(native, value).ThrowIfError();
+        }
+
+        /// <summary>Scale of the cells</summary>
+        public float scale
+        {
+            get => GridPrimitiveBindings.GetScale(native);
+            set => GridPrimitiveBindings.SetScale(native, value).ThrowIfError();
+        }
+
+        /// <summary>Helper overload for accessing and editing grid data</summary>
+        public MaterialType this[int x, int y]
+        {
+            get => GridPrimitiveBindings.GetCell(native, x, y);
+            set => GridPrimitiveBindings.SetCell(native, x, y, value).ThrowIfError();
+        }
+
+        /// <summary>Call this after editing grid data</summary>
+        public void SetDataDirty() => GridPrimitiveBindings.SetDataDirty(native).ThrowIfError();
+
+        protected override vaudionativewrapper.VAResult DestroyNative(System.IntPtr native) => GridPrimitiveBindings.Destroy(native);
+
+        protected override string DebugInfo => $"material={material}, width={width}, height={height}, position={position}, rotation={rotation}, scale={scale}";
+    }
+}

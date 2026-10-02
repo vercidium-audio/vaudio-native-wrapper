@@ -1,0 +1,39 @@
+﻿using System;
+
+namespace vaudionativewrapper.managed
+{
+    /// <summary>A capsule (cylinder with hemispherical caps) audio primitive</summary>
+    public unsafe class CapsulePrimitive : Primitive
+    {
+        public CapsulePrimitive()
+        {
+            native = CapsulePrimitiveBindings.Create();
+            owns = true;
+        }
+
+        /// <summary>Radius of the capsule</summary>
+        public float radius
+        {
+            get => CapsulePrimitiveBindings.GetRadius(native);
+            set => CapsulePrimitiveBindings.SetRadius(native, value).ThrowIfError();
+        }
+
+        /// <summary>Length of the body between the spherical caps</summary>
+        public float length
+        {
+            get => CapsulePrimitiveBindings.GetLength(native);
+            set => CapsulePrimitiveBindings.SetLength(native, value).ThrowIfError();
+        }
+
+        /// <summary>Must only contain rotation and translation components, not scale</summary>
+        public Matrix transform
+        {
+            get => *CapsulePrimitiveBindings.GetTransform(native);
+            set => CapsulePrimitiveBindings.SetTransform(native, ref value).ThrowIfError();
+        }
+
+        protected override VAResult DestroyNative(IntPtr native) => CapsulePrimitiveBindings.Destroy(native);
+
+        protected override string DebugInfo => $"material={material}, radius={radius}, length={length}";
+    }
+}

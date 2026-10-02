@@ -1,0 +1,39 @@
+﻿using System;
+
+namespace vaudionativewrapper.managed
+{
+    /// <summary>A cone primitive with a circular base</summary>
+    public unsafe class ConePrimitive : Primitive
+    {
+        public ConePrimitive()
+        {
+            native = ConePrimitiveBindings.Create();
+            owns = true;
+        }
+
+        /// <summary>Radius of the cone base</summary>
+        public float radius
+        {
+            get => ConePrimitiveBindings.GetRadius(native);
+            set => ConePrimitiveBindings.SetRadius(native, value).ThrowIfError();
+        }
+
+        /// <summary>Height of the cone</summary>
+        public float height
+        {
+            get => ConePrimitiveBindings.GetHeight(native);
+            set => ConePrimitiveBindings.SetHeight(native, value).ThrowIfError();
+        }
+
+        /// <summary>Must only contain rotation and translation components, not scale</summary>
+        public Matrix transform
+        {
+            get => *ConePrimitiveBindings.GetTransform(native);
+            set => ConePrimitiveBindings.SetTransform(native, ref value).ThrowIfError();
+        }
+
+        protected override VAResult DestroyNative(IntPtr native) => ConePrimitiveBindings.Destroy(native);
+
+        protected override string DebugInfo => $"material={material}, radius={radius}, height={height}";
+    }
+}
