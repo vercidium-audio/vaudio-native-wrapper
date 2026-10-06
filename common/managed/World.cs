@@ -417,7 +417,7 @@ namespace vaudionativewrapper.managed
 
                 if (value != null)
                 {
-                    LogCallbackFn fn = (msg) => value(msg);
+                    LogCallbackFn fn = (owner, msg) => value(msg);
                     _logCallbackHandle = GCHandle.Alloc(fn);
 
                     WorldBindings.SetLogCallback(native, Marshal.GetFunctionPointerForDelegate(fn)).ThrowIfError();

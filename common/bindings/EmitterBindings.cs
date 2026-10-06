@@ -22,7 +22,8 @@ namespace vaudionativewrapper
     public delegate float GainFormulaDelegate(bool lowFrequency, int occlusionRayCount, int permeationRayCount, int permeationBounceCount, float occlusionEnergy, float permeationEnergy);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void LogCallbackFn([MarshalAs(UnmanagedType.LPStr)] string message);
+    // owner is the VAWorld* or VAEmitter* that logged the message
+    public delegate void LogCallbackFn(IntPtr owner, [MarshalAs(UnmanagedType.LPStr)] string message);
 
     public static class EmitterBindings
     {

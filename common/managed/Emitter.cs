@@ -621,7 +621,7 @@ namespace vaudionativewrapper.managed
 
                 if (value != null)
                 {
-                    LogCallbackFn callback = (msg) => value(msg);
+                    LogCallbackFn callback = (owner, msg) => value(msg);
                     _logCallbackHandle = GCHandle.Alloc(callback);
                     EmitterBindings.SetLogCallback(native, callback).ThrowIfError();
                 }
@@ -642,7 +642,7 @@ namespace vaudionativewrapper.managed
 
                 if (value != null)
                 {
-                    LogCallbackFn callback = (msg) => value(msg);
+                    LogCallbackFn callback = (owner, msg) => value(msg);
                     _logErrorCallbackHandle = GCHandle.Alloc(callback);
                     EmitterBindings.SetLogErrorCallback(native, callback).ThrowIfError();
                 }
