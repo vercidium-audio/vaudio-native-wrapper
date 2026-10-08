@@ -7,9 +7,9 @@ namespace vaudionativewrapper.managed
     public unsafe class Emitter
     {
         public IntPtr native;
-        private readonly bool owns;
 
 #if DEBUG
+        private readonly bool owns;
         string stackTrace;
 #endif
 
@@ -27,9 +27,9 @@ namespace vaudionativewrapper.managed
         public Emitter()
         {
             native = EmitterBindings.Create();
-            owns = true;
 
 #if DEBUG
+            owns = true;
             stackTrace = Environment.StackTrace;
 #endif
         }

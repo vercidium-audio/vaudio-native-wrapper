@@ -8,9 +8,9 @@ namespace vaudionativewrapper.managed
     public unsafe partial class World
     {
         public IntPtr native;
-        private readonly bool owns;
 
 #if DEBUG
+        private readonly bool owns;
         string stackTrace;
 #endif
 
@@ -18,9 +18,9 @@ namespace vaudionativewrapper.managed
         public World()
         {
             native = WorldBindings.Create();
-            owns = true;
 
 #if DEBUG
+            owns = true;
             stackTrace = Environment.StackTrace;
 #endif
         }
@@ -29,9 +29,9 @@ namespace vaudionativewrapper.managed
         public World(string debugWindowHost, int debugWindowPort)
         {
             native = WorldBindings.CreateWithNetworking(debugWindowHost, debugWindowPort);
-            owns = true;
 
 #if DEBUG
+            owns = true;
             stackTrace = Environment.StackTrace;
 #endif
         }
