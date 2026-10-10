@@ -128,6 +128,34 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetRelativeReverbOuterThreshold(native, value).ThrowIfError();
         }
 
+        /// <summary>Whether this emitter can share reverb, ambient occlusion and ambient permeation rays with other nearby emitters that also have clustering enabled. Rays are cast outwards from each emitter in the cluster in round robin, and each emitter shares the same reverb, EAX and ambience results. This doesn't affect occlusion or permeation. Each emitter in a cluster still casts its own occlusion and permeation rays towards its own targets. Emitters only cluster with others that have the same reverb, ambient occlusion and ambient permeation enabled flags, and the same MaxEchogramTime and EchogramGranularity.</summary>
+        public bool ClusteringEnabled
+        {
+            get => EmitterBindings.GetClusteringEnabled(native);
+            set => EmitterBindings.SetClusteringEnabled(native, value).ThrowIfError();
+        }
+
+        /// <summary>The maximum distance between this emitter and another emitter in a cluster, for it to share their reverb, ambient occlusion and ambient permeation rays. Only used if ClusteringEnabled is true.</summary>
+        public float ClusteringDistance
+        {
+            get => EmitterBindings.GetClusteringDistance(native);
+            set => EmitterBindings.SetClusteringDistance(native, value).ThrowIfError();
+        }
+
+        /// <summary>Whether this emitter groups its targets into clusters, to reduce the number of occlusion and permeation rays it casts. Within each cluster, this emitter casts occlusion and permeation rays towards the targets in the cluster in round robin, and each target gets the same low pass filter. This is set on the emitter that casts the rays (e.g. the listener), not on its targets. For reverb and ambience clustering, see ClusteringEnabled.</summary>
+        public bool TargetClusteringEnabled
+        {
+            get => EmitterBindings.GetTargetClusteringEnabled(native);
+            set => EmitterBindings.SetTargetClusteringEnabled(native, value).ThrowIfError();
+        }
+
+        /// <summary>The maximum distance between two of this emitter's targets for them to be in the same cluster. Only used if TargetClusteringEnabled is true.</summary>
+        public float TargetClusteringDistance
+        {
+            get => EmitterBindings.GetTargetClusteringDistance(native);
+            set => EmitterBindings.SetTargetClusteringDistance(native, value).ThrowIfError();
+        }
+
         /// <summary>Whether to clamp this emitter's position within the world bounds.</summary>
         public bool ClampPosition
         {
