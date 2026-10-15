@@ -61,13 +61,17 @@ namespace vaudionativewrapper.managed
         public void RemoveTarget(Emitter target) => EmitterBindings.RemoveTarget(native, target.native).ThrowIfError();
 
         /// <summary>Returns whether the provided emitter is a target of this emitter</summary>
-        public bool HasTarget(Emitter target) => EmitterBindings.HasTarget(native, target.native);
+        public bool HasTarget(Emitter target) => EmitterBindings.HasTarget(native, target.native).ToBool();
 
         /// <summary>Returns whether a target emitter has been raytraced. If true, it is safe to check the target's filter via GetTargetFilter</summary>
-        public bool HasRaytracedTarget(Emitter target) => EmitterBindings.HasRaytracedTarget(native, target.native);
+        public bool HasRaytracedTarget(Emitter target) => EmitterBindings.HasRaytracedTarget(native, target.native).ToBool();
 
         /// <summary>Get the low- and high-frequency gains for the target emitter. Only access when HasRaytracedTarget(Emitter) returns true.</summary>
-        public LowPassFilter* GetTargetFilter(Emitter target) => EmitterBindings.GetTargetFilter(native, target.native);
+        public LowPassFilter* GetTargetFilter(Emitter target)
+        {
+            EmitterBindings.GetTargetFilter(native, target.native, out var filter).ThrowIfError();
+            return filter;
+        }
 
         /// <summary>Clear the ray cache, causing all rays to be re-cast.</summary>
         public void ResetTrails() => EmitterBindings.ResetTrails(native).ThrowIfError();
@@ -163,7 +167,7 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetClampPosition(native, value).ThrowIfError();
         }
 
-        /// <summary>This name is displayed in the debug window.</summary>
+        /// <summary>This name is displayed in the debug window. Setting null stores an empty string.</summary>
         public string Name
         {
             get => EmitterBindings.GetName(native);
@@ -545,7 +549,7 @@ namespace vaudionativewrapper.managed
             }
         }
 
-        /// <summary>This callback is invoked when this emitter is actually removed from the World. Normally this is invoked immediately within RemoveEmitter, but if it casts reverb rays and AffectsGroupedEAX is true, it will be invoked when its reverb tail finishes playing. During this time, PendingRemoval is set to true.</summary>
+        /// <summary>This callback is invoked once this emitter has been removed from the World and the raytracing threads no longer read it. It's invoked inside Update or Wait once the next raytracing results are handled, inside RemoveEmitter if no raytracing results are pending, or inside Dispose. If it casts reverb rays and AffectsGroupedEAX is true, removal itself waits until its reverb tail finishes playing, and during that time PendingRemoval is set to true. The callback is cleared once invoked. If the emitter is re-added to the same world before then, it isn't invoked, and is kept for the next removal.</summary>
         public Action OnRemoved
         {
             set

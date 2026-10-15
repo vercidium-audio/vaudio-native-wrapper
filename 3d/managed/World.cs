@@ -100,19 +100,22 @@
         /// <summary>Convert a world-space direction (e.g. RelativeDirections) to a listener-space direction, for use as EFX reflections/late reverb pan. Same as ConvertWorldToListenerDirection.</summary>
         public Vector CalculateListenerRelativePan(Vector worldVector, float listenerPitch, float listenerYaw)
         {
-            return WorldBindings.CalculateListenerRelativePan(native, worldVector, listenerPitch, listenerYaw);
+            WorldBindings.CalculateListenerRelativePan(native, worldVector, listenerPitch, listenerYaw, out var pan).ThrowIfError();
+            return pan;
         }
 
         /// <summary>Convert a world-space direction (in the world's CoordinateSystem) to a listener-space direction, based on the listener's pitch and yaw. Listener space is always X+ right, Y+ up and Z+ forward relative to the listener, regardless of CoordinateSystem, matching the EFX reflections/late reverb pan convention.</summary>
         public Vector ConvertWorldToListenerDirection(Vector worldDirection, float listenerPitch, float listenerYaw)
         {
-            return WorldBindings.ConvertWorldToListenerDirection(native, worldDirection, listenerPitch, listenerYaw);
+            WorldBindings.ConvertWorldToListenerDirection(native, worldDirection, listenerPitch, listenerYaw, out var direction).ThrowIfError();
+            return direction;
         }
 
         /// <summary>Convert a listener-space direction (X+ right, Y+ up, Z+ forward relative to the listener) to a world-space direction (in the world's CoordinateSystem), based on the listener's pitch and yaw.</summary>
         public Vector ConvertListenerToWorldDirection(Vector listenerDirection, float listenerPitch, float listenerYaw)
         {
-            return WorldBindings.ConvertListenerToWorldDirection(native, listenerDirection, listenerPitch, listenerYaw);
+            WorldBindings.ConvertListenerToWorldDirection(native, listenerDirection, listenerPitch, listenerYaw, out var direction).ThrowIfError();
+            return direction;
         }
 
     }

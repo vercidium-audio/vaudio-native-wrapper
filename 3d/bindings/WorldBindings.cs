@@ -37,12 +37,12 @@ namespace vaudionativewrapper
         public static extern VAResult SetFieldOfView(IntPtr world, float fieldOfView);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldCalculateListenerRelativePan")]
-        public static extern Vector CalculateListenerRelativePan(IntPtr ctx, Vector worldVector, float listenerPitch, float listenerYaw);
+        public static extern VAResult CalculateListenerRelativePan(IntPtr ctx, Vector worldVector, float listenerPitch, float listenerYaw, out Vector pan);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldConvertWorldToListenerDirection")]
-        public static extern Vector ConvertWorldToListenerDirection(IntPtr ctx, Vector worldDirection, float listenerPitch, float listenerYaw);
+        public static extern VAResult ConvertWorldToListenerDirection(IntPtr ctx, Vector worldDirection, float listenerPitch, float listenerYaw, out Vector direction);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldConvertListenerToWorldDirection")]
-        public static extern Vector ConvertListenerToWorldDirection(IntPtr ctx, Vector listenerDirection, float listenerPitch, float listenerYaw);
+        public static extern VAResult ConvertListenerToWorldDirection(IntPtr ctx, Vector listenerDirection, float listenerPitch, float listenerYaw, out Vector direction);
     }
 }

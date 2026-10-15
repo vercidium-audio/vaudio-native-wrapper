@@ -17,56 +17,56 @@ namespace vaudionativewrapper.managed
         /// <summary>Percentage of low-frequency energy that is lost on each bounce</summary>
         public float AbsorptionLF
         {
-            get => WorldBindings.GetMaterialAbsorptionLF(world, id);
+            get { WorldBindings.GetMaterialAbsorptionLF(world, id, out var value).ThrowIfError(); return value; }
             set => WorldBindings.SetMaterialAbsorptionLF(world, id, value);
         }
 
         /// <summary>Percentage of high-frequency energy that is lost on each bounce</summary>
         public float AbsorptionHF
         {
-            get => WorldBindings.GetMaterialAbsorptionHF(world, id);
+            get { WorldBindings.GetMaterialAbsorptionHF(world, id, out var value).ThrowIfError(); return value; }
             set => WorldBindings.SetMaterialAbsorptionHF(world, id, value);
         }
 
         /// <summary>Scattering strength, where 0.0 has no scattering and 1.0 skews the reflected ray direction by up to 90 degrees</summary>
         public float Scattering
         {
-            get => WorldBindings.GetMaterialScattering(world, id);
+            get { WorldBindings.GetMaterialScattering(world, id, out var value).ThrowIfError(); return value; }
             set => WorldBindings.SetMaterialScattering(world, id, value);
         }
 
         /// <summary>How many meters a ray must travel through a primitive before it loses all low-frequency energy</summary>
         public float TransmissionLF
         {
-            get => WorldBindings.GetMaterialTransmissionLF(world, id);
+            get { WorldBindings.GetMaterialTransmissionLF(world, id, out var value).ThrowIfError(); return value; }
             set => WorldBindings.SetMaterialTransmissionLF(world, id, value);
         }
 
         /// <summary>How many meters a ray must travel through a primitive before it loses all high-frequency energy</summary>
         public float TransmissionHF
         {
-            get => WorldBindings.GetMaterialTransmissionHF(world, id);
+            get { WorldBindings.GetMaterialTransmissionHF(world, id, out var value).ThrowIfError(); return value; }
             set => WorldBindings.SetMaterialTransmissionHF(world, id, value);
         }
 
         /// <summary>Percentage of low-frequency energy lost when a ray touches a primitive with UseFlatTransmission set to true, instead of calculating how long the ray spent inside it</summary>
         public float FlatTransmissionLF
         {
-            get => WorldBindings.GetMaterialFlatTransmissionLF(world, id);
+            get { WorldBindings.GetMaterialFlatTransmissionLF(world, id, out var value).ThrowIfError(); return value; }
             set => WorldBindings.SetMaterialFlatTransmissionLF(world, id, value);
         }
 
         /// <summary>Percentage of high-frequency energy lost when a ray touches a primitive with UseFlatTransmission set to true, instead of calculating how long the ray spent inside it</summary>
         public float FlatTransmissionHF
         {
-            get => WorldBindings.GetMaterialFlatTransmissionHF(world, id);
+            get { WorldBindings.GetMaterialFlatTransmissionHF(world, id, out var value).ThrowIfError(); return value; }
             set => WorldBindings.SetMaterialFlatTransmissionHF(world, id, value);
         }
 
         /// <summary>Debug rendering colour for this material (dev build only). No effect on raytracing.</summary>
         public Color Color
         {
-            get => WorldBindings.GetMaterialColor(world, id);
+            get { WorldBindings.GetMaterialColor(world, id, out var color).ThrowIfError(); return color; }
             set => WorldBindings.SetMaterialColor(world, id, value).ThrowIfError();
         }
     }

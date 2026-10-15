@@ -32,6 +32,7 @@ namespace vaudionativewrapper
         False = 25,
         WrongDimension = 26,
         MissingMaterialCallback = 27,
+        WrongThread = 28,
     }
 
     public static class VAResultExtensions
@@ -41,6 +42,18 @@ namespace vaudionativewrapper
         {
             if (result != VAResult.Success && result != VAResult.Unchanged && result != VAResult.StillRunning && result != VAResult.PendingRemoval && result != VAResult.True && result != VAResult.False)
                 throw new InvalidOperationException($"Native call failed: {result}");
+        }
+
+        // Converts VA_TRUE/VA_FALSE to a bool, and throws for any other result
+        public static bool ToBool(this VAResult result)
+        {
+            if (result == VAResult.True)
+                return true;
+
+            if (result == VAResult.False)
+                return false;
+
+            throw new InvalidOperationException($"Native call failed: {result}");
         }
     }
 }

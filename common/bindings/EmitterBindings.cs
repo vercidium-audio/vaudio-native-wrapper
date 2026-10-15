@@ -40,15 +40,13 @@ namespace vaudionativewrapper
         public static extern VAResult RemoveTarget(IntPtr emitter, IntPtr target);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterHasTarget")]
-        [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool HasTarget(IntPtr emitter, IntPtr target);
+        public static extern VAResult HasTarget(IntPtr emitter, IntPtr target);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterHasRaytracedTarget")]
-        [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool HasRaytracedTarget(IntPtr emitter, IntPtr target);
+        public static extern VAResult HasRaytracedTarget(IntPtr emitter, IntPtr target);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetTargetFilter")]
-        public static extern unsafe LowPassFilter* GetTargetFilter(IntPtr emitter, IntPtr target);
+        public static extern unsafe VAResult GetTargetFilter(IntPtr emitter, IntPtr target, out LowPassFilter* filter);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterResetTrails")]
         public static extern VAResult ResetTrails(IntPtr emitter);
