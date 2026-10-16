@@ -43,13 +43,6 @@ namespace vaudionativewrapper.managed
             set => PathPrimitiveBindings.SetScale(native, value).ThrowIfError();
         }
 
-        /// <summary>Whether rays lose a flat percentage of energy the moment they touch this path, instead of calculating how long the ray spent inside it. Only meaningful to disable for closed paths (svgPath ends with Z/z) as an open path has no interior.</summary>
-        public bool UseFlatTransmission
-        {
-            get => PathPrimitiveBindings.GetUseFlatTransmission(native);
-            set => PathPrimitiveBindings.SetUseFlatTransmission(native, value).ThrowIfError();
-        }
-
         protected override VAResult DestroyNative(IntPtr native) => PathPrimitiveBindings.Destroy(native);
 
         protected override string DebugInfo => $"material={material}, position={position}, rotation={rotation}, scale={scale}";

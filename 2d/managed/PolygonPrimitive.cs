@@ -78,13 +78,6 @@ namespace vaudionativewrapper.managed
             set => PolygonPrimitiveBindings.SetScale(native, value).ThrowIfError();
         }
 
-        /// <summary>Whether rays lose a flat percentage of energy the moment they touch this primitive, instead of calculating how long the ray spent inside it. Flat primitives (e.g. Disk, Plane, Triangle, Line) force this to true and throw if set to false.</summary>
-        public bool UseFlatTransmission
-        {
-            get => PolygonPrimitiveBindings.GetUseFlatTransmission(native);
-            set => PolygonPrimitiveBindings.SetUseFlatTransmission(native, value).ThrowIfError();
-        }
-
         /// <summary>Whether the last point should connect back to the first</summary>
         public bool enclosed
         {

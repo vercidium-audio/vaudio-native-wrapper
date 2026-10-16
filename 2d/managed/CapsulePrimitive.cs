@@ -39,13 +39,6 @@ namespace vaudionativewrapper.managed
             set => CapsulePrimitiveBindings.SetRotation(native, value).ThrowIfError();
         }
 
-        /// <summary>When true, rays lose a flat percentage of energy the moment they touch this capsule, instead of calculating how long the ray spent inside it</summary>
-        public bool UseFlatTransmission
-        {
-            get => CapsulePrimitiveBindings.GetUseFlatTransmission(native);
-            set => CapsulePrimitiveBindings.SetUseFlatTransmission(native, value).ThrowIfError();
-        }
-
         protected override VAResult DestroyNative(IntPtr native) => CapsulePrimitiveBindings.Destroy(native);
 
         protected override string DebugInfo => $"material={material}, center={center}, radius={radius}, length={length}, rotation={rotation}";
