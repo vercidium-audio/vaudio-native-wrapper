@@ -478,7 +478,7 @@ namespace vaudionativewrapper.managed
             {
                 fixed (Vector* ptr = value)
                 {
-                    EmitterBindings.SetOverridePositions(native, ptr, value.Length).ThrowIfError();
+                    EmitterBindings.SetOverridePositions(native, ptr, value?.Length ?? 0).ThrowIfError();
                 }
             }
         }
@@ -490,7 +490,7 @@ namespace vaudionativewrapper.managed
             {
                 fixed (Vector* ptr = value)
                 {
-                    EmitterBindings.SetOverrideRayDirections(native, ptr, value.Length).ThrowIfError();
+                    EmitterBindings.SetOverrideRayDirections(native, ptr, value?.Length ?? 0).ThrowIfError();
                 }
             }
         }
