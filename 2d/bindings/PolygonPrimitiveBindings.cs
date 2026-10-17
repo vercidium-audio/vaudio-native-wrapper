@@ -6,16 +6,13 @@ namespace vaudionativewrapper
     public static class PolygonPrimitiveBindings
     {
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPolygonPrimitiveCreate")]
-        public static extern unsafe VAResult Create(Vector* points, int pointCount, IntPtr* outPrimitive);
+        public static extern unsafe VAResult Create(IntPtr polygon, IntPtr* outPrimitive);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPolygonPrimitiveSetPoints")]
-        public static extern unsafe VAResult SetPoints(IntPtr primitive, Vector* points, int pointCount);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPolygonPrimitiveSetPolygon")]
+        public static extern VAResult SetPolygon(IntPtr primitive, IntPtr polygon);
 
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPolygonPrimitiveGetPointCount")]
-        public static extern int GetPointCount(IntPtr primitive);
-
-        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPolygonPrimitiveGetPoint")]
-        public static extern Vector GetPoint(IntPtr primitive, int index);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPolygonPrimitiveGetPolygon")]
+        public static extern IntPtr GetPolygon(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPolygonPrimitiveSetPosition")]
         public static extern VAResult SetPosition(IntPtr primitive, Vector position);

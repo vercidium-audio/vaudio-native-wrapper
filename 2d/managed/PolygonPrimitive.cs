@@ -1,59 +1,38 @@
 using System;
-using System.Collections.Generic;
 
 namespace vaudionativewrapper.managed
 {
-    /// <summary>A polygon primitive constructed from a list of points</summary>
+    /// <summary>A polygon primitive constructed from a <see cref="Polygon"/>, which can be shared across multiple primitives</summary>
     public unsafe class PolygonPrimitive : Primitive
     {
-        /// <summary>Create a polygon primitive from a list of local-space points. Must contain at least 3 points</summary>
-        public PolygonPrimitive(List<Vector> points)
-        {
-            Vector[] copy = points.ToArray();
-            IntPtr outPrimitive;
+        Polygon _polygon;
 
-            fixed (Vector* ptr = copy)
-            {
-                PolygonPrimitiveBindings.Create(ptr, copy.Length, &outPrimitive).ThrowIfError();
-            }
+        /// <summary>Create a polygon primitive. The polygon must not be destroyed until every primitive using it has been destroyed</summary>
+        public PolygonPrimitive(Polygon polygon)
+        {
+            if (polygon == null)
+                throw new ArgumentNullException(nameof(polygon));
+
+            IntPtr outPrimitive;
+            PolygonPrimitiveBindings.Create(polygon.native, &outPrimitive).ThrowIfError();
 
             native = outPrimitive;
             owns = true;
+            _polygon = polygon;
         }
 
-        /// <summary>Create a polygon primitive from an array of local-space points. Must contain at least 3 points</summary>
-        public PolygonPrimitive(Vector[] points)
+        /// <summary>Shared local-space points, before rotation, scale and position are applied</summary>
+        public Polygon polygon
         {
-            IntPtr outPrimitive;
-
-            fixed (Vector* ptr = points)
-            {
-                PolygonPrimitiveBindings.Create(ptr, points.Length, &outPrimitive).ThrowIfError();
-            }
-
-            native = outPrimitive;
-            owns = true;
-        }
-
-        /// <summary>Local-space points, before rotation, scale and position are applied. Must contain at least 3 points</summary>
-        public Vector[] points
-        {
-            get
-            {
-                int count = PolygonPrimitiveBindings.GetPointCount(native);
-                var result = new Vector[count];
-
-                for (int i = 0; i < count; i++)
-                    result[i] = PolygonPrimitiveBindings.GetPoint(native, i);
-
-                return result;
-            }
+            get => _polygon;
             set
             {
-                fixed (Vector* ptr = value)
-                {
-                    PolygonPrimitiveBindings.SetPoints(native, ptr, value.Length).ThrowIfError();
-                }
+                if (value == null)
+                    throw new ArgumentNullException(nameof(polygon));
+
+                PolygonPrimitiveBindings.SetPolygon(native, value.native).ThrowIfError();
+
+                _polygon = value;
             }
         }
 

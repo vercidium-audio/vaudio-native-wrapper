@@ -2,24 +2,38 @@ using System;
 
 namespace vaudionativewrapper.managed
 {
-    /// <summary>A polygon primitive constructed from an SVG path</summary>
+    /// <summary>A path primitive constructed from a <see cref="Path"/>, which can be shared across multiple primitives</summary>
     public unsafe class PathPrimitive : Primitive
     {
-        /// <summary>Create a path primitive from local-space SVG path data (the contents of an SVG "d" attribute). Supported commands: M/m, L/l, H/h, V/v, C/c, Q/q, A/a, Z/z (absolute and relative forms). Elliptical arcs (A/a) are converted to cubic bezier curves when parsed. Smooth-curve shorthand (S/s, T/t) is not supported</summary>
-        public PathPrimitive(string svgPath)
+        Path _svgPath;
+
+        /// <summary>Create a path primitive. The path must not be destroyed until every primitive using it has been destroyed</summary>
+        public PathPrimitive(Path svgPath)
         {
+            if (svgPath == null)
+                throw new ArgumentNullException(nameof(svgPath));
+
             IntPtr outPrimitive;
-            PathPrimitiveBindings.Create(svgPath, &outPrimitive).ThrowIfError();
+            PathPrimitiveBindings.Create(svgPath.native, &outPrimitive).ThrowIfError();
 
             native = outPrimitive;
             owns = true;
+            _svgPath = svgPath;
         }
 
-        /// <summary>The local-space SVG path data (the contents of an SVG "d" attribute), before rotation, scale and position are applied. Supported commands: M/m, L/l, H/h, V/v, C/c, Q/q, A/a, Z/z (absolute and relative forms). Elliptical arcs (A/a) are converted to cubic bezier curves when parsed. Smooth-curve shorthand (S/s, T/t) is not supported. If the path ends with Z/z it is treated as closed.</summary>
-        public string svgPath
+        /// <summary>Shared, pre-parsed local-space SVG path, before rotation, scale and position are applied</summary>
+        public Path svgPath
         {
-            get => PathPrimitiveBindings.GetSvgPath(native);
-            set => PathPrimitiveBindings.SetSvgPath(native, value).ThrowIfError();
+            get => _svgPath;
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException(nameof(svgPath));
+
+                PathPrimitiveBindings.SetSvgPath(native, value.native).ThrowIfError();
+
+                _svgPath = value;
+            }
         }
 
         /// <summary>Position of the path in world space</summary>

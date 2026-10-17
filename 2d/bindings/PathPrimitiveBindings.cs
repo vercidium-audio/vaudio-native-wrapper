@@ -6,14 +6,13 @@ namespace vaudionativewrapper
     public static class PathPrimitiveBindings
     {
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPathPrimitiveCreate")]
-        public static extern unsafe VAResult Create([MarshalAs(UnmanagedType.LPStr)] string svgPath, IntPtr* outPrimitive);
+        public static extern unsafe VAResult Create(IntPtr svgPath, IntPtr* outPrimitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPathPrimitiveSetSvgPath")]
-        public static extern VAResult SetSvgPath(IntPtr primitive, [MarshalAs(UnmanagedType.LPStr)] string svgPath);
+        public static extern VAResult SetSvgPath(IntPtr primitive, IntPtr svgPath);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPathPrimitiveGetSvgPath")]
-        private static extern IntPtr GetSvgPathRaw(IntPtr primitive);
-        public static string GetSvgPath(IntPtr primitive) => Marshal.PtrToStringAnsi(GetSvgPathRaw(primitive));
+        public static extern IntPtr GetSvgPath(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPathPrimitiveSetPosition")]
         public static extern VAResult SetPosition(IntPtr primitive, Vector position);
