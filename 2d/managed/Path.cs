@@ -16,6 +16,15 @@ namespace vaudionativewrapper.managed
             native = outPath;
         }
 
+        // Wraps a path owned by a PathPrimitive, which frees it natively
+        internal Path(IntPtr native)
+        {
+            this.native = native;
+            ownedByPrimitive = true;
+        }
+
+        readonly bool ownedByPrimitive;
+
         /// <summary>The SVG path data this path was parsed from</summary>
         public string data => PathBindings.GetData(native);
 
@@ -25,7 +34,7 @@ namespace vaudionativewrapper.managed
         /// <summary>Destroys the native path. Returns <see cref="VAResult.ErrorInUse"/> if a PathPrimitive using this path has not been destroyed yet, in which case Destroy can be called again later</summary>
         public VAResult Destroy()
         {
-            if (native == IntPtr.Zero)
+            if (native == IntPtr.Zero || ownedByPrimitive)
                 return VAResult.Success;
 
             var result = PathBindings.Destroy(native);
@@ -38,7 +47,7 @@ namespace vaudionativewrapper.managed
 
         ~Path()
         {
-            if (native != IntPtr.Zero)
+            if (native != IntPtr.Zero && !ownedByPrimitive)
                 LogSettings.Warn("Path was garbage collected without calling Destroy() first.");
         }
     }

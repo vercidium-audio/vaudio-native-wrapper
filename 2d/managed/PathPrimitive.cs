@@ -14,11 +14,25 @@ namespace vaudionativewrapper.managed
                 throw new ArgumentNullException(nameof(svgPath));
 
             IntPtr outPrimitive;
-            PathPrimitiveBindings.Create(svgPath.native, &outPrimitive).ThrowIfError();
+            PathPrimitiveBindings.CreateFromPath(svgPath.native, &outPrimitive).ThrowIfError();
 
             native = outPrimitive;
             owns = true;
             _svgPath = svgPath;
+        }
+
+        /// <summary>Create a path primitive with its own unshared path, from local-space SVG path data (the contents of an SVG "d" attribute) before rotation, scale and position are applied. See <see cref="Path"/> for supported commands</summary>
+        public PathPrimitive(string svgPath)
+        {
+            if (svgPath == null)
+                throw new ArgumentNullException(nameof(svgPath));
+
+            IntPtr outPrimitive;
+            PathPrimitiveBindings.Create(svgPath, &outPrimitive).ThrowIfError();
+
+            native = outPrimitive;
+            owns = true;
+            _svgPath = new Path(PathPrimitiveBindings.GetSvgPath(outPrimitive));
         }
 
         /// <summary>Shared, pre-parsed local-space SVG path, before rotation, scale and position are applied</summary>

@@ -6,7 +6,10 @@ namespace vaudionativewrapper
     public static class PolygonPrimitiveBindings
     {
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPolygonPrimitiveCreate")]
-        public static extern unsafe VAResult Create(IntPtr polygon, IntPtr* outPrimitive);
+        public static extern unsafe VAResult Create(Vector* points, int pointCount, IntPtr* outPrimitive);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPolygonPrimitiveCreateFromPolygon")]
+        public static extern unsafe VAResult CreateFromPolygon(IntPtr polygon, IntPtr* outPrimitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPolygonPrimitiveSetPolygon")]
         public static extern VAResult SetPolygon(IntPtr primitive, IntPtr polygon);

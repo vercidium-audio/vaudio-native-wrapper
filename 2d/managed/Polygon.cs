@@ -19,6 +19,15 @@ namespace vaudionativewrapper.managed
             native = outPolygon;
         }
 
+        // Wraps a polygon owned by a PolygonPrimitive, which frees it natively
+        internal Polygon(IntPtr native)
+        {
+            this.native = native;
+            ownedByPrimitive = true;
+        }
+
+        readonly bool ownedByPrimitive;
+
         /// <summary>Create a polygon from a list of local-space points, before rotation, scale and position are applied. Must contain at least 3 points. The points are copied, so later changes to the list have no effect</summary>
         public Polygon(List<Vector> points) : this(points.ToArray()) { }
 
@@ -40,7 +49,7 @@ namespace vaudionativewrapper.managed
         /// <summary>Destroys the native polygon. Returns <see cref="VAResult.ErrorInUse"/> if a PolygonPrimitive using this polygon has not been destroyed yet, in which case Destroy can be called again later</summary>
         public VAResult Destroy()
         {
-            if (native == IntPtr.Zero)
+            if (native == IntPtr.Zero || ownedByPrimitive)
                 return VAResult.Success;
 
             var result = PolygonBindings.Destroy(native);
@@ -53,7 +62,7 @@ namespace vaudionativewrapper.managed
 
         ~Polygon()
         {
-            if (native != IntPtr.Zero)
+            if (native != IntPtr.Zero && !ownedByPrimitive)
                 LogSettings.Warn("Polygon was garbage collected without calling Destroy() first.");
         }
     }

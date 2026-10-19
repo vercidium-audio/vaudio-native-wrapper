@@ -14,11 +14,27 @@ namespace vaudionativewrapper.managed
                 throw new ArgumentNullException(nameof(polygon));
 
             IntPtr outPrimitive;
-            PolygonPrimitiveBindings.Create(polygon.native, &outPrimitive).ThrowIfError();
+            PolygonPrimitiveBindings.CreateFromPolygon(polygon.native, &outPrimitive).ThrowIfError();
 
             native = outPrimitive;
             owns = true;
             _polygon = polygon;
+        }
+
+        /// <summary>Create a polygon primitive with its own unshared polygon, from an array of local-space points before rotation, scale and position are applied. Must contain at least 3 points. The points are copied, so later changes to the array have no effect</summary>
+        public PolygonPrimitive(Vector[] points)
+        {
+            if (points == null)
+                throw new ArgumentNullException(nameof(points));
+
+            IntPtr outPrimitive;
+
+            fixed (Vector* ptr = points)
+                PolygonPrimitiveBindings.Create(ptr, points.Length, &outPrimitive).ThrowIfError();
+
+            native = outPrimitive;
+            owns = true;
+            _polygon = new Polygon(PolygonPrimitiveBindings.GetPolygon(outPrimitive));
         }
 
         /// <summary>Shared local-space points, before rotation, scale and position are applied</summary>
