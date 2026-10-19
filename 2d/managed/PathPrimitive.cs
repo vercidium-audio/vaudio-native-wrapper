@@ -2,12 +2,12 @@ using System;
 
 namespace vaudionativewrapper.managed
 {
-    /// <summary>A path primitive constructed from a <see cref="Path"/>, which can be shared across multiple primitives</summary>
+    /// <summary>A path primitive constructed from an Path, which can be shared across multiple primitives</summary>
     public unsafe class PathPrimitive : Primitive
     {
         Path _svgPath;
 
-        /// <summary>Create a path primitive. The path must not be destroyed until every primitive using it has been destroyed</summary>
+        /// <summary>Create a path primitive</summary>
         public PathPrimitive(Path svgPath)
         {
             if (svgPath == null)
@@ -21,7 +21,7 @@ namespace vaudionativewrapper.managed
             _svgPath = svgPath;
         }
 
-        /// <summary>Create a path primitive with its own unshared path, from local-space SVG path data (the contents of an SVG "d" attribute) before rotation, scale and position are applied. See <see cref="Path"/> for supported commands</summary>
+        /// <summary>Create a path primitive from an SVG path</summary>
         public PathPrimitive(string svgPath)
         {
             if (svgPath == null)

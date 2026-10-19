@@ -444,7 +444,7 @@ namespace vaudionativewrapper.managed
 
         /// <summary>Whether this emitter casts any rays (excluding visualisation rays)</summary>
         public bool CreatesTrails => EmitterBindings.CreatesTrails(native);
-        /// <summary>Whether this emitter is within Position and MaxBounds. Emitters outside the world bounds will not be raytraced. Set ClampPosition to true to keep this emitter within the world bounds.</summary>
+        /// <summary>Whether this emitter is within Position and MaxBounds. Emitters outside the world bounds will not be raytraced. Set ClampPosition to true to keep this emitter within the world bounds. If ClampPosition is false and any of the OverridePositions are outside the world bounds, this emitter is also outside the world bounds.</summary>
         public bool WithinWorldBounds => EmitterBindings.WithinWorldBounds(native);
         /// <summary>The index of this emitter's EAX object in GroupedEAX</summary>
         public int GroupedEAXIndex => EmitterBindings.GetGroupedEAXIndex(native);
@@ -471,7 +471,7 @@ namespace vaudionativewrapper.managed
 #endregion
 
 #region WriteOnly
-        /// <summary>When defined, rays will be cast in round-robin from these positions rather than the default Position. Set to null or an empty array to revert back to using the default Position. A copy of the provided array will be stored. Warning: changing this at runtime will clear the ray cache.</summary>
+        /// <summary>When defined, rays will be cast in round-robin from these positions rather than the default Position. If any position is outside the world bounds and ClampPosition is true, they are clamped within the world bounds. If ClampPosition is false, a warning is logged and this emitter is treated as outside the world, see WithinWorldBounds. Set to null or an empty array to revert back to using the default Position. A copy of the provided array will be stored. Warning: changing this at runtime will clear the ray cache.</summary>
         public Vector[] OverridePositions
         {
             set

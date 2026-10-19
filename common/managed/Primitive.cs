@@ -31,10 +31,7 @@ namespace vaudionativewrapper.managed
             set => PrimitiveBindings.SetMaterial(native, value).ThrowIfError();
         }
 
-        /// <summary>
-        /// Whether rays lose a flat percentage of energy the moment they touch this primitive, instead of calculating how long the ray spent inside it.<br/>
-        /// Flat primitives (e.g. Disk, Plane, Triangle, Line) force this to true and throw if set to false.
-        /// </summary>
+        /// <summary>Whether rays lose a flat percentage of energy the moment they touch this primitive, instead of calculating how long the ray spent inside it. Flat primitives (e.g. Disk, Plane, Triangle, Line) force this to true and throw if set to false.</summary>
         public bool UseFlatTransmission
         {
             get => PrimitiveBindings.GetUseFlatTransmission(native);

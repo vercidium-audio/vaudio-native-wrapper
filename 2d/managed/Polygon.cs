@@ -8,7 +8,7 @@ namespace vaudionativewrapper.managed
     {
         public IntPtr native;
 
-        /// <summary>Create a polygon from an array of local-space points, before rotation, scale and position are applied. Must contain at least 3 points. The points are copied, so later changes to the array have no effect</summary>
+        /// <summary>Create a polygon from an array of points. The points are copied, so later changes to the array have no effect</summary>
         public Polygon(Vector[] points)
         {
             IntPtr outPolygon;
@@ -28,7 +28,7 @@ namespace vaudionativewrapper.managed
 
         readonly bool ownedByPrimitive;
 
-        /// <summary>Create a polygon from a list of local-space points, before rotation, scale and position are applied. Must contain at least 3 points. The points are copied, so later changes to the list have no effect</summary>
+        /// <summary>Create a polygon from a list of points. The points are copied, so later changes to the list have no effect</summary>
         public Polygon(List<Vector> points) : this(points.ToArray()) { }
 
         /// <summary>Local-space points, before rotation, scale and position are applied</summary>

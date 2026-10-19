@@ -2,12 +2,12 @@ using System;
 
 namespace vaudionativewrapper.managed
 {
-    /// <summary>A polygon primitive constructed from a <see cref="Polygon"/>, which can be shared across multiple primitives</summary>
+    /// <summary>A polygon primitive constructed from a Polygon, which can be shared across multiple primitives</summary>
     public unsafe class PolygonPrimitive : Primitive
     {
         Polygon _polygon;
 
-        /// <summary>Create a polygon primitive. The polygon must not be destroyed until every primitive using it has been destroyed</summary>
+        /// <summary>Create a polygon primitive</summary>
         public PolygonPrimitive(Polygon polygon)
         {
             if (polygon == null)
@@ -21,7 +21,7 @@ namespace vaudionativewrapper.managed
             _polygon = polygon;
         }
 
-        /// <summary>Create a polygon primitive with its own unshared polygon, from an array of local-space points before rotation, scale and position are applied. Must contain at least 3 points. The points are copied, so later changes to the array have no effect</summary>
+        /// <summary>Create a polygon primitive from a set of points</summary>
         public PolygonPrimitive(Vector[] points)
         {
             if (points == null)
