@@ -1,9 +1,10 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace vaudionativewrapper.managed
 {
     /// <summary>A polygon primitive constructed from a Polygon, which can be shared across multiple primitives</summary>
-    public unsafe class PolygonPrimitive : Primitive
+    public class PolygonPrimitive : Primitive
     {
         Polygon _polygon;
 
@@ -13,10 +14,7 @@ namespace vaudionativewrapper.managed
             if (polygon == null)
                 throw new ArgumentNullException(nameof(polygon));
 
-            IntPtr outPrimitive;
-            PolygonPrimitiveBindings.CreateFromPolygon(polygon.native, &outPrimitive).ThrowIfError();
-
-            native = outPrimitive;
+            PolygonPrimitiveBindings.CreateFromPolygon(polygon.native, out native).ThrowIfError();
             owns = true;
             _polygon = polygon;
         }
@@ -27,14 +25,9 @@ namespace vaudionativewrapper.managed
             if (points == null)
                 throw new ArgumentNullException(nameof(points));
 
-            IntPtr outPrimitive;
-
-            fixed (Vector* ptr = points)
-                PolygonPrimitiveBindings.Create(ptr, points.Length, &outPrimitive).ThrowIfError();
-
-            native = outPrimitive;
+            PolygonPrimitiveBindings.Create(in MemoryMarshal.GetReference(points.AsSpan()), points.Length, out native).ThrowIfError();
             owns = true;
-            _polygon = new Polygon(PolygonPrimitiveBindings.GetPolygon(outPrimitive));
+            _polygon = new Polygon(PolygonPrimitiveBindings.GetPolygon(native));
         }
 
         /// <summary>Shared local-space points, before rotation, scale and position are applied</summary>

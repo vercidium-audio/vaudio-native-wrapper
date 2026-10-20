@@ -466,7 +466,7 @@ namespace vaudionativewrapper.managed
         public bool AmbientOcclusionEnabled => EmitterBindings.AmbientOcclusionEnabled(native);
         /// <summary>True if both AmbientPermeationRayCount and AmbientPermeationBounceCount are greater than zero</summary>
         public bool AmbientPermeationEnabled => EmitterBindings.AmbientPermeationEnabled(native);
-        /// <summary>True if both VisualisationRayCount and VisualisationBounceCount are greater than zero</summary>
+        /// <summary>True if both VisualisationRayCount and VisualisationBounceCount are greater than zero, and VisualisationCallback is assigned</summary>
         public bool VisualisationEnabled => EmitterBindings.VisualisationEnabled(native);
 #endregion
 

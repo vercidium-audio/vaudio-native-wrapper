@@ -31,7 +31,7 @@ namespace vaudionativewrapper.managed
         /// <summary>Whether the path ends with Z/z</summary>
         public bool closed => PathBindings.GetClosed(native);
 
-        /// <summary>Destroys the native path. Returns <see cref="VAResult.ErrorInUse"/> if a PathPrimitive using this path has not been destroyed yet, in which case Destroy can be called again later</summary>
+        /// <summary>Destroy the native path. Returns <see cref="VAResult.ErrorInUse"/> if a PathPrimitive using this path has not been destroyed yet.</summary>
         public VAResult Destroy()
         {
             if (native == IntPtr.Zero || ownedByPrimitive)
