@@ -5,10 +5,10 @@ namespace vaudionativewrapper.managed
     /// <summary>An audio primitive defined by a grid of heights, e.g. terrain. Sample (x, y) is at local position (x * scale.X, height * scale.Y, y * scale.Z), so the grid starts at the local origin and extends along +X and +Z, with heights along +Y. Always uses flat transmission and is two-sided.</summary>
     public unsafe class HeightmapPrimitive : Primitive
     {
-        /// <summary>Create a heightmap primitive. heights is sizeX * sizeY values in row-major order, i.e. the height of sample (x, y) is heights[y * sizeX + x]. The heights are copied.</summary>
+        /// <summary>Create a heightmap primitive</summary>
         public HeightmapPrimitive(ReadOnlySpan<float> heights, int sizeX, int sizeY) : this(heights, ReadOnlySpan<bool>.Empty, sizeX, sizeY) { }
 
-        /// <summary>Create a heightmap primitive with holes that rays pass straight through. holes is (sizeX - 1) * (sizeY - 1) values, one per cell in row-major order, i.e. the cell between samples (x, y) and (x + 1, y + 1) is holes[y * (sizeX - 1) + x]. An empty span means no holes. The heights and holes are copied.</summary>
+        /// <summary>Create a heightmap primitive with holes that rays pass straight through</summary>
         public HeightmapPrimitive(ReadOnlySpan<float> heights, ReadOnlySpan<bool> holes, int sizeX, int sizeY)
         {
             if (heights.Length != sizeX * sizeY)
