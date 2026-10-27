@@ -21,11 +21,21 @@ namespace vaudionativewrapper.managed
             MeshBindings.Create(in MemoryMarshal.GetReference(vertices), vertices.Length, minBounds, maxBounds, out native).ThrowIfError();
         }
 
+        // Wraps a mesh created internally by a MeshPrimitive, which frees it once every MeshPrimitive using it has been destroyed
+        internal Mesh(IntPtr native)
+        {
+            this.native = native;
+            ownedByPrimitive = true;
+        }
+
+        readonly bool ownedByPrimitive;
+
         /// <summary>Destroy the native mesh. If a world's background threads are still using it, it is freed automatically once they finish.<br/>
+        /// Does nothing for a mesh created internally by a MeshPrimitive, as it is freed automatically once every MeshPrimitive using it has been destroyed.<br/>
         /// Returns <see cref="VAResult.ErrorInUse"/> if a MeshPrimitive using this mesh has not been destroyed yet.</summary>
         public VAResult Destroy()
         {
-            if (native == IntPtr.Zero)
+            if (native == IntPtr.Zero || ownedByPrimitive)
                 return VAResult.Success;
 
             var result = MeshBindings.Destroy(native);
@@ -38,7 +48,7 @@ namespace vaudionativewrapper.managed
 
         ~Mesh()
         {
-            if (native != IntPtr.Zero)
+            if (native != IntPtr.Zero && !ownedByPrimitive)
                 LogSettings.Warn("Mesh was garbage collected without calling Destroy() first.");
         }
     }

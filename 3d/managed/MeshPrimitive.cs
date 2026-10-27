@@ -18,6 +18,7 @@ namespace vaudionativewrapper.managed
         {
             MeshPrimitiveBindings.Create(material, in MemoryMarshal.GetReference(vertices), vertices.Length, minBounds, maxBounds, ref transform, out native).ThrowIfError();
             owns = true;
+            mesh = new Mesh(MeshPrimitiveBindings.GetMesh(native));
         }
 
         /// <summary>Create a mesh primitive that shares geometry with a Mesh. The BVH is built once in the Mesh and reused by every instance.</summary>
@@ -25,7 +26,12 @@ namespace vaudionativewrapper.managed
         {
             MeshPrimitiveBindings.CreatePrimitiveFromMesh(material, mesh.native, ref transform, out native).ThrowIfError();
             owns = true;
+            this.mesh = mesh;
         }
+
+        /// <summary>The geometry used by this primitive. Primitives created from vertices create their own Mesh, which is freed automatically once every MeshPrimitive using it has been destroyed.<br/>
+        /// Pass it to <see cref="MeshPrimitive(MaterialType, Mesh, Matrix)"/> to create more primitives that share the same geometry and BVH.</summary>
+        public Mesh mesh { get; }
 
         /// <summary>Can contain scale, rotation and translation components</summary>
         public Matrix transform
