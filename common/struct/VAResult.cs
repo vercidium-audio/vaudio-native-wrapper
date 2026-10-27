@@ -33,6 +33,7 @@ namespace vaudionativewrapper
         WrongDimension = 26,
         MissingMaterialCallback = 27,
         WrongThread = 28,
+        DeniedPendingRemoval = 29,
     }
 
     public static class VAResultExtensions
