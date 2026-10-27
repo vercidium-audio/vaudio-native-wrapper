@@ -1,6 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper
 {
     public static class BoxPrimitiveBindings
@@ -15,7 +21,7 @@ namespace vaudionativewrapper
         public static extern VAResult SetSize(IntPtr primitive, Vector size);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaBoxPrimitiveSetRotation")]
-        public static extern VAResult SetRotation(IntPtr primitive, float rotation);
+        public static extern VAResult SetRotation(IntPtr primitive, VAFloat rotation);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaBoxPrimitiveGetPosition")]
         public static extern Vector GetPosition(IntPtr primitive);
@@ -24,7 +30,7 @@ namespace vaudionativewrapper
         public static extern Vector GetSize(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaBoxPrimitiveGetRotation")]
-        public static extern float GetRotation(IntPtr primitive);
+        public static extern VAFloat GetRotation(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaBoxPrimitiveDestroy")]
         public static extern VAResult Destroy(IntPtr primitive);

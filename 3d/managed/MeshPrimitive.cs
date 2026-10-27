@@ -29,8 +29,7 @@ namespace vaudionativewrapper.managed
             this.mesh = mesh;
         }
 
-        /// <summary>The geometry used by this primitive. Primitives created from vertices create their own Mesh.<br/>
-        /// Pass it to <see cref="MeshPrimitive(MaterialType, Mesh, Matrix)"/> to create more primitives that share the same geometry and BVH.</summary>
+        /// <summary>The underlying mesh used by this primitive.</summary>
         public Mesh mesh { get; }
 
         /// <summary>Can contain scale, rotation and translation components</summary>

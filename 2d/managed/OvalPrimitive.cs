@@ -1,5 +1,11 @@
 using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>An oval primitive</summary>
@@ -19,21 +25,21 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Radius of the oval along its local X axis</summary>
-        public float radiusX
+        public VAFloat radiusX
         {
             get => OvalPrimitiveBindings.GetRadiusX(native);
             set => OvalPrimitiveBindings.SetRadiusX(native, value).ThrowIfError();
         }
 
         /// <summary>Radius of the oval along its local Y axis</summary>
-        public float radiusY
+        public VAFloat radiusY
         {
             get => OvalPrimitiveBindings.GetRadiusY(native);
             set => OvalPrimitiveBindings.SetRadiusY(native, value).ThrowIfError();
         }
 
         /// <summary>Rotation of the oval in radians</summary>
-        public float rotation
+        public VAFloat rotation
         {
             get => OvalPrimitiveBindings.GetRotation(native);
             set => OvalPrimitiveBindings.SetRotation(native, value).ThrowIfError();

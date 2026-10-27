@@ -1,5 +1,11 @@
 using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A circle primitive</summary>
@@ -19,7 +25,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Radius of the circle</summary>
-        public float radius
+        public VAFloat radius
         {
             get => CirclePrimitiveBindings.GetRadius(native);
             set => CirclePrimitiveBindings.SetRadius(native, value).ThrowIfError();

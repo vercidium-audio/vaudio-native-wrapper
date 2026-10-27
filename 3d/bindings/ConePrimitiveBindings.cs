@@ -1,6 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper
 {
     public static class ConePrimitiveBindings
@@ -9,19 +15,19 @@ namespace vaudionativewrapper
         public static extern IntPtr Create();
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaConePrimitiveSetRadius")]
-        public static extern VAResult SetRadius(IntPtr primitive, float radius);
+        public static extern VAResult SetRadius(IntPtr primitive, VAFloat radius);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaConePrimitiveSetHeight")]
-        public static extern VAResult SetHeight(IntPtr primitive, float height);
+        public static extern VAResult SetHeight(IntPtr primitive, VAFloat height);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaConePrimitiveSetTransform")]
         public static extern VAResult SetTransform(IntPtr primitive, ref Matrix transform);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaConePrimitiveGetRadius")]
-        public static extern float GetRadius(IntPtr primitive);
+        public static extern VAFloat GetRadius(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaConePrimitiveGetHeight")]
-        public static extern float GetHeight(IntPtr primitive);
+        public static extern VAFloat GetHeight(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaConePrimitiveGetTransform")]
         public static extern unsafe Matrix* GetTransform(IntPtr primitive);

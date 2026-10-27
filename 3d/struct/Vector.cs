@@ -1,13 +1,19 @@
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper
 {
-    /// <summary>A 3D vector with single-precision floating-point components</summary>
+    /// <summary>A 3D vector with VAFloat components, single or double precision to match the native SDK build</summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct Vector
     {
         /// <summary>Creates a vector with all components set to <paramref name="v"/></summary>
-        public Vector(float v)
+        public Vector(VAFloat v)
         {
             X = v;
             Y = v;
@@ -15,7 +21,7 @@ namespace vaudionativewrapper
         }
 
         /// <summary>Creates a vector with the specified components</summary>
-        public Vector(float x, float y, float z)
+        public Vector(VAFloat x, VAFloat y, VAFloat z)
         {
             X = x;
             Y = y;
@@ -23,13 +29,13 @@ namespace vaudionativewrapper
         }
 
         /// <summary>The X component</summary>
-        public float X;
+        public VAFloat X;
 
         /// <summary>The Y component</summary>
-        public float Y;
+        public VAFloat Y;
     
         /// <summary>The Z component</summary>
-        public float Z;
+        public VAFloat Z;
 
         /// <inheritdoc/>
         public override string ToString() => $"({X:F3}, {Y:F4}, {Z:F4})";

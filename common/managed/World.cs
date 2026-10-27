@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A standalone world with its own primitives, emitters, materials and settings. Manages its own raytracing and multithreading.</summary>
@@ -17,6 +23,7 @@ namespace vaudionativewrapper.managed
         /// <summary>Create a new world</summary>
         public World()
         {
+            VersionBindings.EnsureFloatSizeMatches();
             native = WorldBindings.Create();
 
 #if DEBUG
@@ -28,6 +35,7 @@ namespace vaudionativewrapper.managed
         /// <summary>Create a new world that connects to a debug window on the specified host and port</summary>
         public World(string debugWindowHost, int debugWindowPort)
         {
+            VersionBindings.EnsureFloatSizeMatches();
             native = WorldBindings.CreateWithNetworking(debugWindowHost, debugWindowPort);
 
 #if DEBUG
@@ -312,7 +320,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>The epsilon value used for raytracing and primitive intersections</summary>
-        public float Epsilon
+        public VAFloat Epsilon
         {
             get => WorldBindings.GetEpsilon(native);
             set => WorldBindings.SetEpsilon(native, value).ThrowIfError();

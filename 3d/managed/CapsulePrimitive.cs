@@ -1,5 +1,11 @@
 ﻿using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A capsule (cylinder with hemispherical caps) audio primitive</summary>
@@ -12,14 +18,14 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Radius of the capsule</summary>
-        public float radius
+        public VAFloat radius
         {
             get => CapsulePrimitiveBindings.GetRadius(native);
             set => CapsulePrimitiveBindings.SetRadius(native, value).ThrowIfError();
         }
 
         /// <summary>Length of the body between the spherical caps</summary>
-        public float length
+        public VAFloat length
         {
             get => CapsulePrimitiveBindings.GetLength(native);
             set => CapsulePrimitiveBindings.SetLength(native, value).ThrowIfError();

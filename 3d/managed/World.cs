@@ -1,4 +1,10 @@
-﻿namespace vaudionativewrapper.managed
+﻿#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
+namespace vaudionativewrapper.managed
 {
     /// <summary>A standalone world with its own primitives, emitters, materials and settings. Manages its own raytracing and multithreading.</summary>
     public partial class World
@@ -77,14 +83,14 @@
         partial void OnDestroyDimensional() => FreeUnsafeVoxelCallbacks();
 
         /// <summary>The pitch of the camera in the debug window (dev build only)</summary>
-        public float CameraPitch
+        public VAFloat CameraPitch
         {
             get => WorldBindings.GetCameraPitch(native);
             set => WorldBindings.SetCameraPitch(native, value).ThrowIfError();
         }
 
         /// <summary>The yaw of the camera in the debug window (dev build only)</summary>
-        public float CameraYaw
+        public VAFloat CameraYaw
         {
             get => WorldBindings.GetCameraYaw(native);
             set => WorldBindings.SetCameraYaw(native, value).ThrowIfError();
@@ -98,21 +104,21 @@
         }
 
         /// <summary>Convert a world-space direction (e.g. RelativeDirections) to a listener-space direction, for use as EFX reflections/late reverb pan. Same as ConvertWorldToListenerDirection.</summary>
-        public Vector CalculateListenerRelativePan(Vector worldVector, float listenerPitch, float listenerYaw)
+        public Vector CalculateListenerRelativePan(Vector worldVector, VAFloat listenerPitch, VAFloat listenerYaw)
         {
             WorldBindings.CalculateListenerRelativePan(native, worldVector, listenerPitch, listenerYaw, out var pan).ThrowIfError();
             return pan;
         }
 
         /// <summary>Convert a world-space direction (in the world's CoordinateSystem) to a listener-space direction, based on the listener's pitch and yaw. Listener space is always X+ right, Y+ up and Z+ forward relative to the listener, regardless of CoordinateSystem, matching the EFX reflections/late reverb pan convention.</summary>
-        public Vector ConvertWorldToListenerDirection(Vector worldDirection, float listenerPitch, float listenerYaw)
+        public Vector ConvertWorldToListenerDirection(Vector worldDirection, VAFloat listenerPitch, VAFloat listenerYaw)
         {
             WorldBindings.ConvertWorldToListenerDirection(native, worldDirection, listenerPitch, listenerYaw, out var direction).ThrowIfError();
             return direction;
         }
 
         /// <summary>Convert a listener-space direction (X+ right, Y+ up, Z+ forward relative to the listener) to a world-space direction (in the world's CoordinateSystem), based on the listener's pitch and yaw.</summary>
-        public Vector ConvertListenerToWorldDirection(Vector listenerDirection, float listenerPitch, float listenerYaw)
+        public Vector ConvertListenerToWorldDirection(Vector listenerDirection, VAFloat listenerPitch, VAFloat listenerYaw)
         {
             WorldBindings.ConvertListenerToWorldDirection(native, listenerDirection, listenerPitch, listenerYaw, out var direction).ThrowIfError();
             return direction;

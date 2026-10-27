@@ -1,5 +1,11 @@
 using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A cone primitive with a rectangular base</summary>
@@ -12,21 +18,21 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Width of the rectangular base</summary>
-        public float width
+        public VAFloat width
         {
             get => RectangularConePrimitiveBindings.GetWidth(native);
             set => RectangularConePrimitiveBindings.SetWidth(native, value).ThrowIfError();
         }
 
         /// <summary>Length of the rectangular base</summary>
-        public float length
+        public VAFloat length
         {
             get => RectangularConePrimitiveBindings.GetLength(native);
             set => RectangularConePrimitiveBindings.SetLength(native, value).ThrowIfError();
         }
 
         /// <summary>Height of the cone</summary>
-        public float height
+        public VAFloat height
         {
             get => RectangularConePrimitiveBindings.GetHeight(native);
             set => RectangularConePrimitiveBindings.SetHeight(native, value).ThrowIfError();

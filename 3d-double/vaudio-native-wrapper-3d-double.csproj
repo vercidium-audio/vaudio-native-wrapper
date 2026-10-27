@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.1;net8.0</TargetFrameworks>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Platforms>AnyCPU;x64</Platforms>
+        <Configurations>Debug;Release;Production</Configurations>
+        <AssemblyName>vaudio-native-wrapper-3d-double</AssemblyName>
+        <DefineConstants>$(DefineConstants);VA_DOUBLE_PRECISION</DefineConstants>
+
+        <Version>1.11.0</Version>
+        <AssemblyVersion>1.11.0</AssemblyVersion>
+        <FileVersion>1.11.0</FileVersion>
+        <InformationalVersion>1.11.0</InformationalVersion>
+    </PropertyGroup>
+
+    <!-- Same source as vaudio-native-wrapper-3d, built with VA_DOUBLE_PRECISION so VAFloat is System.Double. Pair it with the double precision native SDK -->
+    <ItemGroup>
+        <Compile Include="..\common\**\*.cs" Exclude="..\common\obj\**;..\common\bin\**" LinkBase="common" />
+        <Compile Include="..\3d\**\*.cs" Exclude="..\3d\obj\**;..\3d\bin\**" LinkBase="3d" />
+    </ItemGroup>
+</Project>

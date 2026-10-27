@@ -1,15 +1,21 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper
 {
     public static class HeightmapPrimitiveBindings
     {
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaHeightmapPrimitiveCreate")]
-        public static extern unsafe VAResult Create(float* heights, int sizeX, int sizeY, out IntPtr outPrimitive);
+        public static extern unsafe VAResult Create(VAFloat* heights, int sizeX, int sizeY, out IntPtr outPrimitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaHeightmapPrimitiveCreateWithHoles")]
-        public static extern unsafe VAResult CreateWithHoles(float* heights, bool* holes, int sizeX, int sizeY, out IntPtr outPrimitive);
+        public static extern unsafe VAResult CreateWithHoles(VAFloat* heights, bool* holes, int sizeX, int sizeY, out IntPtr outPrimitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaHeightmapPrimitiveDestroy")]
         public static extern VAResult Destroy(IntPtr primitive);
@@ -33,7 +39,7 @@ namespace vaudionativewrapper
         public static extern int GetSizeY(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaHeightmapPrimitiveGetHeights")]
-        public static extern unsafe float* GetHeights(IntPtr primitive);
+        public static extern unsafe VAFloat* GetHeights(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaHeightmapPrimitiveGetHoles")]
         public static extern unsafe bool* GetHoles(IntPtr primitive);

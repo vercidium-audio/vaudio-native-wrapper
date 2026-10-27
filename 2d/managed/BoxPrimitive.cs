@@ -1,5 +1,11 @@
 using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A box primitive</summary>
@@ -26,7 +32,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Rotation of the box in radians</summary>
-        public float rotation
+        public VAFloat rotation
         {
             get => BoxPrimitiveBindings.GetRotation(native);
             set => BoxPrimitiveBindings.SetRotation(native, value).ThrowIfError();

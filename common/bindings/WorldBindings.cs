@@ -1,6 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper
 {
     public static partial class WorldBindings
@@ -215,9 +221,9 @@ namespace vaudionativewrapper
         public static extern VAResult SetCoordinateSystem(IntPtr ctx, CoordinateSystem value);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetEpsilon")]
-        public static extern float GetEpsilon(IntPtr world);
+        public static extern VAFloat GetEpsilon(IntPtr world);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetEpsilon")]
-        public static extern VAResult SetEpsilon(IntPtr world, float value);
+        public static extern VAResult SetEpsilon(IntPtr world, VAFloat value);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetLatency")]
         public static extern double GetLatency(IntPtr world);

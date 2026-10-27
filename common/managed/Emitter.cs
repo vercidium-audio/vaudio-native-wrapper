@@ -1,6 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>Emitters cast rays and can be discovered by other emitters</summary>
@@ -140,7 +146,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>The maximum distance between this emitter and the centre of a cluster, for it to share that cluster's rays. If two emitters have different distances, the smaller one is used. Only used if ClusteringEnabled is true.</summary>
-        public float ClusteringDistance
+        public VAFloat ClusteringDistance
         {
             get => EmitterBindings.GetClusteringDistance(native);
             set => EmitterBindings.SetClusteringDistance(native, value).ThrowIfError();
@@ -154,7 +160,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>The maximum distance between two of this emitter's targets for them to be in the same cluster. Only used if TargetClusteringEnabled is true.</summary>
-        public float TargetClusteringDistance
+        public VAFloat TargetClusteringDistance
         {
             get => EmitterBindings.GetTargetClusteringDistance(native);
             set => EmitterBindings.SetTargetClusteringDistance(native, value).ThrowIfError();
@@ -301,7 +307,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>The allowed distance between new and old bounce positions when refreshing trails. See TrailRefreshCount for more information.</summary>
-        public float RefreshDistanceThreshold
+        public VAFloat RefreshDistanceThreshold
         {
             get => EmitterBindings.GetRefreshDistanceThreshold(native);
             set => EmitterBindings.SetRefreshDistanceThreshold(native, value).ThrowIfError();

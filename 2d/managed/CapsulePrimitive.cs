@@ -1,5 +1,11 @@
 using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A capsule primitive (a rectangle with semicircular caps), aligned along its local Y axis</summary>
@@ -19,21 +25,21 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Radius of the capsule</summary>
-        public float radius
+        public VAFloat radius
         {
             get => CapsulePrimitiveBindings.GetRadius(native);
             set => CapsulePrimitiveBindings.SetRadius(native, value).ThrowIfError();
         }
 
         /// <summary>Length of the body between the semicircular caps. The total length of the capsule is length + 2 * radius</summary>
-        public float length
+        public VAFloat length
         {
             get => CapsulePrimitiveBindings.GetLength(native);
             set => CapsulePrimitiveBindings.SetLength(native, value).ThrowIfError();
         }
 
         /// <summary>Rotation of the capsule in radians</summary>
-        public float rotation
+        public VAFloat rotation
         {
             get => CapsulePrimitiveBindings.GetRotation(native);
             set => CapsulePrimitiveBindings.SetRotation(native, value).ThrowIfError();

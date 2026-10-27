@@ -1,6 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper
 {
     public static class PolygonPrimitiveBindings
@@ -21,7 +27,7 @@ namespace vaudionativewrapper
         public static extern VAResult SetPosition(IntPtr primitive, Vector position);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPolygonPrimitiveSetRotation")]
-        public static extern VAResult SetRotation(IntPtr primitive, float rotation);
+        public static extern VAResult SetRotation(IntPtr primitive, VAFloat rotation);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPolygonPrimitiveSetScale")]
         public static extern VAResult SetScale(IntPtr primitive, Vector scale);
@@ -30,7 +36,7 @@ namespace vaudionativewrapper
         public static extern Vector GetPosition(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPolygonPrimitiveGetRotation")]
-        public static extern float GetRotation(IntPtr primitive);
+        public static extern VAFloat GetRotation(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPolygonPrimitiveGetScale")]
         public static extern Vector GetScale(IntPtr primitive);

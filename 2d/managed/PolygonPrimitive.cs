@@ -1,6 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A polygon primitive constructed from a Polygon, which can be shared across multiple primitives</summary>
@@ -53,7 +59,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Rotation of the polygon in radians</summary>
-        public float rotation
+        public VAFloat rotation
         {
             get => PolygonPrimitiveBindings.GetRotation(native);
             set => PolygonPrimitiveBindings.SetRotation(native, value).ThrowIfError();

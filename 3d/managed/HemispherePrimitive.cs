@@ -1,5 +1,11 @@
 using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A hemisphere primitive</summary>
@@ -12,7 +18,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Radius of the hemisphere</summary>
-        public float radius
+        public VAFloat radius
         {
             get => HemispherePrimitiveBindings.GetRadius(native);
             set => HemispherePrimitiveBindings.SetRadius(native, value).ThrowIfError();

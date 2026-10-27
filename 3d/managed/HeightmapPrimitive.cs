@@ -1,15 +1,21 @@
 using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>An audio primitive defined by a grid of heights, e.g. terrain. Sample (x, y) is at local position (x * scale.X, height * scale.Y, y * scale.Z), so the grid starts at the local origin and extends along +X and +Z, with heights along +Y. Always uses flat transmission and is two-sided.</summary>
     public unsafe class HeightmapPrimitive : Primitive
     {
         /// <summary>Create a heightmap primitive</summary>
-        public HeightmapPrimitive(ReadOnlySpan<float> heights, int sizeX, int sizeY) : this(heights, ReadOnlySpan<bool>.Empty, sizeX, sizeY) { }
+        public HeightmapPrimitive(ReadOnlySpan<VAFloat> heights, int sizeX, int sizeY) : this(heights, ReadOnlySpan<bool>.Empty, sizeX, sizeY) { }
 
         /// <summary>Create a heightmap primitive with holes that rays pass straight through</summary>
-        public HeightmapPrimitive(ReadOnlySpan<float> heights, ReadOnlySpan<bool> holes, int sizeX, int sizeY)
+        public HeightmapPrimitive(ReadOnlySpan<VAFloat> heights, ReadOnlySpan<bool> holes, int sizeX, int sizeY)
         {
             if (heights.Length != sizeX * sizeY)
                 throw new ArgumentException($"heights.Length must be sizeX * sizeY ({sizeX * sizeY}). Instead received: {heights.Length}");
@@ -17,7 +23,7 @@ namespace vaudionativewrapper.managed
             if (holes.Length != 0 && holes.Length != (sizeX - 1) * (sizeY - 1))
                 throw new ArgumentException($"holes.Length must be 0 or (sizeX - 1) * (sizeY - 1) ({(sizeX - 1) * (sizeY - 1)}). Instead received: {holes.Length}");
 
-            fixed (float* heightsPtr = heights)
+            fixed (VAFloat* heightsPtr = heights)
             fixed (bool* holesPtr = holes)
                 HeightmapPrimitiveBindings.CreateWithHoles(heightsPtr, holes.Length > 0 ? holesPtr : null, sizeX, sizeY, out native).ThrowIfError();
 
@@ -45,7 +51,7 @@ namespace vaudionativewrapper.managed
         public int sizeY => HeightmapPrimitiveBindings.GetSizeY(native);
 
         /// <summary>The heightmap's copy of the heights, sizeX * sizeY values in row-major order</summary>
-        public ReadOnlySpan<float> heights => new ReadOnlySpan<float>(HeightmapPrimitiveBindings.GetHeights(native), sizeX * sizeY);
+        public ReadOnlySpan<VAFloat> heights => new ReadOnlySpan<VAFloat>(HeightmapPrimitiveBindings.GetHeights(native), sizeX * sizeY);
 
         /// <summary>The heightmap's copy of the holes, (sizeX - 1) * (sizeY - 1) values in row-major order. Empty if it has no holes</summary>
         public ReadOnlySpan<bool> holes

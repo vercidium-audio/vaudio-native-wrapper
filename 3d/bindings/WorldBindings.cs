@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -22,14 +28,14 @@ namespace vaudionativewrapper
         public static extern IntPtr GetUnsafeVoxelIsSolidCallback(IntPtr world);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetCameraPitch")]
-        public static extern float GetCameraPitch(IntPtr world);
+        public static extern VAFloat GetCameraPitch(IntPtr world);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetCameraPitch")]
-        public static extern VAResult SetCameraPitch(IntPtr world, float pitch);
+        public static extern VAResult SetCameraPitch(IntPtr world, VAFloat pitch);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetCameraYaw")]
-        public static extern float GetCameraYaw(IntPtr world);
+        public static extern VAFloat GetCameraYaw(IntPtr world);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetCameraYaw")]
-        public static extern VAResult SetCameraYaw(IntPtr world, float yaw);
+        public static extern VAResult SetCameraYaw(IntPtr world, VAFloat yaw);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetFieldOfView")]
         public static extern float GetFieldOfView(IntPtr world);
@@ -37,12 +43,12 @@ namespace vaudionativewrapper
         public static extern VAResult SetFieldOfView(IntPtr world, float fieldOfView);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldCalculateListenerRelativePan")]
-        public static extern VAResult CalculateListenerRelativePan(IntPtr ctx, Vector worldVector, float listenerPitch, float listenerYaw, out Vector pan);
+        public static extern VAResult CalculateListenerRelativePan(IntPtr ctx, Vector worldVector, VAFloat listenerPitch, VAFloat listenerYaw, out Vector pan);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldConvertWorldToListenerDirection")]
-        public static extern VAResult ConvertWorldToListenerDirection(IntPtr ctx, Vector worldDirection, float listenerPitch, float listenerYaw, out Vector direction);
+        public static extern VAResult ConvertWorldToListenerDirection(IntPtr ctx, Vector worldDirection, VAFloat listenerPitch, VAFloat listenerYaw, out Vector direction);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldConvertListenerToWorldDirection")]
-        public static extern VAResult ConvertListenerToWorldDirection(IntPtr ctx, Vector listenerDirection, float listenerPitch, float listenerYaw, out Vector direction);
+        public static extern VAResult ConvertListenerToWorldDirection(IntPtr ctx, Vector listenerDirection, VAFloat listenerPitch, VAFloat listenerYaw, out Vector direction);
     }
 }

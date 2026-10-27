@@ -1,5 +1,11 @@
 using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A path primitive constructed from an Path, which can be shared across multiple primitives</summary>
@@ -58,7 +64,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Rotation of the path in radians</summary>
-        public float rotation
+        public VAFloat rotation
         {
             get => PathPrimitiveBindings.GetRotation(native);
             set => PathPrimitiveBindings.SetRotation(native, value).ThrowIfError();

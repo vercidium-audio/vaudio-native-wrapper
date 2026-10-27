@@ -1,3 +1,9 @@
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A 2D grid of cells</summary>
@@ -24,14 +30,14 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Rotation of the grid in radians</summary>
-        public float rotation
+        public VAFloat rotation
         {
             get => GridPrimitiveBindings.GetRotation(native);
             set => GridPrimitiveBindings.SetRotation(native, value).ThrowIfError();
         }
 
         /// <summary>Scale of the cells</summary>
-        public float scale
+        public VAFloat scale
         {
             get => GridPrimitiveBindings.GetScale(native);
             set => GridPrimitiveBindings.SetScale(native, value).ThrowIfError();

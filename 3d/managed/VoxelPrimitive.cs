@@ -1,3 +1,9 @@
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A 3D grid of voxels</summary>
@@ -19,7 +25,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Scale of the voxels</summary>
-        public float scale
+        public VAFloat scale
         {
             get => VoxelPrimitiveBindings.GetScale(native);
             set => VoxelPrimitiveBindings.SetScale(native, value).ThrowIfError();

@@ -1,5 +1,11 @@
 ﻿using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A cone primitive with a circular base</summary>
@@ -12,14 +18,14 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Radius of the cone base</summary>
-        public float radius
+        public VAFloat radius
         {
             get => ConePrimitiveBindings.GetRadius(native);
             set => ConePrimitiveBindings.SetRadius(native, value).ThrowIfError();
         }
 
         /// <summary>Height of the cone</summary>
-        public float height
+        public VAFloat height
         {
             get => ConePrimitiveBindings.GetHeight(native);
             set => ConePrimitiveBindings.SetHeight(native, value).ThrowIfError();
