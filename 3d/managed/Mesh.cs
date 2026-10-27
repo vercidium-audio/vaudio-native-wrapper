@@ -9,33 +9,30 @@ namespace vaudionativewrapper.managed
     {
         public IntPtr native;
 
-        /// <summary>Create a mesh from an array of vertices</summary>
-        public Mesh(Vector[] vertices, Vector minBounds, Vector maxBounds) : this(new ReadOnlySpan<Vector>(vertices), minBounds, maxBounds) { }
+        // False for a mesh created internally by a vertex MeshPrimitive, which is freed automatically once every MeshPrimitive using it has been destroyed
+        readonly bool owns;
 
         /// <summary>Create a mesh from a list of vertices</summary>
         public Mesh(List<Vector> vertices, Vector minBounds, Vector maxBounds) : this(vertices.ToArray(), minBounds, maxBounds) { }
 
-        /// <summary>Create a mesh from a span of vertices</summary>
+        /// <summary>Create a mesh from an array or span of vertices</summary>
         public Mesh(ReadOnlySpan<Vector> vertices, Vector minBounds, Vector maxBounds)
         {
             MeshBindings.Create(in MemoryMarshal.GetReference(vertices), vertices.Length, minBounds, maxBounds, out native).ThrowIfError();
+            owns = true;
         }
 
-        // Wraps a mesh created internally by a MeshPrimitive, which frees it once every MeshPrimitive using it has been destroyed
         internal Mesh(IntPtr native)
         {
             this.native = native;
-            ownedByPrimitive = true;
         }
 
-        readonly bool ownedByPrimitive;
-
         /// <summary>Destroy the native mesh. If a world's background threads are still using it, it is freed automatically once they finish.<br/>
-        /// Does nothing for a mesh created internally by a MeshPrimitive, as it is freed automatically once every MeshPrimitive using it has been destroyed.<br/>
-        /// Returns <see cref="VAResult.ErrorInUse"/> if a MeshPrimitive using this mesh has not been destroyed yet.</summary>
+        /// Returns <see cref="VAResult.ErrorInUse"/> if a MeshPrimitive using this mesh has not been destroyed yet.<br/>
+        /// Does nothing for a mesh returned by <see cref="MeshPrimitive.mesh"/> on a MeshPrimitive created from vertices, as it's freed automatically once every MeshPrimitive using it has been destroyed.</summary>
         public VAResult Destroy()
         {
-            if (native == IntPtr.Zero || ownedByPrimitive)
+            if (!owns || native == IntPtr.Zero)
                 return VAResult.Success;
 
             var result = MeshBindings.Destroy(native);
@@ -48,7 +45,7 @@ namespace vaudionativewrapper.managed
 
         ~Mesh()
         {
-            if (native != IntPtr.Zero && !ownedByPrimitive)
+            if (owns && native != IntPtr.Zero)
                 LogSettings.Warn("Mesh was garbage collected without calling Destroy() first.");
         }
     }

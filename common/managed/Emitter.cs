@@ -132,21 +132,21 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetRelativeReverbOuterThreshold(native, value).ThrowIfError();
         }
 
-        /// <summary>Whether this emitter can share reverb, ambient occlusion and ambient permeation rays with other nearby emitters that also have clustering enabled. Rays are cast outwards from each emitter in the cluster in round robin, and each emitter shares the same reverb, EAX and ambience results. This doesn't affect occlusion or permeation. Each emitter in a cluster still casts its own occlusion and permeation rays towards its own targets. Emitters only cluster with others that have the same reverb, ambient occlusion and ambient permeation enabled flags, and the same MaxEchogramTime and EchogramGranularity.</summary>
+        /// <summary>Whether this emitter can share its rays with other nearby emitters that also have clustering enabled. A cluster casts its reverb, ambient occlusion, ambient permeation, occlusion and permeation rays outwards from each emitter in the cluster in round robin, and each emitter shares the same reverb, EAX and ambience results. The cluster uses the highest ray count, bounce count and MaxEchogramTime of its emitters. Its occlusion and permeation rays are cast towards the targets of every emitter in the cluster, and each emitter only gets low pass filters for its own targets. Emitters only cluster with others that are within line of sight and have the same EchogramGranularity, and never with their own targets. Emitters with OverridePositions or OverrideRayDirections set never cluster.</summary>
         public bool ClusteringEnabled
         {
             get => EmitterBindings.GetClusteringEnabled(native);
             set => EmitterBindings.SetClusteringEnabled(native, value).ThrowIfError();
         }
 
-        /// <summary>The maximum distance between this emitter and another emitter in a cluster, for it to share their reverb, ambient occlusion and ambient permeation rays. Only used if ClusteringEnabled is true.</summary>
+        /// <summary>The maximum distance between this emitter and the centre of a cluster, for it to share that cluster's rays. If two emitters have different distances, the smaller one is used. Only used if ClusteringEnabled is true.</summary>
         public float ClusteringDistance
         {
             get => EmitterBindings.GetClusteringDistance(native);
             set => EmitterBindings.SetClusteringDistance(native, value).ThrowIfError();
         }
 
-        /// <summary>Whether this emitter groups its targets into clusters, to reduce the number of occlusion and permeation rays it casts. Within each cluster, this emitter casts occlusion and permeation rays towards the targets in the cluster in round robin, and each target gets the same low pass filter. This is set on the emitter that casts the rays (e.g. the listener), not on its targets. For reverb and ambience clustering, see ClusteringEnabled.</summary>
+        /// <summary>Whether this emitter groups its targets into clusters, to reduce the number of occlusion and permeation rays it casts. Within each cluster, this emitter casts occlusion and permeation rays towards the targets in the cluster in round robin, and each target gets the same low pass filter. This is set on the emitter that casts the rays (e.g. the listener), not on its targets. For sharing rays between emitters, see ClusteringEnabled. If this emitter is in a cluster with other emitters that have targets, its targets are only clustered if all of them have this enabled, using the smallest TargetClusteringDistance.</summary>
         public bool TargetClusteringEnabled
         {
             get => EmitterBindings.GetTargetClusteringEnabled(native);
@@ -439,7 +439,7 @@ namespace vaudionativewrapper.managed
         public EAXReverb EAX => new EAXReverb(EmitterBindings.GetEAX(native));
         /// <summary>Contains data gathered by reverb rays. This object is null until this emitter casts its reverb rays for the first time. See Initialising and OnRaytracingComplete</summary>
         public ProcessedReverb ProcessedReverb => new ProcessedReverb(EmitterBindings.GetProcessedReverb(native));
-        /// <summary>Contains the low- and high-frequency volume of ambient sounds. This object is null until this emitter casts its ambient rays for the first time. See Initialising and OnRaytracingComplete</summary>
+        /// <summary>Contains the low- and high-frequency volume of ambient sounds. This object is null until this emitter casts its ambient rays for the first time, and null if neither ambient occlusion nor ambient permeation is enabled. See Initialising and OnRaytracingComplete</summary>
         public LowPassFilter* AmbientFilter => EmitterBindings.GetAmbientFilter(native);
 
         /// <summary>Whether this emitter casts any rays (excluding visualisation rays)</summary>
