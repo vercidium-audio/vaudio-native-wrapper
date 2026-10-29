@@ -1,5 +1,11 @@
 using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A flat rectangular plane primitive</summary>
@@ -13,14 +19,14 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Width of the plane</summary>
-        public float width
+        public VAFloat width
         {
             get => PlanePrimitiveBindings.GetWidth(native);
             set => PlanePrimitiveBindings.SetWidth(native, value).ThrowIfError();
         }
 
         /// <summary>Height of the plane</summary>
-        public float height
+        public VAFloat height
         {
             get => PlanePrimitiveBindings.GetHeight(native);
             set => PlanePrimitiveBindings.SetHeight(native, value).ThrowIfError();

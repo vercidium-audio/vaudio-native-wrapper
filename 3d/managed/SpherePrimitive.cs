@@ -1,5 +1,11 @@
 ﻿using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A sphere primitive</summary>
@@ -19,7 +25,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Radius of the sphere</summary>
-        public float radius
+        public VAFloat radius
         {
             get => SpherePrimitiveBindings.GetRadius(native);
             set => SpherePrimitiveBindings.SetRadius(native, value).ThrowIfError();

@@ -1,6 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper
 {
     public static class GridPrimitiveBindings
@@ -30,15 +36,15 @@ namespace vaudionativewrapper
         public static extern VAResult SetPosition(IntPtr primitive, Vector position);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaGridPrimitiveGetRotation")]
-        public static extern float GetRotation(IntPtr primitive);
+        public static extern VAFloat GetRotation(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaGridPrimitiveSetRotation")]
-        public static extern VAResult SetRotation(IntPtr primitive, float rotation);
+        public static extern VAResult SetRotation(IntPtr primitive, VAFloat rotation);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaGridPrimitiveGetScale")]
-        public static extern float GetScale(IntPtr primitive);
+        public static extern VAFloat GetScale(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaGridPrimitiveSetScale")]
-        public static extern VAResult SetScale(IntPtr primitive, float scale);
+        public static extern VAResult SetScale(IntPtr primitive, VAFloat scale);
     }
 }

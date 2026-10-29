@@ -1,6 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -22,7 +28,8 @@ namespace vaudionativewrapper
     public delegate float GainFormulaDelegate(bool lowFrequency, int occlusionRayCount, int permeationRayCount, int permeationBounceCount, float occlusionEnergy, float permeationEnergy);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void LogCallbackFn([MarshalAs(UnmanagedType.LPStr)] string message);
+    // owner is the VAWorld* or VAEmitter* that logged the message
+    public delegate void LogCallbackFn(IntPtr owner, [MarshalAs(UnmanagedType.LPStr)] string message);
 
     public static class EmitterBindings
     {
@@ -39,15 +46,13 @@ namespace vaudionativewrapper
         public static extern VAResult RemoveTarget(IntPtr emitter, IntPtr target);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterHasTarget")]
-        [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool HasTarget(IntPtr emitter, IntPtr target);
+        public static extern VAResult HasTarget(IntPtr emitter, IntPtr target);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterHasRaytracedTarget")]
-        [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool HasRaytracedTarget(IntPtr emitter, IntPtr target);
+        public static extern VAResult HasRaytracedTarget(IntPtr emitter, IntPtr target);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetTargetFilter")]
-        public static extern unsafe LowPassFilter* GetTargetFilter(IntPtr emitter, IntPtr target);
+        public static extern unsafe VAResult GetTargetFilter(IntPtr emitter, IntPtr target, out LowPassFilter* filter);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterResetTrails")]
         public static extern VAResult ResetTrails(IntPtr emitter);
@@ -155,10 +160,10 @@ namespace vaudionativewrapper
         public static extern VAResult SetTrailRefreshCount(IntPtr emitter, int value);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetRefreshDistanceThreshold")]
-        public static extern float GetRefreshDistanceThreshold(IntPtr emitter);
+        public static extern VAFloat GetRefreshDistanceThreshold(IntPtr emitter);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetRefreshDistanceThreshold")]
-        public static extern VAResult SetRefreshDistanceThreshold(IntPtr emitter, float value);
+        public static extern VAResult SetRefreshDistanceThreshold(IntPtr emitter, VAFloat value);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetReverbEnergyCap")]
         public static extern float GetReverbEnergyCap(IntPtr emitter);
@@ -321,6 +326,32 @@ namespace vaudionativewrapper
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetOutsidePercent")]
         public static extern float GetOutsidePercent(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetClusteringEnabled")]
+        public static extern VAResult SetClusteringEnabled(IntPtr emitter, bool value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetClusteringEnabled")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool GetClusteringEnabled(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetClusteringDistance")]
+        public static extern VAResult SetClusteringDistance(IntPtr emitter, VAFloat value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetClusteringDistance")]
+        public static extern VAFloat GetClusteringDistance(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetTargetClusteringEnabled")]
+        public static extern VAResult SetTargetClusteringEnabled(IntPtr emitter, bool value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetTargetClusteringEnabled")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool GetTargetClusteringEnabled(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetTargetClusteringDistance")]
+        public static extern VAResult SetTargetClusteringDistance(IntPtr emitter, VAFloat value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetTargetClusteringDistance")]
+        public static extern VAFloat GetTargetClusteringDistance(IntPtr emitter);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetHasRelativeReverb")]
         public static extern VAResult SetHasRelativeReverb(IntPtr emitter, bool value);

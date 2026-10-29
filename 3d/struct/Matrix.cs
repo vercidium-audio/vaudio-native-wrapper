@@ -1,16 +1,22 @@
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper
 {
-    /// <summary>A 4x4 single-precision floating-point matrix laid out to match GLSL expectations</summary>
+    /// <summary>A 4x4 VAFloat matrix, single or double precision to match the native SDK build, laid out to match GLSL expectations</summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct Matrix
     {
         /// <summary>Initializes a new matrix with all 16 elements in column-major order (each group of 4 is one column)</summary>
-        public Matrix(float m11, float m12, float m13, float m14,
-                      float m21, float m22, float m23, float m24,
-                      float m31, float m32, float m33, float m34,
-                      float m41, float m42, float m43, float m44)
+        public Matrix(VAFloat m11, VAFloat m12, VAFloat m13, VAFloat m14,
+                      VAFloat m21, VAFloat m22, VAFloat m23, VAFloat m24,
+                      VAFloat m31, VAFloat m32, VAFloat m33, VAFloat m34,
+                      VAFloat m41, VAFloat m42, VAFloat m43, VAFloat m44)
         {
             M11 = m11; M12 = m12; M13 = m13; M14 = m14;
             M21 = m21; M22 = m22; M23 = m23; M24 = m24;
@@ -18,21 +24,21 @@ namespace vaudionativewrapper
             M41 = m41; M42 = m42; M43 = m43; M44 = m44;
         }
 
-        public float M11;
-        public float M12;
-        public float M13;
-        public float M14;
-        public float M21;
-        public float M22;
-        public float M23;
-        public float M24;
-        public float M31;
-        public float M32;
-        public float M33;
-        public float M34;
-        public float M41;
-        public float M42;
-        public float M43;
-        public float M44;
+        public VAFloat M11;
+        public VAFloat M12;
+        public VAFloat M13;
+        public VAFloat M14;
+        public VAFloat M21;
+        public VAFloat M22;
+        public VAFloat M23;
+        public VAFloat M24;
+        public VAFloat M31;
+        public VAFloat M32;
+        public VAFloat M33;
+        public VAFloat M34;
+        public VAFloat M41;
+        public VAFloat M42;
+        public VAFloat M43;
+        public VAFloat M44;
     }
 }

@@ -1,5 +1,11 @@
 using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A cylinder primitive</summary>
@@ -12,14 +18,14 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Radius of the cylinder</summary>
-        public float radius
+        public VAFloat radius
         {
             get => CylinderPrimitiveBindings.GetRadius(native);
             set => CylinderPrimitiveBindings.SetRadius(native, value).ThrowIfError();
         }
 
         /// <summary>Length of the cylinder body</summary>
-        public float length
+        public VAFloat length
         {
             get => CylinderPrimitiveBindings.GetLength(native);
             set => CylinderPrimitiveBindings.SetLength(native, value).ThrowIfError();

@@ -1,59 +1,53 @@
 using System;
-using System.Collections.Generic;
+using System.Runtime.InteropServices;
+
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
 
 namespace vaudionativewrapper.managed
 {
-    /// <summary>A polygon primitive constructed from a list of points</summary>
-    public unsafe class PolygonPrimitive : Primitive
+    /// <summary>A polygon primitive constructed from a Polygon, which can be shared across multiple primitives</summary>
+    public class PolygonPrimitive : Primitive
     {
-        /// <summary>Create a polygon primitive from a list of local-space points. Must contain at least 3 points</summary>
-        public PolygonPrimitive(List<Vector> points)
+        Polygon _polygon;
+
+        /// <summary>Create a polygon primitive</summary>
+        public PolygonPrimitive(Polygon polygon)
         {
-            Vector[] copy = points.ToArray();
-            IntPtr outPrimitive;
+            if (polygon == null)
+                throw new ArgumentNullException(nameof(polygon));
 
-            fixed (Vector* ptr = copy)
-            {
-                PolygonPrimitiveBindings.Create(ptr, copy.Length, &outPrimitive).ThrowIfError();
-            }
-
-            native = outPrimitive;
+            PolygonPrimitiveBindings.CreateFromPolygon(polygon.native, out native).ThrowIfError();
             owns = true;
+            _polygon = polygon;
         }
 
-        /// <summary>Create a polygon primitive from an array of local-space points. Must contain at least 3 points</summary>
+        /// <summary>Create a polygon primitive from a set of points</summary>
         public PolygonPrimitive(Vector[] points)
         {
-            IntPtr outPrimitive;
+            if (points == null)
+                throw new ArgumentNullException(nameof(points));
 
-            fixed (Vector* ptr = points)
-            {
-                PolygonPrimitiveBindings.Create(ptr, points.Length, &outPrimitive).ThrowIfError();
-            }
-
-            native = outPrimitive;
+            PolygonPrimitiveBindings.Create(in MemoryMarshal.GetReference(points.AsSpan()), points.Length, out native).ThrowIfError();
             owns = true;
+            _polygon = new Polygon(PolygonPrimitiveBindings.GetPolygon(native));
         }
 
-        /// <summary>Local-space points, before rotation, scale and position are applied. Must contain at least 3 points</summary>
-        public Vector[] points
+        /// <summary>Shared local-space points, before rotation, scale and position are applied</summary>
+        public Polygon polygon
         {
-            get
-            {
-                int count = PolygonPrimitiveBindings.GetPointCount(native);
-                var result = new Vector[count];
-
-                for (int i = 0; i < count; i++)
-                    result[i] = PolygonPrimitiveBindings.GetPoint(native, i);
-
-                return result;
-            }
+            get => _polygon;
             set
             {
-                fixed (Vector* ptr = value)
-                {
-                    PolygonPrimitiveBindings.SetPoints(native, ptr, value.Length).ThrowIfError();
-                }
+                if (value == null)
+                    throw new ArgumentNullException(nameof(polygon));
+
+                PolygonPrimitiveBindings.SetPolygon(native, value.native).ThrowIfError();
+
+                _polygon = value;
             }
         }
 
@@ -65,7 +59,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Rotation of the polygon in radians</summary>
-        public float rotation
+        public VAFloat rotation
         {
             get => PolygonPrimitiveBindings.GetRotation(native);
             set => PolygonPrimitiveBindings.SetRotation(native, value).ThrowIfError();
@@ -76,13 +70,6 @@ namespace vaudionativewrapper.managed
         {
             get => PolygonPrimitiveBindings.GetScale(native);
             set => PolygonPrimitiveBindings.SetScale(native, value).ThrowIfError();
-        }
-
-        /// <summary>Whether rays lose a flat percentage of energy the moment they touch this primitive, instead of calculating how long the ray spent inside it. Flat primitives (e.g. Disk, Plane, Triangle, Line) force this to true and throw if set to false.</summary>
-        public bool UseFlatTransmission
-        {
-            get => PolygonPrimitiveBindings.GetUseFlatTransmission(native);
-            set => PolygonPrimitiveBindings.SetUseFlatTransmission(native, value).ThrowIfError();
         }
 
         /// <summary>Whether the last point should connect back to the first</summary>

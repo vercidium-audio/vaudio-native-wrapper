@@ -2,25 +2,32 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A standalone world with its own primitives, emitters, materials and settings. Manages its own raytracing and multithreading.</summary>
     public unsafe partial class World
     {
         public IntPtr native;
-        private readonly bool owns;
 
 #if DEBUG
+        private readonly bool owns;
         string stackTrace;
 #endif
 
         /// <summary>Create a new world</summary>
         public World()
         {
+            VersionBindings.EnsureFloatSizeMatches();
             native = WorldBindings.Create();
-            owns = true;
 
 #if DEBUG
+            owns = true;
             stackTrace = Environment.StackTrace;
 #endif
         }
@@ -28,10 +35,11 @@ namespace vaudionativewrapper.managed
         /// <summary>Create a new world that connects to a debug window on the specified host and port</summary>
         public World(string debugWindowHost, int debugWindowPort)
         {
+            VersionBindings.EnsureFloatSizeMatches();
             native = WorldBindings.CreateWithNetworking(debugWindowHost, debugWindowPort);
-            owns = true;
 
 #if DEBUG
+            owns = true;
             stackTrace = Environment.StackTrace;
 #endif
         }
@@ -112,25 +120,29 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Gets the debug rendering colour for a specific material type (dev build only). No effect on raytracing.</summary>
-        public Color GetMaterialColor(int materialId) => WorldBindings.GetMaterialColor(native, materialId);
+        public Color GetMaterialColor(int materialId)
+        {
+            WorldBindings.GetMaterialColor(native, materialId, out var color).ThrowIfError();
+            return color;
+        }
 
         /// <summary>Sets the debug rendering colour for a specific material type (dev build only). No effect on raytracing.</summary>
         public void SetMaterialColor(int materialId, Color color) => WorldBindings.SetMaterialColor(native, materialId, color).ThrowIfError();
 
-        /// <summary>Add a primitive to the raytracing simulation. This method is thread-safe and will not affect the current raytracing threads. Primitives completely outside the world bounds will be ignored during raytracing.</summary>
+        /// <summary>Add a primitive to the raytracing simulation. Primitives completely outside the world bounds will be ignored during raytracing.</summary>
         public void AddPrimitive(Primitive primitive)
         {
             WorldBindings.AddPrimitive(native, primitive.native).ThrowIfError();
             primitive.OnAddedToWorld();
         }
 
-        /// <summary>Remove a primitive from the raytracing simulation. This method is thread-safe and will not affect the current raytracing threads.</summary>
+        /// <summary>Remove a primitive from the raytracing simulation. This method will not affect the current raytracing threads.</summary>
         public void RemovePrimitive(Primitive primitive)
         {
             WorldBindings.RemovePrimitive(native, primitive.native).ThrowIfError();
         }
 
-        /// <summary>Add an Emitter to the raytracing simulation. This method is thread-safe and will not affect the current raytracing threads.</summary>
+        /// <summary>Add an Emitter to the raytracing simulation. This method will not affect the current raytracing threads.</summary>
         public void AddEmitter(Emitter emitter)
         {
             WorldBindings.AddEmitter(native, emitter.native).ThrowIfError();
@@ -142,7 +154,7 @@ namespace vaudionativewrapper.managed
             return WorldBindings.HasEmitter(native, emitter.native);
         }
 
-        /// <summary>Remove an Emitter from the raytracing simulation. This method is thread-safe and will not affect the current raytracing threads. This emitter's OnRaytracingComplete callback will not be invoked.</summary>
+        /// <summary>Remove an Emitter from the raytracing simulation. This method will not affect the current raytracing threads. This emitter's OnRaytracingComplete callback will not be invoked.</summary>
         public void RemoveEmitter(Emitter emitter)
         {
             WorldBindings.RemoveEmitter(native, emitter.native).ThrowIfError();
@@ -153,7 +165,7 @@ namespace vaudionativewrapper.managed
             return WorldBindings.GetEmitterCount(native);
         }
 
-        /// <summary>This name is displayed in the debug window.</summary>
+        /// <summary>This name is displayed in the debug window. Setting null stores an empty string.</summary>
         public string Name
         {
             get => WorldBindings.GetName(native);
@@ -308,7 +320,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>The epsilon value used for raytracing and primitive intersections</summary>
-        public float Epsilon
+        public VAFloat Epsilon
         {
             get => WorldBindings.GetEpsilon(native);
             set => WorldBindings.SetEpsilon(native, value).ThrowIfError();
@@ -379,7 +391,7 @@ namespace vaudionativewrapper.managed
         /// <summary>Returns true if a material exists</summary>
         public bool HasMaterial(MaterialType type)
         {
-            return WorldBindings.HasMaterial(native, (int)type);
+            return WorldBindings.HasMaterial(native, (int)type).ToBool();
         }
 
         private GCHandle _onReverbUpdatedHandle;
@@ -417,7 +429,7 @@ namespace vaudionativewrapper.managed
 
                 if (value != null)
                 {
-                    LogCallbackFn fn = (msg) => value(msg);
+                    LogCallbackFn fn = (owner, msg) => value(msg);
                     _logCallbackHandle = GCHandle.Alloc(fn);
 
                     WorldBindings.SetLogCallback(native, Marshal.GetFunctionPointerForDelegate(fn)).ThrowIfError();

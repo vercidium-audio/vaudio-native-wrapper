@@ -1,5 +1,11 @@
 using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A flat disk primitive</summary>
@@ -13,7 +19,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Radius of the disk</summary>
-        public float radius
+        public VAFloat radius
         {
             get => DiskPrimitiveBindings.GetRadius(native);
             set => DiskPrimitiveBindings.SetRadius(native, value).ThrowIfError();

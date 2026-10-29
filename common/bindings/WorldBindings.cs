@@ -1,6 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper
 {
     public static partial class WorldBindings
@@ -82,23 +88,22 @@ namespace vaudionativewrapper
         public static extern VAResult CreateMaterial(IntPtr world, int materialId);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldHasMaterial")]
-        [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool HasMaterial(IntPtr world, int materialId);
+        public static extern VAResult HasMaterial(IntPtr world, int materialId);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMaterialAbsorptionLF")]
-        public static extern float GetMaterialAbsorptionLF(IntPtr world, int materialId);
+        public static extern VAResult GetMaterialAbsorptionLF(IntPtr world, int materialId, out float value);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMaterialAbsorptionHF")]
-        public static extern float GetMaterialAbsorptionHF(IntPtr world, int materialId);
+        public static extern VAResult GetMaterialAbsorptionHF(IntPtr world, int materialId, out float value);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMaterialScattering")]
-        public static extern float GetMaterialScattering(IntPtr world, int materialId);
+        public static extern VAResult GetMaterialScattering(IntPtr world, int materialId, out float value);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMaterialTransmissionLF")]
-        public static extern float GetMaterialTransmissionLF(IntPtr world, int materialId);
+        public static extern VAResult GetMaterialTransmissionLF(IntPtr world, int materialId, out float value);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMaterialTransmissionHF")]
-        public static extern float GetMaterialTransmissionHF(IntPtr world, int materialId);
+        public static extern VAResult GetMaterialTransmissionHF(IntPtr world, int materialId, out float value);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMaterialFlatTransmissionLF")]
-        public static extern float GetMaterialFlatTransmissionLF(IntPtr world, int materialId);
+        public static extern VAResult GetMaterialFlatTransmissionLF(IntPtr world, int materialId, out float value);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMaterialFlatTransmissionHF")]
-        public static extern float GetMaterialFlatTransmissionHF(IntPtr world, int materialId);
+        public static extern VAResult GetMaterialFlatTransmissionHF(IntPtr world, int materialId, out float value);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetMaterialAbsorptionLF")]
         public static extern VAResult SetMaterialAbsorptionLF(IntPtr world, int materialId, float value);
@@ -116,7 +121,7 @@ namespace vaudionativewrapper
         public static extern VAResult SetMaterialFlatTransmissionHF(IntPtr world, int materialId, float value);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetMaterialColor")]
-        public static extern Color GetMaterialColor(IntPtr world, int materialId);
+        public static extern VAResult GetMaterialColor(IntPtr world, int materialId, out Color color);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetMaterialColor")]
         public static extern VAResult SetMaterialColor(IntPtr world, int materialId, Color color);
 
@@ -216,9 +221,9 @@ namespace vaudionativewrapper
         public static extern VAResult SetCoordinateSystem(IntPtr ctx, CoordinateSystem value);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetEpsilon")]
-        public static extern float GetEpsilon(IntPtr world);
+        public static extern VAFloat GetEpsilon(IntPtr world);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetEpsilon")]
-        public static extern VAResult SetEpsilon(IntPtr world, float value);
+        public static extern VAResult SetEpsilon(IntPtr world, VAFloat value);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetLatency")]
         public static extern double GetLatency(IntPtr world);

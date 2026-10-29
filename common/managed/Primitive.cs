@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 
 namespace vaudionativewrapper.managed
 {
@@ -29,6 +28,13 @@ namespace vaudionativewrapper.managed
         {
             get => PrimitiveBindings.GetMaterial(native);
             set => PrimitiveBindings.SetMaterial(native, value).ThrowIfError();
+        }
+
+        /// <summary>Whether rays lose a flat percentage of energy the moment they touch this primitive, instead of calculating how long the ray spent inside it. Flat primitives (e.g. Disk, Plane, Triangle, Line) force this to true and throw if set to false.</summary>
+        public bool UseFlatTransmission
+        {
+            get => PrimitiveBindings.GetUseFlatTransmission(native);
+            set => PrimitiveBindings.SetUseFlatTransmission(native, value).ThrowIfError();
         }
 
         /// <summary>Unique properties logged in the ~Primitive finaliser to identify which primitive was leaked</summary>

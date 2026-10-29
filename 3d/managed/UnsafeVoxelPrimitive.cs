@@ -1,6 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A 3D grid of voxels that reads directly from unmanaged memory owned by the caller, rather than copying it into a managed array. Each voxel is converted to a material by the world's UnsafeVoxelMaterialMap, which must be set before adding this primitive to a world. Voxel memory is read by the raytracing threads without synchronisation, and must remain valid until this primitive is removed from its world and its OnRemoved callback is invoked.</summary>
@@ -60,7 +66,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Scale of the voxels</summary>
-        public float scale
+        public VAFloat scale
         {
             get => UnsafeVoxelPrimitiveBindings.GetScale(native);
             set => UnsafeVoxelPrimitiveBindings.SetScale(native, value).ThrowIfError();

@@ -7,13 +7,13 @@ namespace vaudionativewrapper.managed
     public class AirAbsorptionSettings
     {
         public IntPtr native;
-        private readonly bool owns;
 
         // Must keep these to prevent garbage collection
         GCHandle lfHandle;
         GCHandle hfHandle;
 
 #if DEBUG
+        private readonly bool owns;
         string stackTrace;
 #endif
 
@@ -21,8 +21,8 @@ namespace vaudionativewrapper.managed
         public AirAbsorptionSettings()
         {
             native = AirAbsorptionSettingsBindings.Create();
-            owns = true;
 #if DEBUG
+            owns = true;
             stackTrace = Environment.StackTrace;
 #endif
         }

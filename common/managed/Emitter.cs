@@ -1,15 +1,21 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>Emitters cast rays and can be discovered by other emitters</summary>
     public unsafe class Emitter
     {
         public IntPtr native;
-        private readonly bool owns;
 
 #if DEBUG
+        private readonly bool owns;
         string stackTrace;
 #endif
 
@@ -27,9 +33,9 @@ namespace vaudionativewrapper.managed
         public Emitter()
         {
             native = EmitterBindings.Create();
-            owns = true;
 
 #if DEBUG
+            owns = true;
             stackTrace = Environment.StackTrace;
 #endif
         }
@@ -61,13 +67,17 @@ namespace vaudionativewrapper.managed
         public void RemoveTarget(Emitter target) => EmitterBindings.RemoveTarget(native, target.native).ThrowIfError();
 
         /// <summary>Returns whether the provided emitter is a target of this emitter</summary>
-        public bool HasTarget(Emitter target) => EmitterBindings.HasTarget(native, target.native);
+        public bool HasTarget(Emitter target) => EmitterBindings.HasTarget(native, target.native).ToBool();
 
         /// <summary>Returns whether a target emitter has been raytraced. If true, it is safe to check the target's filter via GetTargetFilter</summary>
-        public bool HasRaytracedTarget(Emitter target) => EmitterBindings.HasRaytracedTarget(native, target.native);
+        public bool HasRaytracedTarget(Emitter target) => EmitterBindings.HasRaytracedTarget(native, target.native).ToBool();
 
         /// <summary>Get the low- and high-frequency gains for the target emitter. Only access when HasRaytracedTarget(Emitter) returns true.</summary>
-        public LowPassFilter* GetTargetFilter(Emitter target) => EmitterBindings.GetTargetFilter(native, target.native);
+        public LowPassFilter* GetTargetFilter(Emitter target)
+        {
+            EmitterBindings.GetTargetFilter(native, target.native, out var filter).ThrowIfError();
+            return filter;
+        }
 
         /// <summary>Clear the ray cache, causing all rays to be re-cast.</summary>
         public void ResetTrails() => EmitterBindings.ResetTrails(native).ThrowIfError();
@@ -87,7 +97,7 @@ namespace vaudionativewrapper.managed
             get => EmitterBindings.GetInitialising(native);
         }
 
-        /// <summary>Whether this emitter will be removed from the world when its reverb tail finishes playing.</summary>
+        /// <summary>Whether this emitter will be removed from the world when its reverb tail finishes playing. While true, changing this emitter's properties (excluding Name, UserData, LogCallback, LogErrorCallback, OnRemoved and KeepReverbTailAlive) or adding targets throws an InvalidOperationException.</summary>
         public bool PendingRemoval
         {
             get => EmitterBindings.GetPendingRemoval(native);
@@ -100,7 +110,7 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetAffectsGroupedEAX(native, value).ThrowIfError();
         }
 
-        /// <summary>Whether this emitter is kept alive while its reverb tail continues to play.</summary>
+        /// <summary>Whether this emitter is kept alive while its reverb tail continues to play. Setting this to false while PendingRemoval is true removes the emitter on the next Update.</summary>
         public bool KeepReverbTailAlive
         {
             get => EmitterBindings.GetKeepReverbTailAlive(native);
@@ -128,6 +138,34 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetRelativeReverbOuterThreshold(native, value).ThrowIfError();
         }
 
+        /// <summary>Whether this emitter can share its rays with other nearby emitters that also have clustering enabled. A cluster casts its reverb, ambient occlusion, ambient permeation, occlusion and permeation rays outwards from each emitter in the cluster in round robin, and each emitter shares the same reverb, EAX and ambience results. The cluster uses the highest ray count, bounce count and MaxEchogramTime of its emitters. Its occlusion and permeation rays are cast towards the targets of every emitter in the cluster, and each emitter only gets low pass filters for its own targets. Emitters only cluster with others that are within line of sight and have the same EchogramGranularity, and never with their own targets. Emitters with OverridePositions or OverrideRayDirections set never cluster.</summary>
+        public bool ClusteringEnabled
+        {
+            get => EmitterBindings.GetClusteringEnabled(native);
+            set => EmitterBindings.SetClusteringEnabled(native, value).ThrowIfError();
+        }
+
+        /// <summary>The maximum distance between this emitter and the centre of a cluster, for it to share that cluster's rays. If two emitters have different distances, the smaller one is used. Only used if ClusteringEnabled is true.</summary>
+        public VAFloat ClusteringDistance
+        {
+            get => EmitterBindings.GetClusteringDistance(native);
+            set => EmitterBindings.SetClusteringDistance(native, value).ThrowIfError();
+        }
+
+        /// <summary>Whether this emitter groups its targets into clusters, to reduce the number of occlusion and permeation rays it casts. Within each cluster, this emitter casts occlusion and permeation rays towards the targets in the cluster in round robin, and each target gets the same low pass filter. This is set on the emitter that casts the rays (e.g. the listener), not on its targets. For sharing rays between emitters, see ClusteringEnabled. If this emitter is in a cluster with other emitters that have targets, its targets are only clustered if all of them have this enabled, using the smallest TargetClusteringDistance.</summary>
+        public bool TargetClusteringEnabled
+        {
+            get => EmitterBindings.GetTargetClusteringEnabled(native);
+            set => EmitterBindings.SetTargetClusteringEnabled(native, value).ThrowIfError();
+        }
+
+        /// <summary>The maximum distance between two of this emitter's targets for them to be in the same cluster. Only used if TargetClusteringEnabled is true.</summary>
+        public VAFloat TargetClusteringDistance
+        {
+            get => EmitterBindings.GetTargetClusteringDistance(native);
+            set => EmitterBindings.SetTargetClusteringDistance(native, value).ThrowIfError();
+        }
+
         /// <summary>Whether to clamp this emitter's position within the world bounds.</summary>
         public bool ClampPosition
         {
@@ -135,7 +173,7 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetClampPosition(native, value).ThrowIfError();
         }
 
-        /// <summary>This name is displayed in the debug window.</summary>
+        /// <summary>This name is displayed in the debug window. Setting null stores an empty string.</summary>
         public string Name
         {
             get => EmitterBindings.GetName(native);
@@ -269,7 +307,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>The allowed distance between new and old bounce positions when refreshing trails. See TrailRefreshCount for more information.</summary>
-        public float RefreshDistanceThreshold
+        public VAFloat RefreshDistanceThreshold
         {
             get => EmitterBindings.GetRefreshDistanceThreshold(native);
             set => EmitterBindings.SetRefreshDistanceThreshold(native, value).ThrowIfError();
@@ -407,12 +445,12 @@ namespace vaudionativewrapper.managed
         public EAXReverb EAX => new EAXReverb(EmitterBindings.GetEAX(native));
         /// <summary>Contains data gathered by reverb rays. This object is null until this emitter casts its reverb rays for the first time. See Initialising and OnRaytracingComplete</summary>
         public ProcessedReverb ProcessedReverb => new ProcessedReverb(EmitterBindings.GetProcessedReverb(native));
-        /// <summary>Contains the low- and high-frequency volume of ambient sounds. This object is null until this emitter casts its ambient rays for the first time. See Initialising and OnRaytracingComplete</summary>
+        /// <summary>Contains the low- and high-frequency volume of ambient sounds. This object is null until this emitter casts its ambient rays for the first time, and null if neither ambient occlusion nor ambient permeation is enabled. See Initialising and OnRaytracingComplete</summary>
         public LowPassFilter* AmbientFilter => EmitterBindings.GetAmbientFilter(native);
 
         /// <summary>Whether this emitter casts any rays (excluding visualisation rays)</summary>
         public bool CreatesTrails => EmitterBindings.CreatesTrails(native);
-        /// <summary>Whether this emitter is within Position and MaxBounds. Emitters outside the world bounds will not be raytraced. Set ClampPosition to true to keep this emitter within the world bounds.</summary>
+        /// <summary>Whether this emitter is within Position and MaxBounds. Emitters outside the world bounds will not be raytraced. Set ClampPosition to true to keep this emitter within the world bounds. If ClampPosition is false and any of the OverridePositions are outside the world bounds, this emitter is also outside the world bounds.</summary>
         public bool WithinWorldBounds => EmitterBindings.WithinWorldBounds(native);
         /// <summary>The index of this emitter's EAX object in GroupedEAX</summary>
         public int GroupedEAXIndex => EmitterBindings.GetGroupedEAXIndex(native);
@@ -434,19 +472,19 @@ namespace vaudionativewrapper.managed
         public bool AmbientOcclusionEnabled => EmitterBindings.AmbientOcclusionEnabled(native);
         /// <summary>True if both AmbientPermeationRayCount and AmbientPermeationBounceCount are greater than zero</summary>
         public bool AmbientPermeationEnabled => EmitterBindings.AmbientPermeationEnabled(native);
-        /// <summary>True if both VisualisationRayCount and VisualisationBounceCount are greater than zero</summary>
+        /// <summary>True if both VisualisationRayCount and VisualisationBounceCount are greater than zero, and VisualisationCallback is assigned</summary>
         public bool VisualisationEnabled => EmitterBindings.VisualisationEnabled(native);
 #endregion
 
 #region WriteOnly
-        /// <summary>When defined, rays will be cast in round-robin from these positions rather than the default Position. Set to null or an empty array to revert back to using the default Position. A copy of the provided array will be stored. Warning: changing this at runtime will clear the ray cache.</summary>
+        /// <summary>When defined, rays will be cast in round-robin from these positions rather than the default Position. If any position is outside the world bounds and ClampPosition is true, they are clamped within the world bounds. If ClampPosition is false, a warning is logged and this emitter is treated as outside the world, see WithinWorldBounds. Set to null or an empty array to revert back to using the default Position. A copy of the provided array will be stored. Warning: changing this at runtime will clear the ray cache.</summary>
         public Vector[] OverridePositions
         {
             set
             {
                 fixed (Vector* ptr = value)
                 {
-                    EmitterBindings.SetOverridePositions(native, ptr, value.Length).ThrowIfError();
+                    EmitterBindings.SetOverridePositions(native, ptr, value?.Length ?? 0).ThrowIfError();
                 }
             }
         }
@@ -458,7 +496,7 @@ namespace vaudionativewrapper.managed
             {
                 fixed (Vector* ptr = value)
                 {
-                    EmitterBindings.SetOverrideRayDirections(native, ptr, value.Length).ThrowIfError();
+                    EmitterBindings.SetOverrideRayDirections(native, ptr, value?.Length ?? 0).ThrowIfError();
                 }
             }
         }
@@ -517,7 +555,7 @@ namespace vaudionativewrapper.managed
             }
         }
 
-        /// <summary>This callback is invoked when this emitter is actually removed from the World. Normally this is invoked immediately within RemoveEmitter, but if it casts reverb rays and AffectsGroupedEAX is true, it will be invoked when its reverb tail finishes playing. During this time, PendingRemoval is set to true.</summary>
+        /// <summary>This callback is invoked once this emitter has been removed from the World and the raytracing threads no longer read it. It's invoked inside Update or Wait once the next raytracing results are handled, inside RemoveEmitter if no raytracing results are pending, or inside Dispose. If it casts reverb rays and AffectsGroupedEAX is true, removal itself waits until its reverb tail finishes playing, and during that time PendingRemoval is set to true. The callback is cleared once invoked. If the emitter is re-added to the same world before then, it isn't invoked, and is kept for the next removal.</summary>
         public Action OnRemoved
         {
             set
@@ -621,7 +659,7 @@ namespace vaudionativewrapper.managed
 
                 if (value != null)
                 {
-                    LogCallbackFn callback = (msg) => value(msg);
+                    LogCallbackFn callback = (owner, msg) => value(msg);
                     _logCallbackHandle = GCHandle.Alloc(callback);
                     EmitterBindings.SetLogCallback(native, callback).ThrowIfError();
                 }
@@ -642,7 +680,7 @@ namespace vaudionativewrapper.managed
 
                 if (value != null)
                 {
-                    LogCallbackFn callback = (msg) => value(msg);
+                    LogCallbackFn callback = (owner, msg) => value(msg);
                     _logErrorCallbackHandle = GCHandle.Alloc(callback);
                     EmitterBindings.SetLogErrorCallback(native, callback).ThrowIfError();
                 }

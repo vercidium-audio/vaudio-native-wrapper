@@ -1,6 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -21,10 +27,10 @@ namespace vaudionativewrapper
         public static extern VAResult Destroy(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaUnsafeVoxelPrimitiveGetScale")]
-        public static extern float GetScale(IntPtr primitive);
+        public static extern VAFloat GetScale(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaUnsafeVoxelPrimitiveSetScale")]
-        public static extern VAResult SetScale(IntPtr primitive, float scale);
+        public static extern VAResult SetScale(IntPtr primitive, VAFloat scale);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaUnsafeVoxelPrimitiveGetTransform")]
         public static extern unsafe Matrix* GetTransform(IntPtr primitive);

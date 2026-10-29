@@ -1,6 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper
 {
     public static class PathPrimitiveBindings
@@ -8,18 +14,20 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPathPrimitiveCreate")]
         public static extern unsafe VAResult Create([MarshalAs(UnmanagedType.LPStr)] string svgPath, IntPtr* outPrimitive);
 
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPathPrimitiveCreateFromPath")]
+        public static extern unsafe VAResult CreateFromPath(IntPtr svgPath, IntPtr* outPrimitive);
+
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPathPrimitiveSetSvgPath")]
-        public static extern VAResult SetSvgPath(IntPtr primitive, [MarshalAs(UnmanagedType.LPStr)] string svgPath);
+        public static extern VAResult SetSvgPath(IntPtr primitive, IntPtr svgPath);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPathPrimitiveGetSvgPath")]
-        private static extern IntPtr GetSvgPathRaw(IntPtr primitive);
-        public static string GetSvgPath(IntPtr primitive) => Marshal.PtrToStringAnsi(GetSvgPathRaw(primitive));
+        public static extern IntPtr GetSvgPath(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPathPrimitiveSetPosition")]
         public static extern VAResult SetPosition(IntPtr primitive, Vector position);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPathPrimitiveSetRotation")]
-        public static extern VAResult SetRotation(IntPtr primitive, float rotation);
+        public static extern VAResult SetRotation(IntPtr primitive, VAFloat rotation);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPathPrimitiveSetScale")]
         public static extern VAResult SetScale(IntPtr primitive, Vector scale);
@@ -28,7 +36,7 @@ namespace vaudionativewrapper
         public static extern Vector GetPosition(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPathPrimitiveGetRotation")]
-        public static extern float GetRotation(IntPtr primitive);
+        public static extern VAFloat GetRotation(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaPathPrimitiveGetScale")]
         public static extern Vector GetScale(IntPtr primitive);

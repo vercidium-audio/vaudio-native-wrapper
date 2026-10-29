@@ -1,5 +1,11 @@
 using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>A triangular prism primitive</summary>
@@ -12,14 +18,14 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Radius of the triangle face</summary>
-        public float radius
+        public VAFloat radius
         {
             get => TriangularPrismPrimitiveBindings.GetRadius(native);
             set => TriangularPrismPrimitiveBindings.SetRadius(native, value).ThrowIfError();
         }
 
         /// <summary>Length of the prism along its body</summary>
-        public float length
+        public VAFloat length
         {
             get => TriangularPrismPrimitiveBindings.GetLength(native);
             set => TriangularPrismPrimitiveBindings.SetLength(native, value).ThrowIfError();

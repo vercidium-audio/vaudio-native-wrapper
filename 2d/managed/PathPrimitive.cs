@@ -1,25 +1,59 @@
 using System;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper.managed
 {
-    /// <summary>A polygon primitive constructed from an SVG path</summary>
+    /// <summary>A path primitive constructed from an Path, which can be shared across multiple primitives</summary>
     public unsafe class PathPrimitive : Primitive
     {
-        /// <summary>Create a path primitive from local-space SVG path data (the contents of an SVG "d" attribute). Supported commands: M/m, L/l, H/h, V/v, C/c, Q/q, A/a, Z/z (absolute and relative forms). Elliptical arcs (A/a) are converted to cubic bezier curves when parsed. Smooth-curve shorthand (S/s, T/t) is not supported</summary>
+        Path _svgPath;
+
+        /// <summary>Create a path primitive</summary>
+        public PathPrimitive(Path svgPath)
+        {
+            if (svgPath == null)
+                throw new ArgumentNullException(nameof(svgPath));
+
+            IntPtr outPrimitive;
+            PathPrimitiveBindings.CreateFromPath(svgPath.native, &outPrimitive).ThrowIfError();
+
+            native = outPrimitive;
+            owns = true;
+            _svgPath = svgPath;
+        }
+
+        /// <summary>Create a path primitive from an SVG path</summary>
         public PathPrimitive(string svgPath)
         {
+            if (svgPath == null)
+                throw new ArgumentNullException(nameof(svgPath));
+
             IntPtr outPrimitive;
             PathPrimitiveBindings.Create(svgPath, &outPrimitive).ThrowIfError();
 
             native = outPrimitive;
             owns = true;
+            _svgPath = new Path(PathPrimitiveBindings.GetSvgPath(outPrimitive));
         }
 
-        /// <summary>The local-space SVG path data (the contents of an SVG "d" attribute), before rotation, scale and position are applied. Supported commands: M/m, L/l, H/h, V/v, C/c, Q/q, A/a, Z/z (absolute and relative forms). Elliptical arcs (A/a) are converted to cubic bezier curves when parsed. Smooth-curve shorthand (S/s, T/t) is not supported. If the path ends with Z/z it is treated as closed.</summary>
-        public string svgPath
+        /// <summary>Shared, pre-parsed local-space SVG path, before rotation, scale and position are applied</summary>
+        public Path svgPath
         {
-            get => PathPrimitiveBindings.GetSvgPath(native);
-            set => PathPrimitiveBindings.SetSvgPath(native, value).ThrowIfError();
+            get => _svgPath;
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException(nameof(svgPath));
+
+                PathPrimitiveBindings.SetSvgPath(native, value.native).ThrowIfError();
+
+                _svgPath = value;
+            }
         }
 
         /// <summary>Position of the path in world space</summary>
@@ -30,7 +64,7 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>Rotation of the path in radians</summary>
-        public float rotation
+        public VAFloat rotation
         {
             get => PathPrimitiveBindings.GetRotation(native);
             set => PathPrimitiveBindings.SetRotation(native, value).ThrowIfError();
@@ -41,13 +75,6 @@ namespace vaudionativewrapper.managed
         {
             get => PathPrimitiveBindings.GetScale(native);
             set => PathPrimitiveBindings.SetScale(native, value).ThrowIfError();
-        }
-
-        /// <summary>Whether rays lose a flat percentage of energy the moment they touch this path, instead of calculating how long the ray spent inside it. Only meaningful to disable for closed paths (svgPath ends with Z/z) as an open path has no interior.</summary>
-        public bool UseFlatTransmission
-        {
-            get => PathPrimitiveBindings.GetUseFlatTransmission(native);
-            set => PathPrimitiveBindings.SetUseFlatTransmission(native, value).ThrowIfError();
         }
 
         protected override VAResult DestroyNative(IntPtr native) => PathPrimitiveBindings.Destroy(native);

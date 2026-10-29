@@ -1,6 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if VA_DOUBLE_PRECISION
+using VAFloat = System.Double;
+#else
+using VAFloat = System.Single;
+#endif
+
 namespace vaudionativewrapper
 {
     public static class HemispherePrimitiveBindings
@@ -9,13 +15,13 @@ namespace vaudionativewrapper
         public static extern IntPtr Create();
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaHemispherePrimitiveSetRadius")]
-        public static extern VAResult SetRadius(IntPtr primitive, float radius);
+        public static extern VAResult SetRadius(IntPtr primitive, VAFloat radius);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaHemispherePrimitiveSetTransform")]
         public static extern VAResult SetTransform(IntPtr primitive, ref Matrix transform);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaHemispherePrimitiveGetRadius")]
-        public static extern float GetRadius(IntPtr primitive);
+        public static extern VAFloat GetRadius(IntPtr primitive);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaHemispherePrimitiveGetTransform")]
         public static extern unsafe Matrix* GetTransform(IntPtr primitive);
