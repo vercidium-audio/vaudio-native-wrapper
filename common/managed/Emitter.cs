@@ -97,7 +97,7 @@ namespace vaudionativewrapper.managed
             get => EmitterBindings.GetInitialising(native);
         }
 
-        /// <summary>Whether this emitter will be removed from the world when its reverb tail finishes playing.</summary>
+        /// <summary>Whether this emitter will be removed from the world when its reverb tail finishes playing. While true, changing this emitter's properties (excluding Name, UserData, LogCallback, LogErrorCallback, OnRemoved and KeepReverbTailAlive) or adding targets throws an InvalidOperationException.</summary>
         public bool PendingRemoval
         {
             get => EmitterBindings.GetPendingRemoval(native);
@@ -110,7 +110,7 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetAffectsGroupedEAX(native, value).ThrowIfError();
         }
 
-        /// <summary>Whether this emitter is kept alive while its reverb tail continues to play.</summary>
+        /// <summary>Whether this emitter is kept alive while its reverb tail continues to play. Setting this to false while PendingRemoval is true removes the emitter on the next Update.</summary>
         public bool KeepReverbTailAlive
         {
             get => EmitterBindings.GetKeepReverbTailAlive(native);
