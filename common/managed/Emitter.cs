@@ -103,6 +103,13 @@ namespace vaudionativewrapper.managed
             get => EmitterBindings.GetPendingRemoval(native);
         }
 
+        /// <summary>Suspended emitters cast no rays, and keep their last reverb and ambient results. Other emitters can still raytrace it as a target, so its muffling stays up to date. When un-suspended, all of its rays are re-cast. If it shares a cluster, the cluster's rays are re-cast, and its results keep following the cluster while it's suspended.</summary>
+        public bool Suspended
+        {
+            get => EmitterBindings.GetSuspended(native);
+            set => EmitterBindings.SetSuspended(native, value).ThrowIfError();
+        }
+
         /// <summary>Whether this emitter's EAX is blended into the GroupedEAX list. Set this to false for listener emitters</summary>
         public bool AffectsGroupedEAX
         {
