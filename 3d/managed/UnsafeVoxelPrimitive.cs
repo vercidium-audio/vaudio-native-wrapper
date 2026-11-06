@@ -9,7 +9,11 @@ using VAFloat = System.Single;
 
 namespace vaudionativewrapper.managed
 {
-    /// <summary>A 3D grid of voxels that reads directly from unmanaged memory owned by the caller, rather than copying it into a managed array. Each voxel is converted to a material by the world's UnsafeVoxelMaterialMap, which must be set before adding this primitive to a world. Voxel memory is read by the raytracing threads without synchronisation, and must remain valid until this primitive is removed from its world and its OnRemoved callback is invoked.</summary>
+    /// <summary>
+    /// A 3D grid of voxels that reads directly from unmanaged memory owned by the caller, rather than copying it into a managed array.<br/>
+    /// Each voxel is converted to a material by the world's UnsafeVoxelMaterialMap, which must be set before adding this primitive to a world.<br/>
+    /// Voxel memory is read by the raytracing threads without synchronisation, and must remain valid until this primitive is removed from its world and its OnRemoved callback is invoked.
+    /// </summary>
     public unsafe class UnsafeVoxelPrimitive : Primitive
     {
         /// <summary>Pointer to the first voxel. Owned by the caller</summary>
@@ -24,7 +28,10 @@ namespace vaudionativewrapper.managed
         /// <summary>Number of voxels between neighbouring voxels along each axis, i.e. the voxel at (x, y, z) is at data + (x * xPitch + y * yPitch + z * zPitch) * stride</summary>
         public readonly int xPitch, yPitch, zPitch;
 
-        /// <summary>Invoked on the main thread once this primitive has been removed from its world and the raytracing threads no longer use its voxel data. This is invoked by Update, or by RemovePrimitive if this primitive was never sent to the raytracing threads.</summary>
+        /// <summary>
+        /// Invoked on the main thread once this primitive has been removed from its world and the raytracing threads no longer use its voxel data.<br/>
+        /// This is invoked by Update, or by RemovePrimitive if this primitive was never sent to the raytracing threads.
+        /// </summary>
         public Action OnRemoved;
 
         // Keep a delegate for native callbacks
