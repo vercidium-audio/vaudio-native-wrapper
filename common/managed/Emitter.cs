@@ -116,14 +116,14 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetSuspended(native, value).ThrowIfError();
         }
 
-        /// <summary>Whether this emitter's EAX is blended into the GroupedEAX list. Set this to false for listener emitters</summary>
+        /// <summary>Whether this emitter's EAX is blended into the World.GroupedEAX list. Set this to false for listener emitters</summary>
         public bool AffectsGroupedEAX
         {
             get => EmitterBindings.GetAffectsGroupedEAX(native);
             set => EmitterBindings.SetAffectsGroupedEAX(native, value).ThrowIfError();
         }
 
-        /// <summary>Whether this emitter is kept alive while its reverb tail continues to play. Setting this to false while PendingRemoval is true removes the emitter on the next Update.</summary>
+        /// <summary>Whether this emitter is kept alive while its reverb tail continues to play. Setting this to false while PendingRemoval is true removes the emitter on the next World.Update.</summary>
         public bool KeepReverbTailAlive
         {
             get => EmitterBindings.GetKeepReverbTailAlive(native);
@@ -394,7 +394,7 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetAmbientPermeationEnergyCap(native, value).ThrowIfError();
         }
 
-        /// <summary>The loudest linear volume (0–1) this emitter's dry source will ever be played at by the consuming application. Used to estimate how long the emitter's reverb tail stays audible in GetEffectiveTailSeconds - a quieter source reaches an inaudible reverb tail sooner.</summary>
+        /// <summary>The loudest linear volume (0–1) this emitter's dry source will ever be played at by the consuming application. Used to estimate how long the emitter's reverb tail stays audible in EAXUtils.GetEffectiveTailSeconds - a quieter source reaches an inaudible reverb tail sooner.</summary>
         public float MaxVolume
         {
             get => EmitterBindings.GetMaxVolume(native);
@@ -509,12 +509,12 @@ namespace vaudionativewrapper.managed
         /// <summary>Whether this emitter casts any rays (excluding visualisation rays)</summary>
         public bool CreatesTrails => EmitterBindings.CreatesTrails(native);
         /// <summary>
-        /// Whether this emitter is within Position and MaxBounds.<br/>
+        /// Whether this emitter is within World.Position and World.MaxBounds.<br/>
         /// Emitters outside the world bounds will not be raytraced. Set ClampPosition to true to keep this emitter within the world bounds.<br/>
         /// If ClampPosition is false and any of the OverridePositions are outside the world bounds, this emitter is also outside the world bounds.
         /// </summary>
         public bool WithinWorldBounds => EmitterBindings.WithinWorldBounds(native);
-        /// <summary>The index of this emitter's EAX object in GroupedEAX</summary>
+        /// <summary>The index of this emitter's EAX object in World.GroupedEAX</summary>
         public int GroupedEAXIndex => EmitterBindings.GetGroupedEAXIndex(native);
         /// <summary>The percentage of ambient occlusion rays that reached the edge of the world.</summary>
         public float OutsidePercent => EmitterBindings.GetOutsidePercent(native);
@@ -633,7 +633,7 @@ namespace vaudionativewrapper.managed
 
         /// <summary>
         /// This callback is invoked once this emitter has been removed from the World and the raytracing threads no longer read it.<br/>
-        /// It's invoked inside Update or Wait once the next raytracing results are handled, inside RemoveEmitter if no raytracing results are pending, or inside Dispose. If it casts reverb rays and AffectsGroupedEAX is true, removal itself waits until its reverb tail finishes playing, and during that time PendingRemoval is set to true.<br/>
+        /// It's invoked inside World.Update or World.Wait once the next raytracing results are handled, inside World.RemoveEmitter if no raytracing results are pending, or inside World.Dispose. If it casts reverb rays and AffectsGroupedEAX is true, removal itself waits until its reverb tail finishes playing, and during that time PendingRemoval is set to true.<br/>
         /// The callback is cleared once invoked. If the emitter is re-added to the same world before then, it isn't invoked, and is kept for the next removal.
         /// </summary>
         public Action OnRemoved
@@ -729,7 +729,7 @@ namespace vaudionativewrapper.managed
             }
         }
 
-        /// <summary>A custom log callback. Defaults to WriteLine()</summary>
+        /// <summary>A custom log callback. Defaults to Console.WriteLine()</summary>
         public Action<string> LogCallback
         {
             set
@@ -750,7 +750,7 @@ namespace vaudionativewrapper.managed
             }
         }
 
-        /// <summary>A custom error log callback. Defaults to Error.WriteLine()</summary>
+        /// <summary>A custom error log callback. Defaults to Console.Error.WriteLine()</summary>
         public Action<string> LogErrorCallback
         {
             set

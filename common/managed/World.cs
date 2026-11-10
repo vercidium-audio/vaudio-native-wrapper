@@ -75,7 +75,7 @@ namespace vaudionativewrapper.managed
         /// <summary>
         /// Update the raytracing simulation. Call this method regularly to process raytracing results and submit new work.<br/>
         /// This method does nothing if background raytracing threads are still running. If the threads ahve completed, it performs the following operations:<br/>
-        /// - Handles the last raytracing results, updating reverb objects and invoking OnRaytracedByAnotherEmitter and other callbacks<br/>
+        /// - Handles the last raytracing results, updating reverb objects and invoking Emitter.OnRaytracedByAnotherEmitter and other callbacks<br/>
         /// - Applies new settings and resizes memory buffers if needed (e.g. if ray counts were changed)<br/>
         /// - Processes new, modified, and removed primitives<br/>
         /// - Starts raytracing again on background threads<br/>
@@ -88,7 +88,7 @@ namespace vaudionativewrapper.managed
             return result;
         }
 
-        /// <summary>Blocks until all background raytracing threads complete, then handles the results (updates reverb objects and invokes OnRaytracingComplete and OnRaytracedByAnotherEmitter callbacks for each emitter).</summary>
+        /// <summary>Blocks until all background raytracing threads complete, then handles the results (updates reverb objects and invokes Emitter.OnRaytracingComplete and Emitter.OnRaytracedByAnotherEmitter callbacks for each emitter).</summary>
         public VAResult Wait()
         {
             var result = WorldBindings.Wait(native);
@@ -333,7 +333,7 @@ namespace vaudionativewrapper.managed
             set => WorldBindings.SetWorkItemCount(native, value).ThrowIfError();
         }
 
-        /// <summary>The maximum amount of threads that can run in parallel. On WASM all worlds share a single thread pool, so this is a global setting via MaximumConcurrencyLevel. The maximum amount of threads that can run in parallel for this world</summary>
+        /// <summary>The maximum amount of threads that can run in parallel. On WASM all worlds share a single thread pool, so this is a global setting via ThreadSettings.MaximumConcurrencyLevel. The maximum amount of threads that can run in parallel for this world</summary>
         public int MaximumConcurrencyLevel
         {
             get => WorldBindings.GetMaximumConcurrencyLevel(native);
@@ -446,7 +446,7 @@ namespace vaudionativewrapper.managed
         private GCHandle _onReverbUpdatedHandle;
         private GCHandle _logCallbackHandle;
 
-        /// <summary>This callback is invoked after EAX reverb results are updated. This gives you a chance to update your EAX effects, so they can be applied to an emitter in its OnRaytracingComplete callback. After this, each emitter's callbacks are invoked, and then OnRaytracingResultsHandled is invoked.</summary>
+        /// <summary>This callback is invoked after EAX reverb results are updated. This gives you a chance to update your EAX effects, so they can be applied to an emitter in its Emitter.OnRaytracingComplete callback. After this, each emitter's callbacks are invoked, and then OnRaytracingResultsHandled is invoked.</summary>
         public Action OnReverbUpdated
         {
             set
@@ -468,7 +468,7 @@ namespace vaudionativewrapper.managed
             }
         }
 
-        /// <summary>A custom logging callback. Defaults to WriteLine()</summary>
+        /// <summary>A custom logging callback. Defaults to Console.WriteLine()</summary>
         public Action<string> LogCallback
         {
             set
@@ -506,7 +506,7 @@ namespace vaudionativewrapper.managed
 
         /// <summary>
         /// When set to true, Update will stop submitting work to background threads.<br/>
-        /// When ThreadsRunning becomes false, it is safe to call Dispose.
+        /// When ThreadsRunning becomes false, it is safe to call World.Dispose.
         /// </summary>
         public bool PendingShutdown
         {

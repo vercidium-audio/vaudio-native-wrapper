@@ -11,7 +11,7 @@ namespace vaudionativewrapper.managed
 {
     /// <summary>
     /// A 3D grid of voxels that reads directly from unmanaged memory owned by the caller, rather than copying it into a managed array.<br/>
-    /// Each voxel is converted to a material by the world's UnsafeVoxelMaterialMap, which must be set before adding this primitive to a world.<br/>
+    /// Each voxel is converted to a material by the world's World.UnsafeVoxelMaterialMap, which must be set before adding this primitive to a world.<br/>
     /// Voxel memory is read by the raytracing threads without synchronisation, and must remain valid until this primitive is removed from its world and its OnRemoved callback is invoked.
     /// </summary>
     public unsafe class UnsafeVoxelPrimitive : Primitive
@@ -30,7 +30,7 @@ namespace vaudionativewrapper.managed
 
         /// <summary>
         /// Invoked on the main thread once this primitive has been removed from its world and the raytracing threads no longer use its voxel data.<br/>
-        /// This is invoked by Update, or by RemovePrimitive if this primitive was never sent to the raytracing threads.
+        /// This is invoked by World.Update, or by World.RemovePrimitive if this primitive was never sent to the raytracing threads.
         /// </summary>
         public Action OnRemoved;
 
@@ -86,10 +86,10 @@ namespace vaudionativewrapper.managed
             set => UnsafeVoxelPrimitiveBindings.SetTransform(native, ref value).ThrowIfError();
         }
 
-        /// <summary>Returns the material of the voxel at (x, y, z), using the world's UnsafeVoxelMaterialMap</summary>
+        /// <summary>Returns the material of the voxel at (x, y, z), using the world's World.UnsafeVoxelMaterialMap</summary>
         public MaterialType GetMaterial(int x, int y, int z) => UnsafeVoxelPrimitiveBindings.GetVoxel(native, x, y, z);
 
-        /// <summary>Returns true if the voxel at (x, y, z) is solid, using the world's UnsafeVoxelMaterialMap</summary>
+        /// <summary>Returns true if the voxel at (x, y, z) is solid, using the world's World.UnsafeVoxelMaterialMap</summary>
         public bool IsSolid(int x, int y, int z) => UnsafeVoxelPrimitiveBindings.IsSolid(native, x, y, z);
 
         /// <summary>Call this after editing voxel data</summary>
