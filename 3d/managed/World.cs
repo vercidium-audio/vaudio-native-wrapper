@@ -21,7 +21,10 @@ namespace vaudionativewrapper.managed
         // Keeps the delegates alive while native holds pointers to them
         System.Runtime.InteropServices.GCHandle unsafeVoxelCallbacksHandle;
 
-        /// <summary>Converts a voxel in a UnsafeVoxelPrimitive to a MaterialType. If the mapping changes, assign it here again, and all rays that intersect with UnsafeVoxelPrimitives will be re-cast.</summary>
+        /// <summary>
+        /// Converts a voxel in a UnsafeVoxelPrimitive to a MaterialType.<br/>
+        /// If the mapping changes, assign it here again, and all rays that intersect with UnsafeVoxelPrimitives will be re-cast.
+        /// </summary>
         public unsafe UnsafeVoxelMaterialMap UnsafeVoxelMaterialMap
         {
             get => unsafeVoxelMaterialMap;

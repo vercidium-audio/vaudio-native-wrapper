@@ -49,14 +49,14 @@ namespace vaudionativewrapper.managed
             set => WorldBindings.SetMaterialTransmissionHF(world, id, value);
         }
 
-        /// <summary>Percentage of low-frequency energy lost when a ray touches a primitive with UseFlatTransmission set to true, instead of calculating how long the ray spent inside it</summary>
+        /// <summary>Percentage of low-frequency energy lost when a ray touches a primitive with Primitive.UseFlatTransmission set to true, instead of calculating how long the ray spent inside it</summary>
         public float FlatTransmissionLF
         {
             get { WorldBindings.GetMaterialFlatTransmissionLF(world, id, out var value).ThrowIfError(); return value; }
             set => WorldBindings.SetMaterialFlatTransmissionLF(world, id, value);
         }
 
-        /// <summary>Percentage of high-frequency energy lost when a ray touches a primitive with UseFlatTransmission set to true, instead of calculating how long the ray spent inside it</summary>
+        /// <summary>Percentage of high-frequency energy lost when a ray touches a primitive with Primitive.UseFlatTransmission set to true, instead of calculating how long the ray spent inside it</summary>
         public float FlatTransmissionHF
         {
             get { WorldBindings.GetMaterialFlatTransmissionHF(world, id, out var value).ThrowIfError(); return value; }

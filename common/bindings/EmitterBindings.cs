@@ -314,6 +314,13 @@ namespace vaudionativewrapper
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetAffectsGroupedEAX(IntPtr emitter);
 
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetSuspended")]
+        public static extern VAResult SetSuspended(IntPtr emitter, bool value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetSuspended")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool GetSuspended(IntPtr emitter);
+
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetKeepReverbTailAlive")]
         public static extern VAResult SetKeepReverbTailAlive(IntPtr emitter, bool value);
 

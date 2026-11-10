@@ -10,16 +10,30 @@ namespace vaudionativewrapper.managed
             this.native = native;
         }
 
-        /// <summary>The percentage of energy that returned back to the emitter. Calculated as raw.ReturnedTotal / (ReverbRayCount * ReverbBounceCount)</summary>
+        /// <summary>
+        /// The percentage of energy that returned back to the emitter.<br/>
+        /// Calculated as raw.ReturnedTotal / (ReverbRayCount * ReverbBounceCount)
+        /// </summary>
         public float ReturnedPercent => native->returnedPercent;
 
-        /// <summary>The percentage of energy that escaped outside (hit the world edge). Calculated as raw.OutsideTotal / (ReverbRayCount * ReverbBounceCount)</summary>
+        /// <summary>
+        /// The percentage of energy that escaped outside (hit the world edge).<br/>
+        /// Calculated as raw.OutsideTotal / (ReverbRayCount * ReverbBounceCount)
+        /// </summary>
         public float OutsidePercent => native->outsidePercent;
 
-        /// <summary>The low-frequency reverberation decay time measured from the echogram. Calculated using RT20, RT30, or RT60 method depending on echogram length and room size. Used to calculate EAX DecayTime and DecayLFRatio.</summary>
+        /// <summary>
+        /// The low-frequency reverberation decay time measured from the echogram.<br/>
+        /// Calculated using RT20, RT30, or RT60 method depending on echogram length and room size.<br/>
+        /// Used to calculate EAX DecayTime and DecayLFRatio.
+        /// </summary>
         public float MeasuredDecayTimeLF => native->measuredDecayTimeLF;
 
-        /// <summary>The high-frequency reverberation decay time measured from the echogram. Calculated using RT20, RT30, or RT60 method depending on echogram length and room size. Used to calculate EAX DecayTime and DecayHFRatio.</summary>
+        /// <summary>
+        /// The high-frequency reverberation decay time measured from the echogram.<br/>
+        /// Calculated using RT20, RT30, or RT60 method depending on echogram length and room size.<br/>
+        /// Used to calculate EAX DecayTime and DecayHFRatio.
+        /// </summary>
         public float MeasuredDecayTimeHF => native->measuredDecayTimeHF;
 
         /// <summary>The average roughness/scattering of all surfaces that all rays hit.</summary>
