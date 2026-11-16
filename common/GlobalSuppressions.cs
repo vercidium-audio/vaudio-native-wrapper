@@ -4,3 +4,5 @@
 [assembly: SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Unnecessary")]
 [assembly: SuppressMessage("Style", "IDE0017:Simplify object initialization", Justification = "Unnecessary")]
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Unnecessary")]
+[assembly: SuppressMessage("Interoperability", "SYSLIB1054", Justification = "Not available in .netstandard2.1")]
+[assembly: SuppressMessage("Interoperability", "CA1401", Justification = "Unnecessary")]
