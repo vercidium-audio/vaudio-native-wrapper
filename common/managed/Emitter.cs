@@ -446,6 +446,13 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetScatteringSeed(native, value).ThrowIfError();
         }
 
+        /// <summary>Seed used to randomise visualisation rays. If null, a random visualisation seed is generated each time</summary>
+        public int? VisualisationSeed
+        {
+            get => EmitterBindings.GetVisualisationSeed(native, out var value) ? value : (int?)null;
+            set => (value.HasValue ? EmitterBindings.SetVisualisationSeed(native, value.Value) : EmitterBindings.ClearVisualisationSeed(native)).ThrowIfError();
+        }
+
         /// <summary>Whether to render each trail a different color in the debug window (dev build only)</summary>
         public bool RandomTrailColor
         {
