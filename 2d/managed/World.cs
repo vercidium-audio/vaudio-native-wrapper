@@ -1,4 +1,6 @@
-﻿#if VA_DOUBLE_PRECISION
+﻿// Human-created
+
+#if VA_DOUBLE_PRECISION
 using VAFloat = System.Double;
 #else
 using VAFloat = System.Single;

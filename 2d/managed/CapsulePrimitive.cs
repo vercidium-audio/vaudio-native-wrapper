@@ -1,3 +1,5 @@
+// Human-created
+
 using System;
 
 #if VA_DOUBLE_PRECISION

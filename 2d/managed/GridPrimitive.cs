@@ -1,3 +1,5 @@
+// Human-created
+
 #if VA_DOUBLE_PRECISION
 using VAFloat = System.Double;
 #else
