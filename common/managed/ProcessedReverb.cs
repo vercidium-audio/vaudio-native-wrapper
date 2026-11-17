@@ -13,14 +13,12 @@ namespace vaudionativewrapper.managed
         }
 
         /// <summary>
-        /// The percentage of energy that returned back to the emitter.<br/>
-        /// Calculated as raw.ReturnedTotal / (ReverbRayCount * ReverbBounceCount)
+        /// The percentage of energy that returned back to the emitter.
         /// </summary>
         public float ReturnedPercent => native->returnedPercent;
 
         /// <summary>
-        /// The percentage of energy that escaped outside (hit the world edge).<br/>
-        /// Calculated as raw.OutsideTotal / (ReverbRayCount * ReverbBounceCount)
+        /// The percentage of ambient occlusion energy that reached the edge of the world.
         /// </summary>
         public float OutsidePercent => native->outsidePercent;
 
