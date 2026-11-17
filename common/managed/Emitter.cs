@@ -1,3 +1,5 @@
+// Human-created
+
 using System;
 using System.Runtime.InteropServices;
 
@@ -19,7 +21,7 @@ namespace vaudionativewrapper.managed
         string stackTrace;
 #endif
 
-        #region Functions
+#region Functions
         public Emitter(IntPtr native)
         {
             this.native = native;
@@ -582,7 +584,7 @@ namespace vaudionativewrapper.managed
         }
 #endregion
 
-    #region Callbacks
+#region Callbacks
         private GCHandle _onRaytracingCompleteHandle;
         private GCHandle _onRaytracedByAnotherEmitterHandle;
         private GCHandle _onRemovedHandle;

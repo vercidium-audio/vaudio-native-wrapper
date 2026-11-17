@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Human-reviewed
+
+using System;
 using System.Diagnostics;
 
 namespace vaudionativewrapper.managed

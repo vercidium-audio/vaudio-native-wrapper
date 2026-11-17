@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿// Human-created
+
+using System.Runtime.InteropServices;
 
 namespace vaudionativewrapper
 {

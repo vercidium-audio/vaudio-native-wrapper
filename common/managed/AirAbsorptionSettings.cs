@@ -1,16 +1,18 @@
-﻿using System;
+﻿// Human-created
+
+using System;
 using System.Runtime.InteropServices;
 
 namespace vaudionativewrapper.managed
 {
-    /// <summary>Settings that control how sound energy is absorbed by the air over distance</summary>
+    /// <summary>Settings that control how rays lose energy over distance</summary>
     public class AirAbsorptionSettings
     {
         public IntPtr native;
 
         // Must keep these to prevent garbage collection
-        GCHandle lfHandle;
-        GCHandle hfHandle;
+        GCHandle handleLF;
+        GCHandle handleHF;
 
 #if DEBUG
         private readonly bool owns;
@@ -35,6 +37,14 @@ namespace vaudionativewrapper.managed
 #endif
         }
 
+#if DEBUG
+        ~AirAbsorptionSettings()
+        {
+            if (owns && native != IntPtr.Zero)
+                LogSettings.Warn($"AirAbsorptionSettings was garbage collected without calling Destroy() first. Stack trace: {stackTrace}");
+        }
+#endif
+
         /// <summary>Relative humidity as a percentage</summary>
         public float Humidity
         {
@@ -56,6 +66,7 @@ namespace vaudionativewrapper.managed
             set => AirAbsorptionSettingsBindings.SetPressure(native, value).ThrowIfError();
         }
 
+        // TODO - remaining XML docs
         public VAResult Validate() => AirAbsorptionSettingsBindings.Validate(native);
 
         public VAResult Destroy()
@@ -65,24 +76,16 @@ namespace vaudionativewrapper.managed
             return result;
         }
 
-#if DEBUG
-        ~AirAbsorptionSettings()
-        {
-            if (owns && native != IntPtr.Zero)
-                LogSettings.Warn($"AirAbsorptionSettings was garbage collected without calling Destroy() first. Stack trace: {stackTrace}");
-        }
-#endif
-
         public AirAbsorptionFormulaDelegate SetCustomFormulaLF(Func<float, float> value)
         {
-            if (lfHandle.IsAllocated)
-                lfHandle.Free();
+            if (handleLF.IsAllocated)
+                handleLF.Free();
 
             if (value != null)
             {
                 float callback(float distance) => value(distance);
                 var del = (AirAbsorptionFormulaDelegate)callback;
-                lfHandle = GCHandle.Alloc(del);
+                handleLF = GCHandle.Alloc(del);
 
                 AirAbsorptionSettingsBindings.SetCustomFormulaLF(native, Marshal.GetFunctionPointerForDelegate(del)).ThrowIfError();
                 return del;
@@ -96,14 +99,14 @@ namespace vaudionativewrapper.managed
 
         public AirAbsorptionFormulaDelegate SetCustomFormulaHF(Func<float, float> value)
         {
-            if (hfHandle.IsAllocated)
-                hfHandle.Free();
+            if (handleHF.IsAllocated)
+                handleHF.Free();
 
             if (value != null)
             {
                 float callback(float distance) => value(distance);
                 var del = (AirAbsorptionFormulaDelegate)callback;
-                hfHandle = GCHandle.Alloc(del);
+                handleHF = GCHandle.Alloc(del);
 
                 AirAbsorptionSettingsBindings.SetCustomFormulaHF(native, Marshal.GetFunctionPointerForDelegate(del)).ThrowIfError();
                 return del;

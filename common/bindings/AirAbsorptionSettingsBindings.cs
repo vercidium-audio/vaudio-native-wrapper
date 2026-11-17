@@ -1,3 +1,5 @@
+// Human-created
+
 using System;
 using System.Runtime.InteropServices;
 

@@ -1,3 +1,5 @@
+// Human-created
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>Useful properties produced by reverb rays</summary>
