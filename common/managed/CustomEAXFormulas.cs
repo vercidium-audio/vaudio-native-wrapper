@@ -58,7 +58,7 @@ namespace vaudionativewrapper.managed
         /// <summary>Calculates the EAX diffusion parameter based on how smoothly energy accumulates over time</summary>
         public virtual float CalculateDiffusion()
         {
-            if (tempDiffusionCumulative.Length != echogramAverage.Length)
+            if (tempDiffusionCumulative.Length < echogramAverage.Length)
                 Array.Resize(ref tempDiffusionCumulative, echogramAverage.Length);
 
             // Fallback value
@@ -102,7 +102,7 @@ namespace vaudionativewrapper.managed
         public virtual float CalculateDensity()
         {
             // Count significant energy peaks in the first 150ms
-            int analysisLength = Math.Min((int)(150f / binDurationMs), echogramAverage.Length);
+            int analysisLength = Math.Clamp((int)(150f / binDurationMs), 1, echogramAverage.Length);
 
             // Fallback
             if (maxEnergy <= 0f)
@@ -264,44 +264,24 @@ namespace vaudionativewrapper.managed
         /// <summary>Calculates the RT60 reverberation time in seconds for a given echogram using the Schroeder backward-integrated decay curve</summary>
         public virtual float CalculateRT60(float[] echogram)
         {
-            // Convert energy to dB scale
-            float maxEnergy = 0f;
-
             if (echogramDb.Length < echogram.Length)
                 Array.Resize(ref echogramDb, echogram.Length);
 
-            for (int i = 0; i < echogram.Length; i++)
+            // Find the global peak
+            int globalPeakIndex = 0;
+            for (int i = 1; i < echogram.Length; i++)
             {
-                if (echogram[i] > maxEnergy)
-                    maxEnergy = echogram[i];
+                if (echogram[i] > echogram[globalPeakIndex])
+                    globalPeakIndex = i;
             }
 
-            if (maxEnergy <= 0f)
+            if (echogram[globalPeakIndex] <= 0f)
                 return 0f;
 
-            for (int i = 0; i < echogram.Length; i++)
-            {
-                if (echogram[i] > 0f)
-                    echogramDb[i] = 10f * MathF.Log10(echogram[i] / maxEnergy);
-                else
-                    echogramDb[i] = -100f;
-            }
-
-            // Find the peak energy point
-            int peakIndex = 0;
-            float peakDb = echogramDb[0];
-            for (int i = 1; i < echogramDb.Length; i++)
-            {
-                if (echogramDb[i] > peakDb)
-                {
-                    peakDb = echogramDb[i];
-                    peakIndex = i;
-                }
-            }
-
-            // Truncate at the first zero-energy bin after the peak — stray late bins beyond a gap are noise
+            // Truncate at the first zero-energy bin after the global peak — stray late bins beyond a gap are noise
+            // and must not be used as a peak or as decay data
             int echogramLength = echogram.Length;
-            for (int i = peakIndex + 1; i < echogram.Length; i++)
+            for (int i = globalPeakIndex + 1; i < echogram.Length; i++)
             {
                 if (echogram[i] <= 0f)
                 {
@@ -310,79 +290,99 @@ namespace vaudionativewrapper.managed
                 }
             }
 
-            // Try T20 first, then T30, then T60
-            float rt60 = TryCalculateDecayTime(echogramDb, peakIndex, peakDb, binDurationMs, echogramLength, 20f, 3f);
+            int maxSkipBins = Math.Max(1, (int)(echogram.Length * 0.15f));
 
-            if (rt60 <= 0f)
+            for (int skipBins = 0; skipBins < maxSkipBins; skipBins++)
             {
-                rt60 = TryCalculateDecayTime(echogramDb, peakIndex, peakDb, binDurationMs, echogramLength, 30f, 2f);
+                int searchStart = globalPeakIndex + skipBins;
+                if (searchStart >= echogramLength)
+                    break;
+
+                // Find the peak energy point within the contiguous decay, ignoring the first skipBins bins after the global peak
+                int peakIndex = searchStart;
+                for (int i = searchStart + 1; i < echogramLength; i++)
+                {
+                    if (echogram[i] > echogram[peakIndex])
+                        peakIndex = i;
+                }
+
+                // Schroeder backward integration: the energy remaining from each bin onwards, in dB relative to the total from the peak.
+                // Unlike raw bin levels this is monotonic, and it falls away when the energy runs out rather than sitting on a plateau
+                float remaining = 0f;
+                for (int i = echogramLength - 1; i >= peakIndex; i--)
+                {
+                    remaining += echogram[i];
+                    echogramDb[i] = remaining;
+                }
+
+                for (int i = peakIndex; i < echogramLength; i++)
+                    echogramDb[i] = 10f * MathF.Log10(echogramDb[i] / remaining);
+
+                // Try T20 first, then T30, then T60
+                float rt60 = TryCalculateDecayTime(echogramDb, peakIndex, 0f, binDurationMs, echogramLength, 20f, 3f);
+
+                if (rt60 <= 0f)
+                {
+                    rt60 = TryCalculateDecayTime(echogramDb, peakIndex, 0f, binDurationMs, echogramLength, 30f, 2f);
+                }
+
+                if (rt60 <= 0f)
+                {
+                    rt60 = TryCalculateDecayTime(echogramDb, peakIndex, 0f, binDurationMs, echogramLength, 60f, 1f);
+                }
+
+                if (rt60 > 0f)
+                    return rt60;
             }
 
-            if (rt60 <= 0f)
-            {
-                rt60 = TryCalculateDecayTime(echogramDb, peakIndex, peakDb, binDurationMs, echogramLength, 60f, 1f);
-            }
-
-            return rt60;
+            return 0f;
         }
 
-        /// <summary>Attempts to estimate RT60 by fitting a linear regression to the decay slope between -5 dB and <paramref name="targetDecayDb"/> below the peak</summary>
-        /// <param name="echogramDb">Echogram values in decibels</param>
+        /// <summary>Attempts to estimate RT60 from the time the decay curve takes to fall from -5 dB to <paramref name="targetDecayDb"/> below the peak</summary>
+        /// <param name="echogramDb">Schroeder decay curve in decibels, valid from <paramref name="peakIndex"/> up to <paramref name="echogramLength"/></param>
         /// <param name="peakIndex">Index of the peak energy bin</param>
-        /// <param name="peakDb">Peak energy level in dB</param>
+        /// <param name="peakDb">Decay curve level at the peak in dB</param>
         /// <param name="binDurationMs">Duration of each echogram bin in milliseconds</param>
-        /// <param name="echogramLength">The length of the echogram array</param>
-        /// <param name="targetDecayDb">The dB drop range to use for the regression (e.g. 20, 30, or 60)</param>
+        /// <param name="echogramLength">The number of valid bins. The energy is treated as having run out after this bin</param>
+        /// <param name="targetDecayDb">The dB drop range to measure (e.g. 20, 30, or 60)</param>
         /// <param name="scaleFactor">Multiplier applied when extrapolating to full RT60</param>
-        /// <returns>Estimated RT60 in seconds, or 0 if there are insufficient data points or the slope is non-negative</returns>
+        /// <returns>Estimated RT60 in seconds, or 0 if the measured span is too short or the curve never decays</returns>
         protected virtual float TryCalculateDecayTime(float[] echogramDb, int peakIndex, float peakDb, float binDurationMs, int echogramLength, float targetDecayDb, float scaleFactor)
         {
-            // Use linear regression to find decay slope through noisy/oscillating echograms
-            // Analyze from -5dB to -targetDecayDb below peak
             float startDb = peakDb - 5f;
             float endDb = peakDb - targetDecayDb;
 
-            int pointCount = 0;
-            float sumX = 0f, sumY = 0f, sumXX = 0f, sumXY = 0f;
-            float minTimeMs = float.MaxValue, maxTimeMs = float.MinValue;
+            float startMs = FindDecayCrossingMs(echogramDb, peakIndex, binDurationMs, echogramLength, startDb);
+            float endMs = FindDecayCrossingMs(echogramDb, peakIndex, binDurationMs, echogramLength, endDb);
 
-            for (int i = peakIndex + 1; i < echogramLength; i++)
+            // Too short to measure reliably
+            const float minSpanMs = 100f;
+            if (endMs - startMs < minSpanMs)
+                return 0f;
+
+            // Extrapolate the measured drop to a 60dB decay
+            float rt60Ms = (endMs - startMs) * 60f / (targetDecayDb - 5f);
+            return rt60Ms / 1000f; // Convert to seconds
+        }
+
+        /// <summary>Finds the time (relative to the peak) at which the decay curve first falls below <paramref name="levelDb"/>, interpolating between bins</summary>
+        protected static float FindDecayCrossingMs(float[] echogramDb, int peakIndex, float binDurationMs, int echogramLength, float levelDb)
+        {
+            for (int i = peakIndex; i < echogramLength; i++)
             {
-                float db = echogramDb[i];
-                if (db > startDb || db < endDb)
-                    continue;
-
+                float a = echogramDb[i];
                 float timeMs = (i - peakIndex) * binDurationMs;
-                sumX += timeMs;
-                sumY += db;
-                sumXX += timeMs * timeMs;
-                sumXY += timeMs * db;
-                pointCount++;
 
-                if (timeMs < minTimeMs) minTimeMs = timeMs;
-                if (timeMs > maxTimeMs) maxTimeMs = timeMs;
+                // The energy runs out after the last bin, so the curve drops through every level by the end of it
+                if (i + 1 >= echogramLength)
+                    return timeMs + binDurationMs;
+
+                float b = echogramDb[i + 1];
+                if (b < levelDb)
+                    return timeMs + binDurationMs * (a - levelDb) / (a - b);
             }
 
-            // Need enough points and a sufficient time span for reliable regression.
-            // A narrow time span (e.g. a brief outdoor burst) produces a shallow extrapolated slope → inflated RT60.
-            const float minSpanMs = 100f;
-            if (pointCount < 10 || (maxTimeMs - minTimeMs) < minSpanMs)
-                return 0f;
-
-            // Calculate slope using least squares: slope = (n*sumXY - sumX*sumY) / (n*sumXX - sumX*sumX)
-            float denominator = pointCount * sumXX - sumX * sumX;
-            if (MathF.Abs(denominator) < 0.0001f)
-                return 0f;
-
-            float slope = (pointCount * sumXY - sumX * sumY) / denominator; // dB per ms
-
-            // Slope must be negative (decaying)
-            if (slope >= 0f)
-                return 0f;
-
-            // RT60 = 60dB / |slope| gives time in ms for 60dB decay
-            float rt60Ms = 60f / MathF.Abs(slope);
-            return rt60Ms / 1000f; // Convert to seconds
+            return 0f;
         }
     }
 }
