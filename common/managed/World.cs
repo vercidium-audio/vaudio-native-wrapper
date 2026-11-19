@@ -527,6 +527,9 @@ namespace vaudionativewrapper.managed
             set => WorldBindings.SetRenderingEnabled(native, value).ThrowIfError();
         }
 
+        /// <summary>Whether the world is connected to a running debug window (dev build only)</summary>
+        public bool DebugWindowConnected => WorldBindings.GetDebugWindowConnected(native);
+
         /// <summary>The position of the camera in the debug window (dev build only)</summary>
         public Vector CameraPosition
         {

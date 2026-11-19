@@ -36,6 +36,7 @@ namespace vaudionativewrapper
         MissingMaterialCallback = 27,
         WrongThread = 28,
         DeniedPendingRemoval = 29,
+        Pending = 30,
     }
 
     public static class VAResultExtensions
@@ -43,7 +44,7 @@ namespace vaudionativewrapper
         // VA_UNCHANGED means the setter was a no-op (value already matched) - not an error.
         public static void ThrowIfError(this VAResult result)
         {
-            if (result != VAResult.Success && result != VAResult.Unchanged && result != VAResult.StillRunning && result != VAResult.PendingRemoval && result != VAResult.True && result != VAResult.False)
+            if (result != VAResult.Success && result != VAResult.Unchanged && result != VAResult.StillRunning && result != VAResult.PendingRemoval && result != VAResult.Pending && result != VAResult.True && result != VAResult.False)
                 throw new InvalidOperationException($"Native call failed: {result}");
         }
 
