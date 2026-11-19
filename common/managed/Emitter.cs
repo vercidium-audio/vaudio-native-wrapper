@@ -525,7 +525,7 @@ namespace vaudionativewrapper.managed
         public bool WithinWorldBounds => EmitterBindings.WithinWorldBounds(native);
         /// <summary>The index of this emitter's EAX object in World.GroupedEAX</summary>
         public int GroupedEAXIndex => EmitterBindings.GetGroupedEAXIndex(native);
-        /// <summary>The percentage of ambient occlusion rays that reached the edge of the world.</summary>
+        /// <summary>The percentage of ambient occlusion energy that reached the edge of the world.</summary>
         public float OutsidePercent => EmitterBindings.GetOutsidePercent(native);
 
         /// <summary>The number of trails that will be created for this emitter</summary>

@@ -12,14 +12,10 @@ namespace vaudionativewrapper.managed
             this.native = native;
         }
 
-        /// <summary>
-        /// The percentage of energy that returned back to the emitter.
-        /// </summary>
+        /// <summary>The percentage of energy that returned back to the emitter.</summary>
         public float ReturnedPercent => native->returnedPercent;
 
-        /// <summary>
-        /// The percentage of ambient occlusion energy that reached the edge of the world.
-        /// </summary>
+        /// <summary>The percentage of ambient occlusion energy that reached the edge of the world.</summary>
         public float OutsidePercent => native->outsidePercent;
 
         /// <summary>

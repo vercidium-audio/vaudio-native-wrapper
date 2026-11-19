@@ -18,7 +18,7 @@ namespace vaudionativewrapper.managed
             set => WorldBindings.SetCameraRotation(native, value).ThrowIfError();
         }
 
-        /// <summary>The camera zoom factor in the debug window (dev build only)</summary>
+        /// <summary>The zoom of the camera in the debug window (dev build only)</summary>
         public float CameraZoom
         {
             get => WorldBindings.GetCameraZoom(native);
