@@ -1,3 +1,5 @@
+// Human-created
+
 using System;
 using System.Runtime.InteropServices;
 
@@ -391,6 +393,16 @@ namespace vaudionativewrapper
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetScatteringSeed")]
         public static extern int GetScatteringSeed(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetVisualisationSeed")]
+        public static extern VAResult SetVisualisationSeed(IntPtr emitter, int value);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterClearVisualisationSeed")]
+        public static extern VAResult ClearVisualisationSeed(IntPtr emitter);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterGetVisualisationSeed")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool GetVisualisationSeed(IntPtr emitter, out int value);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetName")]
         public static extern VAResult SetName(IntPtr emitter, [MarshalAs(UnmanagedType.LPStr)] string name);

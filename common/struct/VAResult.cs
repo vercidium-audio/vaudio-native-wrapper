@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Human-created
+
+using System;
 
 namespace vaudionativewrapper
 {

@@ -1,3 +1,5 @@
+// Human-created
+
 using System;
 using System.Runtime.InteropServices;
 
@@ -19,7 +21,7 @@ namespace vaudionativewrapper.managed
         string stackTrace;
 #endif
 
-        #region Functions
+#region Functions
         public Emitter(IntPtr native)
         {
             this.native = native;
@@ -446,6 +448,13 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetScatteringSeed(native, value).ThrowIfError();
         }
 
+        /// <summary>Seed used to randomise visualisation rays. If null, a random visualisation seed is generated each time</summary>
+        public int? VisualisationSeed
+        {
+            get => EmitterBindings.GetVisualisationSeed(native, out var value) ? value : (int?)null;
+            set => (value.HasValue ? EmitterBindings.SetVisualisationSeed(native, value.Value) : EmitterBindings.ClearVisualisationSeed(native)).ThrowIfError();
+        }
+
         /// <summary>Whether to render each trail a different color in the debug window (dev build only)</summary>
         public bool RandomTrailColor
         {
@@ -516,7 +525,7 @@ namespace vaudionativewrapper.managed
         public bool WithinWorldBounds => EmitterBindings.WithinWorldBounds(native);
         /// <summary>The index of this emitter's EAX object in World.GroupedEAX</summary>
         public int GroupedEAXIndex => EmitterBindings.GetGroupedEAXIndex(native);
-        /// <summary>The percentage of ambient occlusion rays that reached the edge of the world.</summary>
+        /// <summary>The percentage of ambient occlusion energy that reached the edge of the world.</summary>
         public float OutsidePercent => EmitterBindings.GetOutsidePercent(native);
 
         /// <summary>The number of trails that will be created for this emitter</summary>
@@ -575,7 +584,7 @@ namespace vaudionativewrapper.managed
         }
 #endregion
 
-    #region Callbacks
+#region Callbacks
         private GCHandle _onRaytracingCompleteHandle;
         private GCHandle _onRaytracedByAnotherEmitterHandle;
         private GCHandle _onRemovedHandle;

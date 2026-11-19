@@ -1,3 +1,5 @@
+// Human-created
+
 using System.Runtime.InteropServices;
 
 #if VA_DOUBLE_PRECISION

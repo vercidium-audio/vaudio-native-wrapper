@@ -1,4 +1,6 @@
-﻿#if VA_DOUBLE_PRECISION
+﻿// Human-created
+
+#if VA_DOUBLE_PRECISION
 using VAFloat = System.Double;
 #else
 using VAFloat = System.Single;
@@ -16,7 +18,7 @@ namespace vaudionativewrapper.managed
             set => WorldBindings.SetCameraRotation(native, value).ThrowIfError();
         }
 
-        /// <summary>The camera zoom factor in the debug window (dev build only)</summary>
+        /// <summary>The zoom of the camera in the debug window (dev build only)</summary>
         public float CameraZoom
         {
             get => WorldBindings.GetCameraZoom(native);

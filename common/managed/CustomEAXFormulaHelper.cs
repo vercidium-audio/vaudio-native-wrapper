@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Human-created
+
+using System;
 using System.Runtime.InteropServices;
 
 namespace vaudionativewrapper.managed
@@ -17,22 +19,30 @@ namespace vaudionativewrapper.managed
 
     public unsafe class CustomEAXFormulaHelper
     {
+        static float[] ToManaged(float* data, int length)
+        {
+            float[] result = new float[length];
+            Marshal.Copy((IntPtr)data, result, 0, length);
+
+            return result;
+        }
+
         public static CustomEAXFormulaCallbacks CreateCustomEAXFormulaCallbacks(CustomEAXFormulas value)
         {
             var callbacks = new CustomEAXFormulaCallbacks();
 
             callbacks.Initialise = (formulas, processed, totalReturnedEnergyLF, totalReturnedEnergyHF, echogramGranularity, echogramLF, echogramHF, echogramAverage, echogramLength) =>
             {
-                float[] lfArray = new float[echogramLength];
-                float[] hfArray = new float[echogramLength];
-                float[] avgArray = new float[echogramLength];
-
-                Marshal.Copy((IntPtr)echogramLF, lfArray, 0, echogramLength);
-                Marshal.Copy((IntPtr)echogramHF, hfArray, 0, echogramLength);
-                Marshal.Copy((IntPtr)echogramAverage, avgArray, 0, echogramLength);
+                float[] lfArray = ToManaged(echogramLF, echogramLength);
+                float[] hfArray = ToManaged(echogramHF, echogramLength);
+                float[] avgArray = ToManaged(echogramAverage, echogramLength);
 
                 float totalLF = 0f, totalHF = 0f;
-                for (int i = 0; i < echogramLength; i++) { totalLF += lfArray[i]; totalHF += hfArray[i]; }
+                for (int i = 0; i < echogramLength; i++)
+                {
+                    totalLF += lfArray[i];
+                    totalHF += hfArray[i];
+                }
 
                 value.Initialise(processed, totalLF, totalHF, echogramGranularity, lfArray, hfArray, avgArray);
             };
@@ -45,6 +55,7 @@ namespace vaudionativewrapper.managed
             callbacks.CalculateFrequencyGains = (formulas, referenceEnergy, outLFGain, outHFGain) =>
             {
                 value.CalculateFrequencyGains(referenceEnergy, out float lfGain, out float hfGain);
+
                 *outLFGain = lfGain;
                 *outHFGain = hfGain;
             };
@@ -58,10 +69,10 @@ namespace vaudionativewrapper.managed
 
             callbacks.CalculateRT60 = (formulas, echogram, echogramLength) =>
             {
-                float[] echogramArray = new float[echogramLength];
-                Marshal.Copy((IntPtr)echogram, echogramArray, 0, echogramLength);
+                float[] echogramArray = ToManaged(echogram, echogramLength);
                 return value.CalculateRT60(echogramArray);
             };
+
             return callbacks;
         }
     }

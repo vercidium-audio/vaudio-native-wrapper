@@ -1,4 +1,6 @@
-﻿namespace vaudionativewrapper
+﻿// Human-created
+
+namespace vaudionativewrapper
 {
     public class Constants
     {
