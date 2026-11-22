@@ -100,6 +100,7 @@ namespace vaudionativewrapper.managed
         // A primitive can be added and removed from a world multiple times, so ensure we invoke OnRemoved the correct amount of times
         internal override void OnAddedToWorld() => pendingRemovedCallbacks++;
 
+        [AOT.MonoPInvokeCallback(typeof(UnsafeVoxelRemovedCallback))]
         static void OnRemovedNative(IntPtr userData)
         {
             var primitive = (UnsafeVoxelPrimitive)GCHandle.FromIntPtr(userData).Target;

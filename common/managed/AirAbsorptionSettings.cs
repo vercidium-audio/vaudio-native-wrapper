@@ -76,6 +76,7 @@ namespace vaudionativewrapper.managed
             return result;
         }
 
+        /// <remarks>Not supported on Unity's IL2CPP backend yet, as the native formula isn't passed its settings</remarks>
         public AirAbsorptionFormulaDelegate SetCustomFormulaLF(Func<float, float> value)
         {
             if (handleLF.IsAllocated)
@@ -97,6 +98,7 @@ namespace vaudionativewrapper.managed
             }
         }
 
+        /// <remarks>Not supported on Unity's IL2CPP backend yet, as the native formula isn't passed its settings</remarks>
         public AirAbsorptionFormulaDelegate SetCustomFormulaHF(Func<float, float> value)
         {
             if (handleHF.IsAllocated)

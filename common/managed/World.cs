@@ -58,6 +58,13 @@ namespace vaudionativewrapper.managed
                 return;
 
             WorldBindings.Destroy(native).ThrowIfError();
+
+            // Native can no longer invoke this world's callbacks
+            onReverbUpdatedHandlers.Remove(native);
+            logHandlers.Remove(native);
+            CustomEAXFormulaHelper.Unregister(customEAXFormulasNative);
+            customEAXFormulasNative = IntPtr.Zero;
+
             native = IntPtr.Zero;
 
             OnDestroyDimensional();
@@ -393,42 +400,26 @@ namespace vaudionativewrapper.managed
             set => WorldBindings.SetAirAbsorption(native, value.native).ThrowIfError();
         }
 
-        private GCHandle[] _customEAXFormulaHandles;
+        // The native formulas this world owns, which native destroys when they're replaced or the world is destroyed
+        IntPtr customEAXFormulasNative;
 
         public CustomEAXFormulaCallbacks UpdateCustomEAXFormulas(managed.CustomEAXFormulas formulas)
         {
-            var callbacks = CustomEAXFormulaHelper.CreateCustomEAXFormulaCallbacks(formulas);
-
             var nativeFormulas = CustomEAXFormulasBindings.Create();
+            var callbacks = CustomEAXFormulaHelper.Register(nativeFormulas, formulas);
 
-            nativeFormulas->initialise = Marshal.GetFunctionPointerForDelegate(callbacks.Initialise);
-            nativeFormulas->calculateDiffusion = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateDiffusion);
-            nativeFormulas->calculateDensity = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateDensity);
-            nativeFormulas->calculateReflectionsDelay = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateReflectionsDelay);
-            nativeFormulas->calculateLateReverbDelay = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateLateReverbDelay);
-            nativeFormulas->calculateFrequencyGains = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateFrequencyGains);
-            nativeFormulas->calculateReflectionsAndLateReverbGain = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateReflectionsAndLateReverbGain);
-            nativeFormulas->calculateRT60 = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateRT60);
-
-            WorldBindings.SetCustomEAXFormulas(native, nativeFormulas).ThrowIfError();
-
-            // Free GC-prevention handles
-            if (_customEAXFormulaHandles != null)
-                foreach (var handle in _customEAXFormulaHandles)
-                    if (handle.IsAllocated)
-                        handle.Free();
-
-            _customEAXFormulaHandles = new[]
+            try
             {
-                GCHandle.Alloc(callbacks.Initialise),
-                GCHandle.Alloc(callbacks.CalculateDiffusion),
-                GCHandle.Alloc(callbacks.CalculateDensity),
-                GCHandle.Alloc(callbacks.CalculateReflectionsDelay),
-                GCHandle.Alloc(callbacks.CalculateLateReverbDelay),
-                GCHandle.Alloc(callbacks.CalculateFrequencyGains),
-                GCHandle.Alloc(callbacks.CalculateReflectionsAndLateReverbGain),
-                GCHandle.Alloc(callbacks.CalculateRT60),
-            };
+                WorldBindings.SetCustomEAXFormulas(native, nativeFormulas).ThrowIfError();
+            }
+            catch
+            {
+                CustomEAXFormulaHelper.Unregister((IntPtr)nativeFormulas);
+                throw;
+            }
+
+            CustomEAXFormulaHelper.Unregister(customEAXFormulasNative);
+            customEAXFormulasNative = (IntPtr)nativeFormulas;
 
             return callbacks;
         }
@@ -445,51 +436,30 @@ namespace vaudionativewrapper.managed
             return WorldBindings.HasMaterial(native, (int)type).ToBool();
         }
 
-        private GCHandle _onReverbUpdatedHandle;
-        private GCHandle _logCallbackHandle;
+        static readonly CallbackTable<Action> onReverbUpdatedHandlers = new CallbackTable<Action>();
+        static readonly CallbackTable<Action<string>> logHandlers = new CallbackTable<Action<string>>();
+
+        static readonly OnReverbUpdatedFn onReverbUpdatedNative = OnReverbUpdatedNative;
+        static readonly LogCallbackFn logNative = LogNative;
+        static readonly IntPtr onReverbUpdatedNativePtr = Marshal.GetFunctionPointerForDelegate(onReverbUpdatedNative);
+        static readonly IntPtr logNativePtr = Marshal.GetFunctionPointerForDelegate(logNative);
+
+        [AOT.MonoPInvokeCallback(typeof(OnReverbUpdatedFn))]
+        static void OnReverbUpdatedNative(IntPtr world) => onReverbUpdatedHandlers.Get(world)?.Invoke();
+
+        [AOT.MonoPInvokeCallback(typeof(LogCallbackFn))]
+        static void LogNative(IntPtr world, string message) => logHandlers.Get(world)?.Invoke(message);
 
         /// <summary>This callback is invoked after EAX reverb results are updated. This gives you a chance to update your EAX effects, so they can be applied to an emitter in its Emitter.OnRaytracingComplete callback. After this, each emitter's callbacks are invoked, and then OnRaytracingResultsHandled is invoked.</summary>
         public Action OnReverbUpdated
         {
-            set
-            {
-                if (_onReverbUpdatedHandle.IsAllocated)
-                    _onReverbUpdatedHandle.Free();
-
-                if (value != null)
-                {
-                    OnReverbUpdatedFn fn = () => value();
-                    _onReverbUpdatedHandle = GCHandle.Alloc(fn);
-
-                    WorldBindings.SetOnReverbUpdated(native, Marshal.GetFunctionPointerForDelegate(fn)).ThrowIfError();
-                }
-                else
-                {
-                    WorldBindings.SetOnReverbUpdated(native, IntPtr.Zero).ThrowIfError();
-                }
-            }
+            set => WorldBindings.SetOnReverbUpdated(native, onReverbUpdatedHandlers.Set(native, value) ? onReverbUpdatedNativePtr : IntPtr.Zero).ThrowIfError();
         }
 
         /// <summary>A custom logging callback. Defaults to Console.WriteLine()</summary>
         public Action<string> LogCallback
         {
-            set
-            {
-                if (_logCallbackHandle.IsAllocated)
-                    _logCallbackHandle.Free();
-
-                if (value != null)
-                {
-                    LogCallbackFn fn = (owner, msg) => value(msg);
-                    _logCallbackHandle = GCHandle.Alloc(fn);
-
-                    WorldBindings.SetLogCallback(native, Marshal.GetFunctionPointerForDelegate(fn)).ThrowIfError();
-                }
-                else
-                {
-                    WorldBindings.SetLogCallback(native, IntPtr.Zero).ThrowIfError();
-                }
-            }
+            set => WorldBindings.SetLogCallback(native, logHandlers.Set(native, value) ? logNativePtr : IntPtr.Zero).ThrowIfError();
         }
 
         /// <summary>Whether to log memory allocation warnings.</summary>

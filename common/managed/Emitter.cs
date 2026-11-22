@@ -46,6 +46,7 @@ namespace vaudionativewrapper.managed
         public void Destroy()
         {
             EmitterBindings.Destroy(native).ThrowIfError();
+            RemoveCallbacks(native);
             native = IntPtr.Zero;
         }
 
@@ -585,35 +586,71 @@ namespace vaudionativewrapper.managed
 #endregion
 
 #region Callbacks
-        private GCHandle _onRaytracingCompleteHandle;
-        private GCHandle _onRaytracedByAnotherEmitterHandle;
-        private GCHandle _onRemovedHandle;
-        private GCHandle _visualisationCallbackHandle;
+        // Handlers are keyed by the emitter's native pointer, see CallbackTable
+        static readonly CallbackTable<Action> onRaytracingCompleteHandlers = new CallbackTable<Action>();
+        static readonly CallbackTable<Action<Emitter>> onRaytracedByAnotherEmitterHandlers = new CallbackTable<Action<Emitter>>();
+        static readonly CallbackTable<Action> onRemovedHandlers = new CallbackTable<Action>();
+        static readonly CallbackTable<Action<VisualisationData[]>> visualisationHandlers = new CallbackTable<Action<VisualisationData[]>>();
+        static readonly CallbackTable<Action<string>> logHandlers = new CallbackTable<Action<string>>();
+        static readonly CallbackTable<Action<string>> logErrorHandlers = new CallbackTable<Action<string>>();
+
+        static readonly OnRaytracingCompleteFn onRaytracingCompleteNative = OnRaytracingCompleteNative;
+        static readonly OnRaytracedByAnotherEmitterFn onRaytracedByAnotherEmitterNative = OnRaytracedByAnotherEmitterNative;
+        static readonly OnRemovedFn onRemovedNative = OnRemovedNative;
+        static readonly VisualisationCallbackFn visualisationNative = VisualisationNative;
+        static readonly LogCallbackFn logNative = LogNative;
+        static readonly LogCallbackFn logErrorNative = LogErrorNative;
+
+        [AOT.MonoPInvokeCallback(typeof(OnRaytracingCompleteFn))]
+        static void OnRaytracingCompleteNative(IntPtr emitter) => onRaytracingCompleteHandlers.Get(emitter)?.Invoke();
+
+        [AOT.MonoPInvokeCallback(typeof(OnRaytracedByAnotherEmitterFn))]
+        static void OnRaytracedByAnotherEmitterNative(IntPtr source, IntPtr target) => onRaytracedByAnotherEmitterHandlers.Get(target)?.Invoke(source == IntPtr.Zero ? null : new Emitter(source));
+
+        // Native clears its callback once invoked, and the user may destroy the emitter inside it
+        [AOT.MonoPInvokeCallback(typeof(OnRemovedFn))]
+        static void OnRemovedNative(IntPtr emitter) => onRemovedHandlers.Take(emitter)?.Invoke();
+
+        [AOT.MonoPInvokeCallback(typeof(VisualisationCallbackFn))]
+        static void VisualisationNative(IntPtr emitter, VisualisationData* data, int count)
+        {
+            var handler = visualisationHandlers.Get(emitter);
+
+            if (handler == null)
+                return;
+
+            var arr = new VisualisationData[count];
+
+            for (int i = 0; i < count; i++)
+                arr[i] = new VisualisationData { position = data[i].position, normal = data[i].normal };
+
+            handler.Invoke(arr);
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(LogCallbackFn))]
+        static void LogNative(IntPtr emitter, string message) => logHandlers.Get(emitter)?.Invoke(message);
+
+        [AOT.MonoPInvokeCallback(typeof(LogCallbackFn))]
+        static void LogErrorNative(IntPtr emitter, string message) => logErrorHandlers.Get(emitter)?.Invoke(message);
+
+        // Native can no longer invoke this emitter's callbacks
+        static void RemoveCallbacks(IntPtr emitter)
+        {
+            onRaytracingCompleteHandlers.Remove(emitter);
+            onRaytracedByAnotherEmitterHandlers.Remove(emitter);
+            onRemovedHandlers.Remove(emitter);
+            visualisationHandlers.Remove(emitter);
+            logHandlers.Remove(emitter);
+            logErrorHandlers.Remove(emitter);
+        }
+
         private GCHandle _gainFormulaHandle;
         private GCHandle _ambientGainFormulaHandle;
-        private GCHandle _logCallbackHandle;
-        private GCHandle _logErrorCallbackHandle;
-        
+
         /// <summary>This callback is invoked when this emitter has cast its reverb and ambient rays for the first time.</summary>
         public Action OnRaytracingComplete
         {
-            set
-            {
-                if (_onRaytracingCompleteHandle.IsAllocated)
-                    _onRaytracingCompleteHandle.Free();
-
-                if (value != null)
-                {
-                    OnRaytracingCompleteFn callback = (emitter) => value.Invoke();
-
-                    _onRaytracingCompleteHandle = GCHandle.Alloc(callback);
-                    EmitterBindings.SetOnRaytracingCompleteCallback(native, callback).ThrowIfError();
-                }
-                else
-                {
-                    EmitterBindings.SetOnRaytracingCompleteCallback(native, null).ThrowIfError();
-                }
-            }
+            set => EmitterBindings.SetOnRaytracingCompleteCallback(native, onRaytracingCompleteHandlers.Set(native, value) ? onRaytracingCompleteNative : null).ThrowIfError();
         }
 
         /// <summary>
@@ -622,22 +659,7 @@ namespace vaudionativewrapper.managed
         /// </summary>
         public Action<Emitter> OnRaytracedByAnotherEmitter
         {
-            set
-            {
-                if (_onRaytracedByAnotherEmitterHandle.IsAllocated)
-                    _onRaytracedByAnotherEmitterHandle.Free();
-
-                if (value != null)
-                {
-                    vaudionativewrapper.OnRaytracedByAnotherEmitterFn callback = (source, target) => value.Invoke(source == IntPtr.Zero ? null : new Emitter(source));
-                    _onRaytracedByAnotherEmitterHandle = GCHandle.Alloc(callback);
-                    EmitterBindings.SetOnRaytracedByAnotherEmitterCallback(native, callback).ThrowIfError();
-                }
-                else
-                {
-                    EmitterBindings.SetOnRaytracedByAnotherEmitterCallback(native, null).ThrowIfError();
-                }
-            }
+            set => EmitterBindings.SetOnRaytracedByAnotherEmitterCallback(native, onRaytracedByAnotherEmitterHandlers.Set(native, value) ? onRaytracedByAnotherEmitterNative : null).ThrowIfError();
         }
 
         /// <summary>
@@ -647,55 +669,16 @@ namespace vaudionativewrapper.managed
         /// </summary>
         public Action OnRemoved
         {
-            set
-            {
-                if (_onRemovedHandle.IsAllocated)
-                    _onRemovedHandle.Free();
-
-                if (value != null)
-                {
-                    OnRemovedFn callback = () => value.Invoke();
-
-                    _onRemovedHandle = GCHandle.Alloc(callback);
-                    EmitterBindings.SetOnRemovedCallback(native, callback).ThrowIfError();
-                }
-                else
-                {
-                    EmitterBindings.SetOnRemovedCallback(native, null).ThrowIfError();
-                }
-            }
+            set => EmitterBindings.SetOnRemovedCallback(native, onRemovedHandlers.Set(native, value) ? onRemovedNative : null).ThrowIfError();
         }
 
         /// <summary>This callback is invoked with the position and normal of each bounce of each visualisation ray. Do not modify the array or access it outside this callback.</summary>
         public Action<VisualisationData[]> VisualisationCallback
         {
-            set
-            {
-                if (_visualisationCallbackHandle.IsAllocated)
-                    _visualisationCallbackHandle.Free();
-
-                if (value != null)
-                {
-                    VisualisationCallbackFn callback = (emitter, dataPtr, count) =>
-                    {
-                        var arr = new VisualisationData[count];
-
-                        for (int i = 0; i < count; i++)
-                            arr[i] = new VisualisationData { position = dataPtr[i].position, normal = dataPtr[i].normal };
-
-                        value.Invoke(arr);
-                    };
-
-                    _visualisationCallbackHandle = GCHandle.Alloc(callback);
-                    EmitterBindings.SetVisualisationCallback(native, callback).ThrowIfError();
-                }
-                else
-                {
-                    EmitterBindings.SetVisualisationCallback(native, null).ThrowIfError();
-                }
-            }
+            set => EmitterBindings.SetVisualisationCallback(native, visualisationHandlers.Set(native, value) ? visualisationNative : null).ThrowIfError();
         }
 
+        /// <remarks>Not supported on Unity's IL2CPP backend yet, as the native formula isn't passed the emitter</remarks>
         public Func<bool, int, int, int, float, float, float> GainFormula
         {
             set
@@ -717,6 +700,7 @@ namespace vaudionativewrapper.managed
             }
         }
 
+        /// <remarks>Not supported on Unity's IL2CPP backend yet, as the native formula isn't passed the emitter</remarks>
         public Func<bool, int, int, int, float, float, float> AmbientGainFormula
         {
             set
@@ -741,43 +725,13 @@ namespace vaudionativewrapper.managed
         /// <summary>A custom log callback. Defaults to Console.WriteLine()</summary>
         public Action<string> LogCallback
         {
-            set
-            {
-                if (_logCallbackHandle.IsAllocated)
-                    _logCallbackHandle.Free();
-
-                if (value != null)
-                {
-                    LogCallbackFn callback = (owner, msg) => value(msg);
-                    _logCallbackHandle = GCHandle.Alloc(callback);
-                    EmitterBindings.SetLogCallback(native, callback).ThrowIfError();
-                }
-                else
-                {
-                    EmitterBindings.SetLogCallback(native, null).ThrowIfError();
-                }
-            }
+            set => EmitterBindings.SetLogCallback(native, logHandlers.Set(native, value) ? logNative : null).ThrowIfError();
         }
 
         /// <summary>A custom error log callback. Defaults to Console.Error.WriteLine()</summary>
         public Action<string> LogErrorCallback
         {
-            set
-            {
-                if (_logErrorCallbackHandle.IsAllocated)
-                    _logErrorCallbackHandle.Free();
-
-                if (value != null)
-                {
-                    LogCallbackFn callback = (owner, msg) => value(msg);
-                    _logErrorCallbackHandle = GCHandle.Alloc(callback);
-                    EmitterBindings.SetLogErrorCallback(native, callback).ThrowIfError();
-                }
-                else
-                {
-                    EmitterBindings.SetLogErrorCallback(native, null).ThrowIfError();
-                }
-            }
+            set => EmitterBindings.SetLogErrorCallback(native, logErrorHandlers.Set(native, value) ? logErrorNative : null).ThrowIfError();
         }
 #endregion
     }
