@@ -1,9 +1,10 @@
 ﻿// Human-created
 
+using System;
 using System.Runtime.InteropServices;
 
 namespace vaudionativewrapper
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate float AirAbsorptionFormulaDelegate(float distance);
+    public delegate float AirAbsorptionFormulaDelegate(float distance, IntPtr userData);
 }

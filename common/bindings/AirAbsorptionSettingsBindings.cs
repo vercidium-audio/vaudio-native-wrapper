@@ -23,10 +23,10 @@ namespace vaudionativewrapper
         public static extern VAResult SetPressure(IntPtr settings, float value);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaAirAbsorptionSetCustomFormulaLF")]
-        public static extern VAResult SetCustomFormulaLF(IntPtr settings, IntPtr formula);
+        public static extern VAResult SetCustomFormulaLF(IntPtr settings, AirAbsorptionFormulaDelegate formula, IntPtr userData);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaAirAbsorptionSetCustomFormulaHF")]
-        public static extern VAResult SetCustomFormulaHF(IntPtr settings, IntPtr formula);
+        public static extern VAResult SetCustomFormulaHF(IntPtr settings, AirAbsorptionFormulaDelegate formula, IntPtr userData);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaAirAbsorptionGetHumidity")]
         public static extern float GetHumidity(IntPtr settings);
@@ -42,6 +42,12 @@ namespace vaudionativewrapper
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaAirAbsorptionGetCustomFormulaHF")]
         public static extern IntPtr GetCustomFormulaHF(IntPtr settings);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaAirAbsorptionGetCustomFormulaLFUserData")]
+        public static extern IntPtr GetCustomFormulaLFUserData(IntPtr settings);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaAirAbsorptionGetCustomFormulaHFUserData")]
+        public static extern IntPtr GetCustomFormulaHFUserData(IntPtr settings);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaAirAbsorptionDestroy")]
         public static extern VAResult Destroy(IntPtr settings);

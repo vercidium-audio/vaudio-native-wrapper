@@ -27,7 +27,7 @@ namespace vaudionativewrapper
     public unsafe delegate void VisualisationCallbackFn(IntPtr emitter, VisualisationData* data, int count);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate float GainFormulaDelegate(bool lowFrequency, int occlusionRayCount, int permeationRayCount, int permeationBounceCount, float occlusionEnergy, float permeationEnergy);
+    public delegate float GainFormulaDelegate(IntPtr emitter, [MarshalAs(UnmanagedType.U1)] bool lowFrequency,int occlusionRayCount, int permeationRayCount, int permeationBounceCount, float occlusionEnergy, float permeationEnergy);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     // owner is the VAWorld* or VAEmitter* that logged the message
@@ -272,10 +272,10 @@ namespace vaudionativewrapper
         public static extern unsafe VAResult SetOverrideRayDirections(IntPtr emitter, Vector* directions, int count);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetGainFormula")]
-        public static extern VAResult SetGainFormula(IntPtr emitter, IntPtr formula);
+        public static extern VAResult SetGainFormula(IntPtr emitter, GainFormulaDelegate formula);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetAmbientGainFormula")]
-        public static extern VAResult SetAmbientGainFormula(IntPtr emitter, IntPtr formula);
+        public static extern VAResult SetAmbientGainFormula(IntPtr emitter, GainFormulaDelegate formula);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaEmitterSetLogCallback")]
         public static extern VAResult SetLogCallback(IntPtr emitter, LogCallbackFn callback);

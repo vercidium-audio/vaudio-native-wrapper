@@ -180,9 +180,9 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetAirAbsorptionPressure")]
         public static extern VAResult SetAirAbsorptionPressure(IntPtr world, float value);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetAirAbsorptionCustomFormulaLF")]
-        public static extern VAResult SetAirAbsorptionCustomFormulaLF(IntPtr world, IntPtr formula);
+        public static extern VAResult SetAirAbsorptionCustomFormulaLF(IntPtr world, AirAbsorptionFormulaDelegate formula, IntPtr userData);
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetAirAbsorptionCustomFormulaHF")]
-        public static extern VAResult SetAirAbsorptionCustomFormulaHF(IntPtr world, IntPtr formula);
+        public static extern VAResult SetAirAbsorptionCustomFormulaHF(IntPtr world, AirAbsorptionFormulaDelegate formula, IntPtr userData);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetCustomEAXFormulas")]
         public static extern unsafe VAResult SetCustomEAXFormulas(IntPtr world, CustomEAXFormulas* formulas);

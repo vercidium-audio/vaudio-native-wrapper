@@ -10,10 +10,6 @@ namespace vaudionativewrapper.managed
     {
         public IntPtr native;
 
-        // Must keep these to prevent garbage collection
-        GCHandle handleLF;
-        GCHandle handleHF;
-
 #if DEBUG
         private readonly bool owns;
         string stackTrace;
@@ -72,52 +68,49 @@ namespace vaudionativewrapper.managed
         public VAResult Destroy()
         {
             var result = AirAbsorptionSettingsBindings.Destroy(native);
+
+            if (result == VAResult.Success)
+            {
+                formulaLFHandlers.Remove(native);
+                formulaHFHandlers.Remove(native);
+            }
+
             native = IntPtr.Zero;
             return result;
         }
 
-        /// <remarks>Not supported on Unity's IL2CPP backend yet, as the native formula isn't passed its settings</remarks>
-        public AirAbsorptionFormulaDelegate SetCustomFormulaLF(Func<float, float> value)
+        // Handlers are keyed by the settings' native pointer, which is passed to native as the formula's userData, since the raytracing threads invoke the formulas on a per-frame copy of the settings. See CallbackTable
+        static readonly CallbackTable<Func<float, float>> formulaLFHandlers = new CallbackTable<Func<float, float>>();
+        static readonly CallbackTable<Func<float, float>> formulaHFHandlers = new CallbackTable<Func<float, float>>();
+
+        static readonly AirAbsorptionFormulaDelegate formulaLFNative = FormulaLFNative;
+        static readonly AirAbsorptionFormulaDelegate formulaHFNative = FormulaHFNative;
+
+        // The handler is only missing if the settings were destroyed while a frame was in flight, so fall back to no energy loss
+        [AOT.MonoPInvokeCallback(typeof(AirAbsorptionFormulaDelegate))]
+        static float FormulaLFNative(float distance, IntPtr settings) => formulaLFHandlers.Get(settings)?.Invoke(distance) ?? 1;
+
+        [AOT.MonoPInvokeCallback(typeof(AirAbsorptionFormulaDelegate))]
+        static float FormulaHFNative(float distance, IntPtr settings) => formulaHFHandlers.Get(settings)?.Invoke(distance) ?? 1;
+
+        // A cleared formula keeps its handler until the settings are destroyed, as a frame in flight may still invoke it
+        AirAbsorptionFormulaDelegate SetCustomFormula(CallbackTable<Func<float, float>> handlers, Func<float, float> value, Func<IntPtr, AirAbsorptionFormulaDelegate, IntPtr, VAResult> set, AirAbsorptionFormulaDelegate trampoline)
         {
-            if (handleLF.IsAllocated)
-                handleLF.Free();
-
-            if (value != null)
+            if (value == null)
             {
-                float callback(float distance) => value(distance);
-                var del = (AirAbsorptionFormulaDelegate)callback;
-                handleLF = GCHandle.Alloc(del);
-
-                AirAbsorptionSettingsBindings.SetCustomFormulaLF(native, Marshal.GetFunctionPointerForDelegate(del)).ThrowIfError();
-                return del;
-            }
-            else
-            {
-                AirAbsorptionSettingsBindings.SetCustomFormulaLF(native, IntPtr.Zero).ThrowIfError();
+                set(native, null, IntPtr.Zero).ThrowIfError();
                 return null;
             }
+
+            handlers.Set(native, value);
+            set(native, trampoline, native).ThrowIfError();
+            return trampoline;
         }
 
-        /// <remarks>Not supported on Unity's IL2CPP backend yet, as the native formula isn't passed its settings</remarks>
-        public AirAbsorptionFormulaDelegate SetCustomFormulaHF(Func<float, float> value)
-        {
-            if (handleHF.IsAllocated)
-                handleHF.Free();
+        /// <summary>Set a custom air absorption formula for low frequencies. Takes distance (meters) and returns energy loss as a percentage. Invoked on the raytracing threads. Pass null to use the default formula.</summary>
+        public AirAbsorptionFormulaDelegate SetCustomFormulaLF(Func<float, float> value) => SetCustomFormula(formulaLFHandlers, value, AirAbsorptionSettingsBindings.SetCustomFormulaLF, formulaLFNative);
 
-            if (value != null)
-            {
-                float callback(float distance) => value(distance);
-                var del = (AirAbsorptionFormulaDelegate)callback;
-                handleHF = GCHandle.Alloc(del);
-
-                AirAbsorptionSettingsBindings.SetCustomFormulaHF(native, Marshal.GetFunctionPointerForDelegate(del)).ThrowIfError();
-                return del;
-            }
-            else
-            {
-                AirAbsorptionSettingsBindings.SetCustomFormulaHF(native, IntPtr.Zero).ThrowIfError();
-                return null;
-            }
-        }
+        /// <summary>Set a custom air absorption formula for high frequencies. Takes distance (meters) and returns energy loss as a percentage. Invoked on the raytracing threads. Pass null to use the default formula.</summary>
+        public AirAbsorptionFormulaDelegate SetCustomFormulaHF(Func<float, float> value) => SetCustomFormula(formulaHFHandlers, value, AirAbsorptionSettingsBindings.SetCustomFormulaHF, formulaHFNative);
     }
 }

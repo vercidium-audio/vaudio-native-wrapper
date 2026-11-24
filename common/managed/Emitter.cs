@@ -9,6 +9,8 @@ using VAFloat = System.Double;
 using VAFloat = System.Single;
 #endif
 
+using GainFormulaFunc = System.Func<bool, int, int, int, float, float, float>;
+
 namespace vaudionativewrapper.managed
 {
     /// <summary>Emitters cast rays and can be discovered by other emitters</summary>
@@ -593,6 +595,8 @@ namespace vaudionativewrapper.managed
         static readonly CallbackTable<Action<VisualisationData[]>> visualisationHandlers = new CallbackTable<Action<VisualisationData[]>>();
         static readonly CallbackTable<Action<string>> logHandlers = new CallbackTable<Action<string>>();
         static readonly CallbackTable<Action<string>> logErrorHandlers = new CallbackTable<Action<string>>();
+        static readonly CallbackTable<GainFormulaFunc> gainFormulaHandlers = new CallbackTable<GainFormulaFunc>();
+        static readonly CallbackTable<GainFormulaFunc> ambientGainFormulaHandlers = new CallbackTable<GainFormulaFunc>();
 
         static readonly OnRaytracingCompleteFn onRaytracingCompleteNative = OnRaytracingCompleteNative;
         static readonly OnRaytracedByAnotherEmitterFn onRaytracedByAnotherEmitterNative = OnRaytracedByAnotherEmitterNative;
@@ -600,6 +604,8 @@ namespace vaudionativewrapper.managed
         static readonly VisualisationCallbackFn visualisationNative = VisualisationNative;
         static readonly LogCallbackFn logNative = LogNative;
         static readonly LogCallbackFn logErrorNative = LogErrorNative;
+        static readonly GainFormulaDelegate gainFormulaNative = GainFormulaNative;
+        static readonly GainFormulaDelegate ambientGainFormulaNative = AmbientGainFormulaNative;
 
         [AOT.MonoPInvokeCallback(typeof(OnRaytracingCompleteFn))]
         static void OnRaytracingCompleteNative(IntPtr emitter) => onRaytracingCompleteHandlers.Get(emitter)?.Invoke();
@@ -633,6 +639,15 @@ namespace vaudionativewrapper.managed
         [AOT.MonoPInvokeCallback(typeof(LogCallbackFn))]
         static void LogErrorNative(IntPtr emitter, string message) => logErrorHandlers.Get(emitter)?.Invoke(message);
 
+        // Invoked on the raytracing threads. The handler is only missing if native raced a clear, so fall back to full volume
+        [AOT.MonoPInvokeCallback(typeof(GainFormulaDelegate))]
+        static float GainFormulaNative(IntPtr emitter, bool lowFrequency, int occlusionRayCount, int permeationRayCount, int permeationBounceCount, float occlusionEnergy, float permeationEnergy) =>
+            gainFormulaHandlers.Get(emitter)?.Invoke(lowFrequency, occlusionRayCount, permeationRayCount, permeationBounceCount, occlusionEnergy, permeationEnergy) ?? 1;
+
+        [AOT.MonoPInvokeCallback(typeof(GainFormulaDelegate))]
+        static float AmbientGainFormulaNative(IntPtr emitter, bool lowFrequency, int occlusionRayCount, int permeationRayCount, int permeationBounceCount, float occlusionEnergy, float permeationEnergy) =>
+            ambientGainFormulaHandlers.Get(emitter)?.Invoke(lowFrequency, occlusionRayCount, permeationRayCount, permeationBounceCount, occlusionEnergy, permeationEnergy) ?? 1;
+
         // Native can no longer invoke this emitter's callbacks
         static void RemoveCallbacks(IntPtr emitter)
         {
@@ -642,10 +657,32 @@ namespace vaudionativewrapper.managed
             visualisationHandlers.Remove(emitter);
             logHandlers.Remove(emitter);
             logErrorHandlers.Remove(emitter);
+            gainFormulaHandlers.Remove(emitter);
+            ambientGainFormulaHandlers.Remove(emitter);
         }
 
-        private GCHandle _gainFormulaHandle;
-        private GCHandle _ambientGainFormulaHandle;
+        // Native validates a new formula by invoking it, so its handler is registered first and the previous one restored if native rejects it. A cleared formula keeps its handler until the emitter is destroyed, as the raytracing threads may still be invoking it
+        void SetGainFormula(CallbackTable<GainFormulaFunc> handlers, GainFormulaFunc value, Func<IntPtr, GainFormulaDelegate, VAResult> set, GainFormulaDelegate trampoline)
+        {
+            if (value == null)
+            {
+                set(native, null).ThrowIfError();
+                return;
+            }
+
+            var previous = handlers.Get(native);
+            handlers.Set(native, value);
+
+            try
+            {
+                set(native, trampoline).ThrowIfError();
+            }
+            catch
+            {
+                handlers.Set(native, previous);
+                throw;
+            }
+        }
 
         /// <summary>This callback is invoked when this emitter has cast its reverb and ambient rays for the first time.</summary>
         public Action OnRaytracingComplete
@@ -678,48 +715,30 @@ namespace vaudionativewrapper.managed
             set => EmitterBindings.SetVisualisationCallback(native, visualisationHandlers.Set(native, value) ? visualisationNative : null).ThrowIfError();
         }
 
-        /// <remarks>Not supported on Unity's IL2CPP backend yet, as the native formula isn't passed the emitter</remarks>
-        public Func<bool, int, int, int, float, float, float> GainFormula
+        /// <summary>
+        /// A custom formula that calculates how muffled this emitter is, relative to another emitter.<br/>
+        /// This is invoked for both low-frequency and high-frequency energy and the values it returns are stored in the other emitter's low pass filter, accessed via GetTargetFilter.<br/>
+        /// Set to null to use the default formula.<br/>
+        /// This formula is invoked on background threads. Do not attempt to access data from the main thread within this function.<br/>
+        /// Parameters: (bool lowFrequency, int occlusionRayCount, int permeationRayCount, int permeationBounceCount, float occlusionEnergy, float permeationEnergy)<br/>
+        /// Returns: float between 0.0f and 1.0f (inclusive)
+        /// </summary>
+        public GainFormulaFunc GainFormula
         {
-            set
-            {
-                if (_gainFormulaHandle.IsAllocated)
-                    _gainFormulaHandle.Free();
-
-                if (value != null)
-                {
-                    GainFormulaDelegate callback = (lf, ocRay, permRay, permBounce, ocEnergy, permEnergy) =>
-                        value(lf, ocRay, permRay, permBounce, ocEnergy, permEnergy);
-                    _gainFormulaHandle = GCHandle.Alloc(callback);
-                    EmitterBindings.SetGainFormula(native, Marshal.GetFunctionPointerForDelegate(callback)).ThrowIfError();
-                }
-                else
-                {
-                    EmitterBindings.SetGainFormula(native, IntPtr.Zero).ThrowIfError();
-                }
-            }
+            set => SetGainFormula(gainFormulaHandlers, value, EmitterBindings.SetGainFormula, gainFormulaNative);
         }
 
-        /// <remarks>Not supported on Unity's IL2CPP backend yet, as the native formula isn't passed the emitter</remarks>
-        public Func<bool, int, int, int, float, float, float> AmbientGainFormula
+        /// <summary>
+        /// A custom formula that calculates how muffled ambience is relative to this emitter.<br/>
+        /// This is invoked for both low-frequency and high-frequency energy and the values it returns are stored in this emitter's AmbientFilter.<br/>
+        /// Set to null to use the default formula.<br/>
+        /// This formula is invoked on the main thread.<br/>
+        /// Parameters: (bool lowFrequency, int ambientOcclusionRayCount, int ambientPermeationRayCount, int ambientPermeationBounceCount, float ambientOcclusionEnergy, float ambientPermeationEnergy)<br/>
+        /// Returns: float between 0.0f and 1.0f (inclusive)
+        /// </summary>
+        public GainFormulaFunc AmbientGainFormula
         {
-            set
-            {
-                if (_ambientGainFormulaHandle.IsAllocated)
-                    _ambientGainFormulaHandle.Free();
-
-                if (value != null)
-                {
-                    GainFormulaDelegate callback = (lf, ocRay, permRay, permBounce, ocEnergy, permEnergy) =>
-                        value(lf, ocRay, permRay, permBounce, ocEnergy, permEnergy);
-                    _ambientGainFormulaHandle = GCHandle.Alloc(callback);
-                    EmitterBindings.SetAmbientGainFormula(native, Marshal.GetFunctionPointerForDelegate(callback)).ThrowIfError();
-                }
-                else
-                {
-                    EmitterBindings.SetAmbientGainFormula(native, IntPtr.Zero).ThrowIfError();
-                }
-            }
+            set => SetGainFormula(ambientGainFormulaHandlers, value, EmitterBindings.SetAmbientGainFormula, ambientGainFormulaNative);
         }
 
         /// <summary>A custom log callback. Defaults to Console.WriteLine()</summary>
