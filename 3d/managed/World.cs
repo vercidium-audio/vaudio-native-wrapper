@@ -1,5 +1,9 @@
 ﻿// Human-created
 
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+
 #if VA_DOUBLE_PRECISION
 using VAFloat = System.Double;
 #else
@@ -9,19 +13,24 @@ using VAFloat = System.Single;
 namespace vaudionativewrapper.managed
 {
     /// <summary>A standalone world with its own primitives, emitters, materials and settings. Manages its own raytracing and multithreading.</summary>
-    public partial class World
+    public unsafe partial class World
     {
         UnsafeVoxelMaterialMap unsafeVoxelMaterialMap;
 
-        // Both delegates native holds pointers to
-        sealed class UnsafeVoxelCallbacks
-        {
-            public UnsafeVoxelMaterialCallback getMaterial;
-            public UnsafeVoxelIsSolidCallback isSolid;
-        }
+        // Static so IL2CPP can marshal them. Native passes back userData, a GCHandle to the map
+        static readonly UnsafeVoxelMaterialCallback getMaterialNative = GetMaterialNative;
+        static readonly UnsafeVoxelIsSolidCallback isSolidNative = IsSolidNative;
+        static readonly IntPtr getMaterialNativePtr = Marshal.GetFunctionPointerForDelegate(getMaterialNative);
+        static readonly IntPtr isSolidNativePtr = Marshal.GetFunctionPointerForDelegate(isSolidNative);
 
-        // Keeps the delegates alive while native holds pointers to them
-        System.Runtime.InteropServices.GCHandle unsafeVoxelCallbacksHandle;
+        [AOT.MonoPInvokeCallback(typeof(UnsafeVoxelMaterialCallback))]
+        static MaterialType GetMaterialNative(void* voxel, IntPtr userData) => ((UnsafeVoxelMaterialMap)GCHandle.FromIntPtr(userData).Target).GetMaterial(voxel);
+
+        [AOT.MonoPInvokeCallback(typeof(UnsafeVoxelIsSolidCallback))]
+        static bool IsSolidNative(void* voxel, IntPtr userData) => ((UnsafeVoxelMaterialMap)GCHandle.FromIntPtr(userData).Target).IsSolid(voxel);
+
+        // One handle per map assigned to this world. In-flight raytracing threads may still use a replaced map's handle, so they're only freed once the world is destroyed
+        readonly Dictionary<UnsafeVoxelMaterialMap, GCHandle> unsafeVoxelMapHandles = new Dictionary<UnsafeVoxelMaterialMap, GCHandle>();
 
         /// <summary>
         /// Converts a voxel in a UnsafeVoxelPrimitive to a MaterialType.<br/>
@@ -34,58 +43,30 @@ namespace vaudionativewrapper.managed
             {
                 if (value == null)
                 {
-                    WorldBindings.SetUnsafeVoxelMaterialCallbacks(native, System.IntPtr.Zero, System.IntPtr.Zero, System.IntPtr.Zero).ThrowIfError();
-                    FreeUnsafeVoxelCallbacks();
+                    WorldBindings.SetUnsafeVoxelMaterialCallbacks(native, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero).ThrowIfError();
                     unsafeVoxelMaterialMap = null;
                     return;
                 }
 
-                // Same map, so re-send without creating new delegates
-                if (value == unsafeVoxelMaterialMap)
+                if (!unsafeVoxelMapHandles.TryGetValue(value, out var handle))
                 {
-                    SetUnsafeVoxelCallbacks((UnsafeVoxelCallbacks)unsafeVoxelCallbacksHandle.Target);
-                    return;
+                    handle = GCHandle.Alloc(value);
+                    unsafeVoxelMapHandles[value] = handle;
                 }
 
-                var callbacks = new UnsafeVoxelCallbacks
-                {
-                    getMaterial = (voxel, userData) => value.GetMaterial(voxel),
-                    isSolid = (voxel, userData) => value.IsSolid(voxel),
-                };
-
-                var handle = System.Runtime.InteropServices.GCHandle.Alloc(callbacks);
-
-                try
-                {
-                    SetUnsafeVoxelCallbacks(callbacks);
-                }
-                catch
-                {
-                    handle.Free();
-                    throw;
-                }
-
-                // Native no longer references the previous delegates
-                FreeUnsafeVoxelCallbacks();
-                unsafeVoxelCallbacksHandle = handle;
+                // Re-sending the same map re-casts rays that hit UnsafeVoxelPrimitives
+                WorldBindings.SetUnsafeVoxelMaterialCallbacks(native, getMaterialNativePtr, isSolidNativePtr, GCHandle.ToIntPtr(handle)).ThrowIfError();
                 unsafeVoxelMaterialMap = value;
             }
         }
 
-        void SetUnsafeVoxelCallbacks(UnsafeVoxelCallbacks callbacks)
+        partial void OnDestroyDimensional()
         {
-            var getMaterial = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(callbacks.getMaterial);
-            var isSolid = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(callbacks.isSolid);
-            WorldBindings.SetUnsafeVoxelMaterialCallbacks(native, getMaterial, isSolid, System.IntPtr.Zero).ThrowIfError();
-        }
+            foreach (var handle in unsafeVoxelMapHandles.Values)
+                handle.Free();
 
-        void FreeUnsafeVoxelCallbacks()
-        {
-            if (unsafeVoxelCallbacksHandle.IsAllocated)
-                unsafeVoxelCallbacksHandle.Free();
+            unsafeVoxelMapHandles.Clear();
         }
-
-        partial void OnDestroyDimensional() => FreeUnsafeVoxelCallbacks();
 
         /// <summary>The pitch of the camera in the debug window (dev build only)</summary>
         public VAFloat CameraPitch

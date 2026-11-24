@@ -253,6 +253,9 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetRenderingEnabled")]
         [return: MarshalAs(UnmanagedType.U1)]
         public static extern bool GetRenderingEnabled(IntPtr world);
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldGetDebugWindowConnected")]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static extern bool GetDebugWindowConnected(IntPtr world);
 
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaWorldSetManualCamera")]
         public static extern VAResult SetManualCamera(IntPtr world, bool value);

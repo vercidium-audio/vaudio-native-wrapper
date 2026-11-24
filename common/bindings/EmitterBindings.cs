@@ -15,13 +15,13 @@ namespace vaudionativewrapper
     public delegate void OnRaytracingCompleteFn(IntPtr emitter);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void OnReverbUpdatedFn();
+    public delegate void OnReverbUpdatedFn(IntPtr world);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void OnRaytracedByAnotherEmitterFn(IntPtr source, IntPtr target);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void OnRemovedFn();
+    public delegate void OnRemovedFn(IntPtr emitter);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public unsafe delegate void VisualisationCallbackFn(IntPtr emitter, VisualisationData* data, int count);
