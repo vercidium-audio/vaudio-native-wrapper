@@ -15,6 +15,10 @@ namespace vaudionativewrapper.managed
         public CustomEAXFormulas_CalculateFrequencyGainsDelegate CalculateFrequencyGains;
         public CustomEAXFormulas_CalculateReflectionsAndLateReverbGainDelegate CalculateReflectionsAndLateReverbGain;
         public CustomEAXFormulas_CalculateRT60Delegate CalculateRT60;
+        public CustomEAXFormulas_CalculateHighCutDelegate CalculateHighCut;
+        public CustomEAXFormulas_CalculateLowShelfGainDelegate CalculateLowShelfGain;
+        public CustomEAXFormulas_CalculateWetLevelDelegate CalculateWetLevel;
+        public CustomEAXFormulas_CalculateEarlyLateMixDelegate CalculateEarlyLateMix;
     }
 
     public unsafe class CustomEAXFormulaHelper
@@ -33,6 +37,10 @@ namespace vaudionativewrapper.managed
             CalculateFrequencyGains = CalculateFrequencyGainsNative,
             CalculateReflectionsAndLateReverbGain = CalculateReflectionsAndLateReverbGainNative,
             CalculateRT60 = CalculateRT60Native,
+            CalculateHighCut = CalculateHighCutNative,
+            CalculateLowShelfGain = CalculateLowShelfGainNative,
+            CalculateWetLevel = CalculateWetLevelNative,
+            CalculateEarlyLateMix = CalculateEarlyLateMixNative,
         };
 
         static float[] ToManaged(float* data, int length)
@@ -58,6 +66,10 @@ namespace vaudionativewrapper.managed
             nativeFormulas->calculateFrequencyGains = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateFrequencyGains);
             nativeFormulas->calculateReflectionsAndLateReverbGain = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateReflectionsAndLateReverbGain);
             nativeFormulas->calculateRT60 = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateRT60);
+            nativeFormulas->calculateHighCut = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateHighCut);
+            nativeFormulas->calculateLowShelfGain = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateLowShelfGain);
+            nativeFormulas->calculateWetLevel = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateWetLevel);
+            nativeFormulas->calculateEarlyLateMix = Marshal.GetFunctionPointerForDelegate(callbacks.CalculateEarlyLateMix);
 
             return callbacks;
         }
@@ -114,5 +126,17 @@ namespace vaudionativewrapper.managed
 
         [AOT.MonoPInvokeCallback(typeof(CustomEAXFormulas_CalculateRT60Delegate))]
         static float CalculateRT60Native(vaudionativewrapper.CustomEAXFormulas* formulas, float* echogram, int echogramLength) => Get(formulas).CalculateRT60(ToManaged(echogram, echogramLength));
+
+        [AOT.MonoPInvokeCallback(typeof(CustomEAXFormulas_CalculateHighCutDelegate))]
+        static float CalculateHighCutNative(vaudionativewrapper.CustomEAXFormulas* formulas, float hfReference) => Get(formulas).CalculateHighCut(hfReference);
+
+        [AOT.MonoPInvokeCallback(typeof(CustomEAXFormulas_CalculateLowShelfGainDelegate))]
+        static float CalculateLowShelfGainNative(vaudionativewrapper.CustomEAXFormulas* formulas) => Get(formulas).CalculateLowShelfGain();
+
+        [AOT.MonoPInvokeCallback(typeof(CustomEAXFormulas_CalculateWetLevelDelegate))]
+        static float CalculateWetLevelNative(vaudionativewrapper.CustomEAXFormulas* formulas, float earlyLateTransitionMs, float referenceEnergy, float gain) => Get(formulas).CalculateWetLevel(earlyLateTransitionMs, referenceEnergy, gain);
+
+        [AOT.MonoPInvokeCallback(typeof(CustomEAXFormulas_CalculateEarlyLateMixDelegate))]
+        static float CalculateEarlyLateMixNative(vaudionativewrapper.CustomEAXFormulas* formulas, float earlyLateTransitionMs) => Get(formulas).CalculateEarlyLateMix(earlyLateTransitionMs);
     }
 }

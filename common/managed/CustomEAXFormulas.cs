@@ -223,27 +223,7 @@ namespace vaudionativewrapper.managed
         /// <summary>Calculates the gain for early reflections and late reverb by splitting the echogram at a transition point</summary>
         public virtual void CalculateReflectionsAndLateReverbGain(float earlyLateTransitionMs, float referenceEnergy, out float reflectionsGain, out float lateReverbGain)
         {
-            int transitionBin = (int)(earlyLateTransitionMs / binDurationMs);
-
-            // Calculate energy in early reflections
-            float earlyEnergyLF = 0f;
-            float earlyEnergyHF = 0f;
-
-            for (int i = 0; i < Math.Min(transitionBin, echogramLF.Length); i++)
-            {
-                earlyEnergyLF += echogramLF[i];
-                earlyEnergyHF += echogramHF[i];
-            }
-
-            // Calculate energy in late reverb
-            float lateEnergyLF = 0f;
-            float lateEnergyHF = 0f;
-
-            for (int i = transitionBin; i < echogramLF.Length; i++)
-            {
-                lateEnergyLF += echogramLF[i];
-                lateEnergyHF += echogramHF[i];
-            }
+            GetEarlyAndLateEnergy(earlyLateTransitionMs, out float earlyEnergyLF, out float earlyEnergyHF, out float lateEnergyLF, out float lateEnergyHF);
 
             // Average both frequency bands
             float earlyEnergy = (earlyEnergyLF + earlyEnergyHF) * 0.5f;
@@ -259,6 +239,125 @@ namespace vaudionativewrapper.managed
             // Calculate gains relative to reference energy
             reflectionsGain = MathF.Sqrt(earlyEnergy / referenceEnergy);
             lateReverbGain = MathF.Sqrt(lateEnergy / referenceEnergy);
+        }
+
+        // The HF and LF amplitudes of the returned energy, relative to the louder of the two. 1 when nothing returned
+        void GetRelativeBandGains(out float lf, out float hf)
+        {
+            float loudest = MathF.Max(totalReturnedEnergyLF, totalReturnedEnergyHF);
+
+            if (loudest <= 0f)
+            {
+                lf = 1f;
+                hf = 1f;
+                return;
+            }
+
+            lf = MathF.Sqrt(totalReturnedEnergyLF / loudest);
+            hf = MathF.Sqrt(totalReturnedEnergyHF / loudest);
+        }
+
+        /// <summary>Calculates the cutoff frequency of a low-pass filter that attenuates the reverb at <paramref name="hfReference"/> by as much as its high frequencies were absorbed, relative to its low frequencies</summary>
+        /// <param name="hfReference">The reference frequency of the high-frequency band, in Hz</param>
+        /// <returns>Cutoff frequency in Hz, or 20000 if the high frequencies aren't quieter</returns>
+        public virtual float CalculateHighCut(float hfReference)
+        {
+            GetRelativeBandGains(out _, out float gain);
+
+            if (gain >= 1f)
+                return HIGH_CUT_MAX;
+
+            // Fitted to FMOD's SFX reverb presets, which match their EFX equivalents' GainHF at 5kHz to within 1.3%
+            return hfReference * MathF.Sqrt(gain / (1f - gain));
+        }
+
+        /// <summary>Calculates the gain of a low-shelf filter, for how much more the reverb's low frequencies were absorbed than its high frequencies</summary>
+        /// <returns>Gain in decibels, 0 if the low frequencies aren't quieter</returns>
+        public virtual float CalculateLowShelfGain()
+        {
+            GetRelativeBandGains(out float gain, out _);
+            return GainToDecibels(gain);
+        }
+
+        /// <summary>Calculates the level of the reverb signal, from the louder of its early reflections and late reverb in the louder frequency band, so <see cref="CalculateHighCut"/> and <see cref="CalculateLowShelfGain"/> only ever cut from it</summary>
+        /// <param name="earlyLateTransitionMs">Time in milliseconds marking the boundary between early and late energy</param>
+        /// <param name="referenceEnergy">Reference energy used to normalise the level</param>
+        /// <param name="gain">Overall linear gain of the reverb, i.e. EAXReverb.Gain</param>
+        /// <returns>Level in decibels</returns>
+        public virtual float CalculateWetLevel(float earlyLateTransitionMs, float referenceEnergy, float gain)
+        {
+            // Same fallback level as CalculateReflectionsAndLateReverbGain's late reverb
+            if (referenceEnergy <= 0f)
+                return GainToDecibels(gain * 0.1f);
+
+            GetLouderBandEarlyAndLateEnergy(earlyLateTransitionMs, out float early, out float late);
+            float energy = MathF.Max(early, late);
+
+            if (energy <= 0f)
+                return WET_LEVEL_MIN;
+
+            return GainToDecibels(gain * MathF.Sqrt(energy / referenceEnergy));
+        }
+
+        /// <summary>Calculates the late reverb amplitude's share of the early reflections + late reverb amplitudes. 0 is only early reflections, 100 is only late reverb</summary>
+        /// <param name="earlyLateTransitionMs">Time in milliseconds marking the boundary between early and late energy</param>
+        /// <returns>Mix in percent, or 50 if nothing returned</returns>
+        public virtual float CalculateEarlyLateMix(float earlyLateTransitionMs)
+        {
+            GetLouderBandEarlyAndLateEnergy(earlyLateTransitionMs, out float early, out float late);
+
+            float earlyGain = MathF.Sqrt(early);
+            float lateGain = MathF.Sqrt(late);
+            float total = earlyGain + lateGain;
+
+            if (total <= 0f)
+                return 50f;
+
+            return lateGain / total * 100f;
+        }
+
+        const float HIGH_CUT_MAX = 20000f;
+        const float WET_LEVEL_MIN = -80f;
+
+        // The early and late energy of whichever band returned more energy, which WetLevel and EarlyLateMix describe so HighCut and LowShelfGain only cut from it
+        void GetLouderBandEarlyAndLateEnergy(float earlyLateTransitionMs, out float early, out float late)
+        {
+            GetEarlyAndLateEnergy(earlyLateTransitionMs, out float earlyEnergyLF, out float earlyEnergyHF, out float lateEnergyLF, out float lateEnergyHF);
+
+            bool lfLouder = earlyEnergyLF + lateEnergyLF >= earlyEnergyHF + lateEnergyHF;
+            early = lfLouder ? earlyEnergyLF : earlyEnergyHF;
+            late = lfLouder ? lateEnergyLF : lateEnergyHF;
+        }
+
+        /// <summary>Sums each band's echogram energy before and after <paramref name="earlyLateTransitionMs"/></summary>
+        protected void GetEarlyAndLateEnergy(float earlyLateTransitionMs, out float earlyEnergyLF, out float earlyEnergyHF, out float lateEnergyLF, out float lateEnergyHF)
+        {
+            int transitionBin = (int)(earlyLateTransitionMs / binDurationMs);
+
+            earlyEnergyLF = 0f;
+            earlyEnergyHF = 0f;
+
+            for (int i = 0; i < Math.Min(transitionBin, echogramLF.Length); i++)
+            {
+                earlyEnergyLF += echogramLF[i];
+                earlyEnergyHF += echogramHF[i];
+            }
+
+            lateEnergyLF = 0f;
+            lateEnergyHF = 0f;
+
+            for (int i = transitionBin; i < echogramLF.Length; i++)
+            {
+                lateEnergyLF += echogramLF[i];
+                lateEnergyHF += echogramHF[i];
+            }
+        }
+
+        /// <summary>Converts a linear amplitude gain to decibels, flooring silence at -80dB</summary>
+        protected static float GainToDecibels(float gain)
+        {
+            const float minGain = 0.0001f; // -80dB
+            return 20f * MathF.Log10(MathF.Max(gain, minGain));
         }
 
         /// <summary>Calculates the RT60 reverberation time in seconds for a given echogram using the Schroeder backward-integrated decay curve</summary>

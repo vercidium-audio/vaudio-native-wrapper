@@ -56,6 +56,14 @@ namespace vaudionativewrapper.managed
         public float RoomRolloffFactor => native->roomRolloffFactor;
         /// <summary>Whether to limit high-frequency decay time to the air absorption limit (0 or 1)</summary>
         public int DecayHFLimit => native->decayHFLimit;
+        /// <summary>Cutoff frequency of a low-pass filter on the reverb, in Hz (20–20000). Matches FMOD's DSP_SFXREVERB.HIGHCUT</summary>
+        public float HighCut => native->highCut;
+        /// <summary>Gain of a low-shelf filter on the reverb at <see cref="LFReference"/>, in decibels (-36–12). Matches FMOD's DSP_SFXREVERB.LOWSHELFGAIN</summary>
+        public float LowShelfGain => native->lowShelfGain;
+        /// <summary>Level of the reverb signal, in decibels (-80–20). <see cref="HighCut"/> and <see cref="LowShelfGain"/> only cut from it. Matches FMOD's DSP_SFXREVERB.WETLEVEL</summary>
+        public float WetLevel => native->wetLevel;
+        /// <summary>Blend of late reverb to early reflections, in percent (0–100). 0 is only early reflections, 100 is only late reverb. Matches FMOD's DSP_SFXREVERB.EARLYLATEMIX</summary>
+        public float EarlyLateMix => native->earlyLateMix;
 
         /// <summary>
         /// The direction that reverb should be heard from for the provided emitter, which must have HasRelativeReverb set to true. Returns null if no entry exists for this emitter.<br/>

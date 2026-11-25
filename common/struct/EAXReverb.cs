@@ -42,6 +42,10 @@ namespace vaudionativewrapper
         public float lfReference;
         public float roomRolloffFactor;
         public int decayHFLimit;
+        public float highCut;
+        public float lowShelfGain;
+        public float wetLevel;
+        public float earlyLateMix;
 
         // Ignore this
         private int internalData;

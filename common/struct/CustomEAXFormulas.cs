@@ -32,6 +32,18 @@ namespace vaudionativewrapper
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public unsafe delegate float CustomEAXFormulas_TryCalculateDecayTimeDelegate(CustomEAXFormulas* formulas, float* echogramDb, int echogramDbLength, int peakIndex, float peakDb, float binDurationMs, float targetDecayDb, float scaleFactor);
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public unsafe delegate float CustomEAXFormulas_CalculateHighCutDelegate(CustomEAXFormulas* formulas, float hfReference);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public unsafe delegate float CustomEAXFormulas_CalculateLowShelfGainDelegate(CustomEAXFormulas* formulas);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public unsafe delegate float CustomEAXFormulas_CalculateWetLevelDelegate(CustomEAXFormulas* formulas, float earlyLateTransitionMs, float referenceEnergy, float gain);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public unsafe delegate float CustomEAXFormulas_CalculateEarlyLateMixDelegate(CustomEAXFormulas* formulas, float earlyLateTransitionMs);
+
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct CustomEAXFormulas
     {
@@ -44,6 +56,10 @@ namespace vaudionativewrapper
         public IntPtr calculateReflectionsAndLateReverbGain;
         public IntPtr calculateRT60;
         public IntPtr tryCalculateDecayTime;
+        public IntPtr calculateHighCut;
+        public IntPtr calculateLowShelfGain;
+        public IntPtr calculateWetLevel;
+        public IntPtr calculateEarlyLateMix;
 
         public float* tempDiffusionCumulative;
         public int tempDiffusionCumulativeLength;
