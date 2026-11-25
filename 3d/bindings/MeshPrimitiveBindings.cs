@@ -10,6 +10,15 @@ namespace vaudionativewrapper
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaMeshPrimitiveCreate")]
         public static extern VAResult Create(MaterialType material, in Vector vertices, int vertexCount, Vector minBounds, Vector maxBounds, ref Matrix transform, out IntPtr outPrimitive);
 
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaMeshPrimitiveCreateWithMaterials")]
+        public static extern VAResult CreateWithMaterials(MaterialType material, in Vector vertices, in MaterialType triangleMaterials, int vertexCount, Vector minBounds, Vector maxBounds, ref Matrix transform, out IntPtr outPrimitive);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaMeshPrimitiveSetPermeationMaterial")]
+        public static extern VAResult SetPermeationMaterial(IntPtr primitive, MaterialType material);
+
+        [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaMeshPrimitiveGetPermeationMaterial")]
+        public static extern MaterialType GetPermeationMaterial(IntPtr primitive);
+
         [DllImport(Constants.DLL_NAME, CallingConvention = CallingConvention.Cdecl, EntryPoint = "vaMeshPrimitiveDestroy")]
         public static extern VAResult Destroy(IntPtr primitive);
 

@@ -20,6 +20,18 @@ namespace vaudionativewrapper.managed
             mesh = new Mesh(MeshPrimitiveBindings.GetMesh(native));
         }
 
+        /// <summary>Create a mesh primitive from a list of vertices, with a material per triangle</summary>
+        public MeshPrimitive(MaterialType material, List<Vector> vertices, List<MaterialType> triangleMaterials, Vector minBounds, Vector maxBounds, Matrix transform) : this(material, vertices.ToArray(), triangleMaterials.ToArray(), minBounds, maxBounds, transform) { }
+
+        /// <summary>Create a mesh primitive from an array or span of vertices, with a material per triangle (see the <see cref="Mesh"/> constructor). material is used for <see cref="MaterialType.Air"/> triangles and as the last permeation material fallback, and must not be <see cref="MaterialType.Air"/>.</summary>
+        public MeshPrimitive(MaterialType material, ReadOnlySpan<Vector> vertices, ReadOnlySpan<MaterialType> triangleMaterials, Vector minBounds, Vector maxBounds, Matrix transform)
+        {
+            Mesh.CheckTriangleMaterialCount(vertices.Length, triangleMaterials.Length);
+            MeshPrimitiveBindings.CreateWithMaterials(material, in MemoryMarshal.GetReference(vertices), in MemoryMarshal.GetReference(triangleMaterials), vertices.Length, minBounds, maxBounds, ref transform, out native).ThrowIfError();
+            owns = true;
+            mesh = new Mesh(MeshPrimitiveBindings.GetMesh(native));
+        }
+
         /// <summary>Create a mesh primitive that shares geometry with a Mesh. The BVH is built once in the Mesh and reused by every instance.</summary>
         public MeshPrimitive(MaterialType material, Mesh mesh, Matrix transform)
         {
@@ -39,6 +51,13 @@ namespace vaudionativewrapper.managed
         {
             get => *MeshPrimitiveBindings.GetTransform(native);
             set => MeshPrimitiveBindings.SetTransform(native, ref value).ThrowIfError();
+        }
+
+        /// <summary>The material used for transmission through this primitive's interior (depth permeation), overriding <see cref="Mesh.PermeationMaterial"/>. <see cref="MaterialType.Air"/> (default) means "use the mesh's permeation material, else this primitive's material". Flat transmission always uses the material of the triangle that was hit.</summary>
+        public MaterialType PermeationMaterial
+        {
+            get => MeshPrimitiveBindings.GetPermeationMaterial(native);
+            set => MeshPrimitiveBindings.SetPermeationMaterial(native, value).ThrowIfError();
         }
 
         protected override VAResult DestroyNative(IntPtr native) => MeshPrimitiveBindings.Destroy(native);

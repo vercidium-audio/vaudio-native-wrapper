@@ -24,9 +24,34 @@ namespace vaudionativewrapper.managed
             owns = true;
         }
 
+        /// <summary>Create a mesh from a list of vertices, with a material per triangle</summary>
+        public Mesh(List<Vector> vertices, List<MaterialType> triangleMaterials, Vector minBounds, Vector maxBounds) : this(vertices.ToArray(), triangleMaterials.ToArray(), minBounds, maxBounds) { }
+
+        /// <summary>Create a mesh from an array or span of vertices, with a material per triangle. triangleMaterials has one entry per triangle (vertices.Length / 3). <see cref="MaterialType.Air"/> means "use the MeshPrimitive's material". Triangle materials can't be changed after creation.</summary>
+        public Mesh(ReadOnlySpan<Vector> vertices, ReadOnlySpan<MaterialType> triangleMaterials, Vector minBounds, Vector maxBounds)
+        {
+            CheckTriangleMaterialCount(vertices.Length, triangleMaterials.Length);
+            MeshBindings.CreateWithMaterials(in MemoryMarshal.GetReference(vertices), in MemoryMarshal.GetReference(triangleMaterials), vertices.Length, minBounds, maxBounds, out native).ThrowIfError();
+            owns = true;
+        }
+
         internal Mesh(IntPtr native)
         {
             this.native = native;
+        }
+
+        // The native API reads one material per triangle, so a shorter array would read out of bounds
+        internal static void CheckTriangleMaterialCount(int vertexCount, int materialCount)
+        {
+            if (materialCount != vertexCount / 3)
+                throw new ArgumentException($"Expected one material per triangle ({vertexCount / 3}), got {materialCount}");
+        }
+
+        /// <summary>The material used for transmission through this mesh's interior (depth permeation), for every MeshPrimitive using it that doesn't set its own. <see cref="MaterialType.Air"/> (default) means "use the primitive's material".</summary>
+        public MaterialType PermeationMaterial
+        {
+            get => MeshBindings.GetPermeationMaterial(native);
+            set => MeshBindings.SetPermeationMaterial(native, value).ThrowIfError();
         }
 
         /// <summary>Destroy the native mesh. If a world's background threads are still using it, it is freed automatically once they finish.<br/>
