@@ -1,3 +1,5 @@
+// AI-created
+
 using System;
 using System.Collections.Concurrent;
 
